@@ -1,0 +1,106 @@
+
+
+\section{Preliminaries}
+
+\paragraph{Iterated exponential}
+Let $a,b \in \mathbb{R}$, and let $a > 0$. Let $R \geq 1$ be an integer. We define the iterated exponential function as
+\[
+	\exp^R_a(b) := \exp^{R-1}_a(a^b)
+\]
+for $R > 1$, and when $R=1$ define $\exp^1_a(b) = a^b$. Equivalently, 
+\[
+	\exp^R_a(b) := \underbrace{a^{a^{\cdot^{\cdot^{a^b}}}}}_{R}.
+\]
+Furthermore, for convenience we will define $\exp^0_a(b) = b$ and $\exp^0_a(-b) = 1/b$ when $b \geq 0$.
+
+
+\subsection{Quantum interactive protocols} 
+
+We define general quantum interactive protocols between a quantum verifier $V$ and provers $P_1,P_2,\ldots,P_r$. For simplicity, we will restrict our attention to protocols with a single prover $P$. Extending the discussion to multiple provers will be straightforward. 
+
+We can model a single-prover protocol as follows: our Hilbert space consists of three registers: $\sV, \sM, \sP$. The verifier $V$ acts on registers $\sV$ (the verifier's local memory) and $\sM$ (the message register). The prover $P$ acts on $\sM$ and $\sP$ (the prover's local memory). The $\sV$ register initially starts off in the $\ket{0}$ state, but the $\sM$ and $\sP$ registers are arbitrary. The verifier applies a polynomial-size circuit $V_1$ to $\sV \sM$. The prover then applies some unitary $W_1$ (which in general will not be representable by a polynomial size circuit) to $\sM \sP$. The verifier applies $V_2$ to $\sV \sM$, and so on. This continues for polynomially-many steps until the verifier applies a final circuit $V_k$, and the first output qubit of $\sV$ is measured to determine whether the verifier accepts or rejects.
+
+
+We can assume without loss of generality that every operation in this protocol is a reflection. The gates applied by the verifier $V$ are either the Hadamard gate ($H$) or the Toffoli gate ($T$) which are reflections. The prover's unitaries $W_1, W_2,\ldots$ can be made reflections by introducing an ancilla qubit that indicates whether the unitary is to be run forward or backward. In other words, every unitary $W$ can be embedded in a reflection as $\wt{W} = \ketbra{1}{0} \otimes W + \ketbra{0}{1} \otimes W^\dagger$. 
+
+We can now describe the execution of this interactive protocol as a sequence of gates $G_1,G_2,\ldots,G_\tau$ corresponding to the sequence of Hadamard and Toffoli gates of the verifier circuits interleaved with the prover's unitaries $W_i$. In other words, the gate sequence $\{G_t\}$ consists entirely of Hadamard and Toffoli gates except for the prover's unitaries. %Note that $\tau = \poly(n)$ since the interactive protocol runs in polynomial time.
+
+\subsection{Complexity classes}
+
+\begin{definition}[Nondeterministic iterated exponential time]
+	Let $R$ be a positive integer. Then we define
+	\[
+		\NEXPR = \NTIME[\exp^R_2(n)]
+	\]
+\end{definition}
+with $n$ being the input size. 
+
+We now define a canonically complete language for $\NEXPR$. Define $\mathcal{L}_R$ to be the set of all instances $\langle M, 1^n \rangle$ such that $M$, when interpreted as a nondeterministic Turing Machine, accepts after $\exp^R_2(n)$ steps on a blank tape as input.
+
+\begin{definition}[$\MIPstar$]
+	A language $L$ is in $\MIPstar(m,r)$ if there is a $m$-player, $r$-round quantum interactive proof for $L$.
+\end{definition}
+
+
+
+
+
+\subsection{Games}
+
+\paragraph{Extended non-local (ENL) games} In an extended non-local (ENL) game, a quantum referee (which we will also call the \textbf{Extended Verifier}) interacts with one or more quantum players $P_1,\ldots,P_r$. Before the game starts, the players distribute a shared state $\rho_{\sR \sP_1 \cdots \sP_r}$ where the referee gets register $\sR$, and player $i$ gets register $\sP_i$. 
+
+In the game, the referee measures its part of the state, and based on the measurement outcome $s$, generates questions $q_1,\ldots,q_r$ and sends $q_i$ to player $P_i$, who measures $\sP_i$ (depending on $q_i$) and  responds with answer $a_i$. The referee then decides to accept or reject based on a predicate $V(s,q_1,\ldots,q_r,a_1,\ldots,a_r)$.
+
+An extended verifier can thus be described by three circuits: the first is a quantum circuit for the measurement to be performed on $\sR$, the second is a classical circuit that computes questions to the players, as a function of the input and the measurement outcome, and the third is a classical circuit that computes the referee's decision as a function of the measurement outcome, the questions, and the players' answers. 
+
+\begin{definition}
+Given the description of a family of circuits $V$ for the verifier in an ENL, we let $\omega^*(V)$ denote the maximum acceptance probability for a strategy of the provers in the game. 
+\end{definition}
+
+%\begin{theorem}[Single-shot compression]
+%	Let $G$ be an $r$-player ENL game such that the extended verifier circuit has size $S$, and furthermore there exists a gate Turing Machine $T_G$ such that on input $1 \leq t \leq S$ (written in binary), $T_G$ outputs the description of the $t$'th gate in $S$ in time $O(\poly \log(S))$. Then there exists an $r+1$-player ENL game $G'$ such that the extended verifier has size $O(\poly \log(S))$, and has value 
+%	\[
+%		1 - (1 - \omega^*(G))/\poly(S).
+%	\]
+%	Furthermore, there exists a gate Turing Machine $T_{G'}$ that specifies the $t$'th gate of the extended verifier of $G'$ in $\poly \log \log(S)$ time.
+%\end{theorem}
+
+\subsection{Turing machines}
+\label{sec:turing_machines}
+
+An \textbf{oblivious Turing machine} is one where the movement of the heads is independent of the input.
+
+\begin{theorem}[Pippenger, Fischer~\cite{pippenger1979relations}]\label{thm:pippenger}
+Any $k$-tape Turing machine $M$ that runs in time $T$ can be simulated by a $k$-tape oblivious Turing machine that runs in time $\poly(T)$. Furthermore, the location of the $k$ tape heads at time $1 \leq t \leq T$ can be computed in $\poly \log T$ time.
+\end{theorem}
+
+
+\subsubsection{Simulation of oblivious Turing machines with a quantum circuit}
+
+\begin{lemma}\label{lem:tmsim}
+	For all $T$, for every $k$-tape oblivious Turing machine $M$, there exists a quantum circuit $TMSIM(M,T)$ of size $\poly(T)$ where
+	\begin{enumerate}
+		\item $TMSIM(M,T)$ acts on registers $\sM \sA_1 \ldots \sA_k$
+		\item The output of the $\{\sA_j\}$ registers of $TMSIM(M,T)$, when run on input $\ket{0}_{\sM} \otimes \ket{x}_{\sA_1 \cdots \sA_k}$, will be equal to the contents of $M$'s tapes on input $x$ after $T$ steps.
+	\end{enumerate}
+	Furthermore, there exists a Turing machine $\text{TMSIM-DESC}$ that on input $(M,T,t)$ (where $t$ is written in binary), it will output the $t$'th gate of $TMSIM(M,T)$ in $\poly\log(T)$ time. 
+\end{lemma}
+
+\begin{proof}
+	The architecture of the circuit $TMSIM(M,T)$ is the following: the registers $\sM$ will store the state of the Turing machine $M$, and $\{\sA_j\}$ represent the work tapes of $M$. Since $M$ is oblivious, the head movement patterns of $M$ are pre-determined. Without loss of generality, each tape head will alternate between sweeping left for $T$ steps and then right for $T$ steps, and the heads will be moved in sequence (i.e., the first tape's head will move first, then the second tape's head will move, and so on). 
+	
+	Each $\sA_j$ register is $O(T)$ qubits wide, representing the $T$ cells of tape $j$ that $M$ could possibly access. Each movement of the heads of $M$ will correspond to a layer in the circuit; the computation of the head transition function of $M$ will be computed in the $\sM$ registers, which connected via two-qubit gates to the corresponding locations in the $\sA_j$ registers. 
+	
+	Since the computation of the transition function is some constant that only depends on the description size of $M$, the number of gates in each layer is a constant. Thus the total gate complexity of this circuit is $O(T)$. Notice that the gate sequence of each layer is the same, except the gates that cross between $\sM$ and the $\{\sA_j\}$ registers will be different depending on which cells of the tapes are supposed to be read at that layer. 
+	
+	Thus it is clear that it only takes $\poly\log T$ time to compute any desired gate of the circuit $TMSIM(M,T)$.
+\end{proof}
+
+\subsection{Circuits}
+
+Analogously to the circuit $TMSIM$ that simulates a Turing Machine, we require the notion of universal circuit $CKTSIM$ that simulates an arbitrary circuit. 
+
+\begin{lemma}\label{lem:cktsim}
+For every integer $n$ there is a classical (resp. quantum) circuit $CKTSIM$ of size $\poly(n)$ that operates on $2n$ bits and is such that for any input $(C,x)$ where $x\in\{0,1\}^n$ and $C$ is the description of a classical (resp. quantum) circuit operating on at most $n$ bits returns $C(x)$. 
+\end{lemma}
+
