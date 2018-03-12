@@ -46,12 +46,16 @@ $$\Big\{ \Pi^0 = \proj{d} \otimes \proj{+_t},\; \Pi^1 =  \proj{d} \otimes \proj{
 where $\ket{\pm_t} = \frac{1}{\sqrt{2}}(\ket{t}\pm\ket{t+1})$. If the outcome is $c=2$, accept. Otherwise, if $d=0$, send $B$ the question $CZ_{t}$. If $d=1$, send B the question $CX_t$. Check that the answer reported by B equals $(-1)^c$, where $c\in\{0,1\}$ is the outcome obtained by the verifier.\\
 \tnote{Intended goal: Check that the state shared by the players takes the form of a history state, where the reflection applied on Bob's registers $BB'$ at step $2$ only acts on register $B$ and the appropriate qubit of $B'$.}
 
-\item \emph{(CTL check)} Measure register $\reg{C}_{p}$ in the computational basis to obtain an outcome $(d,t)$. Send player A the EPR question $X'_{n+t}$ ($d=1$) or $X'_t$ ($d=0$). Either:
-\begin{enumerate}
-\item Send player B the same EPR question as player A, as well as the Pauli question $X_t$ (if $d=1)$ or $Z_t$ (if $d=0$).  Reject if the product of the three answer bits received is not $1$.
-\item Send player B the same EPR question as player A, as well as the CTL-Pauli question $CX_t$ ($d=1)$ or $CZ_t$ ($d=0$).  Reject if B's second answer is not $1$, or if A's answer and B's first answer do not match.
-\end{enumerate}
+\item \emph{(CTL check)} Measure register $\reg{C}_{p}$ in the computational basis to obtain an outcome $(d,t)$. Send player A the EPR question $X'_{N+t}$ ($d=1$) or $X'_t$ ($d=0$).  Send player B the same EPR question as player A, as well as the Pauli question $X_t$ (if $d=1)$ or $Z_t$ (if $d=0$).  Reject if the product of the three answer bits received is not $1$.
+%\item Send player B the same EPR question as player A, as well as the CTL-Pauli question $CX_t$ ($d=1)$ or $CZ_t$ ($d=0$).  Reject if B's second answer is not $1$, or if A's answer and B's first answer do not match.
 \tnote{Intended goal: Check that the reflection applied by B on question $CX_i$ (resp. $CZ_j$) is a controlled observable, controlled on the qubit in register $B'_i$ (resp. $B'_{n+j}$) only, and that it matches the observable applies on question $X_i$ (resp. $Z_j$), which only acts on register $B$.}
+
+\item{\emph{Pauli relation check}} Measure register $\reg{C}_p$  in the computational basis to obtain an outcome $(d,t)$. Accept if $(d,t)\neq (1,N)$. Perform either of the following, with probability half each:
+\begin{enumerate}
+\item Choose $i\in\{1,\ldots,N\}$ uniformly at random. Send player $A$ the EPR question $X'_i$. Send player $B$ the same EPR question as player $A$, as well as the Pauli question $X_i$. Reject if the product of the three answer bits is not $+1$. 
+\item Choose $j\in\{1,\ldots,N\}$ uniformly at random. Send player $A$ the EPR question $(Z'_j,X'_{j+N})$. Send player $B$ the EPR question $X'_{j+N}$, as well as the Pauli question $Z_j$. Reject if the product of all answer bits is not $+1$. 
+\end{enumerate}
+\tnote{Intended goal: check the Pauli relations, in the format of Lemma~\ref{lem:gh}. For (b), the $Z'_i$ operator for Alice corrects for the phase in $Z_jX(a)X(b)=(-1)^{a_j}X(a)Z(b+e_j)$.}
 	\end{enumerate}    
 \end{mdframed}
 \end{center}
@@ -104,7 +108,7 @@ V_A \otimes V_B \otimes \Id_{CR} \ket{\psi}_\reg{CABR} \approx_\delta \frac{1}{\
 
 \tnote{The next lemma will be part of the proof of the soundness analysis. For now, ignore it}
 
-\begin{lemma}
+\begin{lemma}\label{lem:gh}
 Let $\{X_i,Z_j:\, i,j\in\{1,\ldots,n\}\}$ be observables on $\mathcal{H}_B$, and $\ket{\psi}_{BR}$ a state on $\mathcal{H}_B\otimes \cH_R$ such that  on average over $a,b\in\{0,1\}^n$ and $i,j\in\{1,\ldots,n\}$,
 \begin{align}
 \Id_A \otimes X_i X(a) Z(b)\otimes \Id_R \ket{\psi}& \approx_\delta \Id_A \otimes X(a+e_i)Z(b) \otimes \Id_R \ket{\psi}_{ABR}\label{eq:x-com}\\
