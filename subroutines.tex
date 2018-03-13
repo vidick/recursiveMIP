@@ -133,9 +133,9 @@ The relations~\eqref{eq:x-com} and~\eqref{eq:z-com} are sufficient to verify tha
 \begin{center}
 \begin{mdframed}
     Input: $(1^n,w,r,G,V,M)$
-    
+    \tnote{This figure is slightly inconsistent in that for 1. you write ``write into the tape...'', which is accurate, whereas for 2,3 you just write ``compute the questions''. For the Pauli check, I messed it up, I forgot these were meant to be VTMs. One suggestion is to have an additional figure, that can be used as a skeleton for all the checks, and sets some common language and notation (such as the clocks, things like $\ket{+_t}$, what is ``$a_P$'' (in item 3 below), etc. It would also make it easier to enforce consistency across tests}
 	\begin{enumerate}
-		\item (\textsc{ClockMeasurement}) Use $w$ to select a uniformly random time $1 \leq t \leq \tau(N)$, where $N = 2^n$. Write into the measurement specification tape a description for the circuit $C_M$ that implements the following measurement, which is a tensor product of a two-outcome POVM $F$ acting on register $\reg{C}_p$ and a three outcome POVM $\Pi_t$ acting on register $\reg{C}_{mip}$:
+		\item (\textsc{ClockMeasurement}) Use $w$ to select a uniformly random time $1 \leq t \leq \tau(N)$, where $N = 2^n$. Write into the measurement specification tape a description for the circuit $C_M$ that implements the following measurement, which is a tensor product of a two-outcome POVM $F$ acting on register $\reg{C}_p$ and a three outcome POVM $\Pi_t$ acting on register $\reg{C}_{mip}$: \tnote{how about a single zero for the $F^0$ projector? Right now the Pauli clock has two registers, but maybe this will change, so it'll be easier to remain consistent}
 \[
 	\{F^0 = \ketbra{0}{0} \otimes \ketbra{0}{0}, F^1 = \Id - F^0 \}
 \]
@@ -149,7 +149,7 @@ where $\ket{\pm_t} = \frac{1}{\sqrt{2}} \left( \ket{t} \pm \ket{t+1} \right)$. L
 	\item (\textsc{GenQuestions}) Execute the GTM $G$ to compute $g = G(N,r-1,t)$. 
 	\begin{itemize}
 		\item If $g$ is a Toffoli gate or doubled Hadamard gate, then generate questions according to \textsc{Toffoli Check} or \textsc{Hadamard Check}, respectively. 
-		\item If $g$ is a prover query to prover $P$, then set $q_P = \star$. 	
+		\item If $g$ is a prover query to prover $P$, then set $q_P = \star$. \tnote{a nice convention I used in another paper, is to use ``question'' for any individual question to a prover, and ``query'' for a complete tuple of questions to all provers. So, here it would be ``question''}	
 	\end{itemize}
 %	If $g$ is a verifier gate, compute questions as in the Verifier Gate Check. If $g$ is a prover query, compute questions as in the Prover Gate Check.
 		\item (\textsc{CheckAnswers}) If $p \neq 0$, accept. If $s = 2$, then accept. Otherwise:
@@ -166,11 +166,11 @@ where $\ket{\pm_t} = \frac{1}{\sqrt{2}} \left( \ket{t} \pm \ket{t+1} \right)$. L
 \label{fig:prop_check}
 \end{figure}
 
-For completeness, we include the full descriptions of \textsc{Toffoli Check} and \textsc{Hadamard Check} from~\cite{ji2016compression}. Note that we implicitly combine the phases \textsc{ClockMeasurement}, \textsc{GenQuestions}, and \text{CheckAnswers} in the description of these protocols, but it should be clear what the phases are.
+For completeness, we include the full descriptions of \textsc{Toffoli Check} and \textsc{Hadamard Check} from~\cite{ji2016compression}. Note that we implicitly combine the phases \textsc{ClockMeasurement}, \textsc{GenQuestions}, and \textsc{CheckAnswers} in the description of these protocols, but it should be clear what the phases are.
 
 Furthermore, a Toffoli or doubled Hadamard gate $g$ acts on a set of qubits that the $(r-1)$-level verifier $UEVC_{N,r-1}$ is supposed to act on, and in the protocol executed by the $r$-level verifier $UEVC_{n,r}$, these qubits are distributed between the provers. Depending on which qubits the gate $g$ acts on, questions will be sent to different provers. 
 
-For example, suppose $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$. Suppose that $u_1,u_2$ are qubits in the register $\reg{V}_{r-1,in}$, and $u_3$ is a qubit in register $\reg{M}_{r-1,j}$ for some prover $P_j$. Then two Pauli questions will be sent to prover $PV$ and one Pauli question will be sent to prover $PP_j$, because $PP_j$ is supposed to hold the $\reg{M}_{r-1,j}$ register.
+For example, suppose $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$. Suppose that $u_1,u_2$ are qubits in the register $\reg{V}_{r-1,in}$, and $u_3$ is a qubit in register $\reg{M}_{r-1,j}$ for some prover $P_j$. Then two Pauli questions will be sent to prover $PV$ and one Pauli question will be sent to prover $PP_j$, because $PP_j$ is supposed to hold the $\reg{M}_{r-1,j}$ register. \tnote{Maybe, rather than a ``for example'', we need a summary of how qubits are distributed between provers somewhere, that we can easily refer to?}
 
 \vspace{10pt}
 \begin{center}
@@ -214,7 +214,7 @@ For example, suppose $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$. Suppo
 
 \begin{lemma}[Hadamard and Toffoli Check~\cite{ji2016compression}]
 \label{lem:ver_gate_check}
-	Let $\mathcal{S}$ be an honest Pauli strategy with $\rho_{\sC_{mip} \sP}$ as the shared state in \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}). Let $U$ denote a doubled Hadamard gate (resp. Toffoli gate). Then the \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}) rejects with probability
+	Let $\mathcal{S}$ be an honest Pauli strategy with $\rho_{\sC_{mip} \sP}$ as the shared state in \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}). Let $U$ denote a doubled Hadamard gate (resp. Toffoli gate). Then the \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}) rejects with probability \tnote{Do we want to use $\Tr_\rho$ as notation? The format for this soundness guarantee is different from the format in Pauli check. Are we going to use this? I am less used to it, but I'm fine either way.}
 	\[
 		\frac{1}{4} \Tr_{\rho} \left[ \Id - J_t \otimes U \right ]
 	\]
@@ -225,13 +225,12 @@ For example, suppose $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$. Suppo
 	where $\ket{-_t} = \frac{1}{\sqrt{2}} \left( \ket{t} - \ket{t+1} \right)$.
 \end{lemma}
 
-\paragraph{The high level} At a high level, this test will perform the following. The $r$'th level verifier will sample a random time $t \in \{1,\ldots,\tau(N)\}$, and compute the $t$'th gate $g_t$ of $UEVC_{N,r-1}$ using the GTM $G = G_{UEVC}$. Most of the time, the gate $g_t$ will be a (doubled) Hadamard or Toffoli gate that's computed by the $(r-1)$-level verifier $UEVC_{N,r-1}$. To check the propagation of such a gate, the $r$-level verifier will run the corresponding Hamadard or Toffoli Check (see above) to generate the corresponding questions. %If the gate $g_t$ does not act on any of the $\{ \sM_i\}$ register of $UEVC_{N,r-1}$, then the Hadamard/Toffoli check questions are sent to prover $PV$. If $g_t$ acts partially on the $\sM_i$ register, then the questions are partially sent to $PV$, and partially sent to $PP_i$. If $g_t$ acts fully on $\sM_i$, then all the questions are sent to $PP_i$.
+\paragraph{The high level} \tnote{got rid of ``will's'' and ``above'' and ``$t$'th'' and ``that's''} At a high level, this test  proceeds as follows. The $r$-th level verifier samples a random time $t \in \{1,\ldots,\tau(N)\}$, and computes the $t$-th gate $g_t$ of $UEVC_{N,r-1}$ using the GTM $G = G_{UEVC}$. Most of the time, the gate $g_t$ is a (doubled) Hadamard or Toffoli gate that is computed by the $(r-1)$-level verifier $UEVC_{N,r-1}$. To check the propagation of such a gate, the $r$-level verifier executes the corresponding Hamadard or Toffoli Check (see Figure~\ref{}) to generate the corresponding questions. %If the gate $g_t$ does not act on any of the $\{ \sM_i\}$ register of $UEVC_{N,r-1}$, then the Hadamard/Toffoli check questions are sent to prover $PV$. If $g_t$ acts partially on the $\sM_i$ register, then the questions are partially sent to $PV$, and partially sent to $PP_i$. If $g_t$ acts fully on $\sM_i$, then all the questions are sent to $PP_i$.
+In some cases the gate $g_t$ is not be a gate, but rather it represents the $i$-th prover's unitary. In that case, prover $i$ is sent the question $\star$.  
 
-Sometimes, the gate $g_t$ will not be a gate at all, but rather it will represent the $i$'th prover's unitary. In that case, prover $i$ will be sent the question $\star$.  
+Any prover who was not explicitly sent a question is sent a null question, denoted by $\bot$.
 
-Any prover who was not explicitly sent a question will receive a null question, denoted by $\bot$.
-
-\paragraph{Question types} There are two types of questions asked in this test: Pauli operations, and a prover reflection query $\star$.
+\paragraph{Question types} There are two types of questions in this test: Pauli operations, and a prover reflection query $\star$.
 
 
 \paragraph{The honest strategy} For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. An honest Pauli strategy $\mathcal{S}$ is an honest Propagation strategy if the shared state $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$, when projected onto the space where the $\sC_p$ register is all zeroes, is a history state of the computation $g_1g_2\cdots g_{\tau(N)}$. In other words, it has the following form:
@@ -244,16 +243,16 @@ The register $\sR$ is some purifying register (part of which may be shared by th
 
 \begin{theorem}	
 \label{thm:prop_check}
-The honest Propagation strategy passes the $\textsc{Propagation Check}$ subprotocol with probability $1$. All honest Pauli strategies $\mathcal{S}$ that pass the $\textsc{Propagation Check}$ subprotocol with probability at least $1 - \eps$ is $\poly(N,\eps)$-close to an honest Propagation Check strategy.
+The honest Propagation strategy passes the $\textsc{Propagation Check}$ subprotocol with probability $1$. All honest Pauli strategies $\mathcal{S}$ that pass the $\textsc{Propagation Check}$ subprotocol with probability at least $1 - \eps$ is $\poly(N,\eps)$-close to an honest Propagation Check strategy. \tnote{do you have a good way to write $\poly(N,\eps)$? I know I used it too. But of course $N^2 = \poly(N,\eps)$, which is not super helpful. I can only think of $\poly(N)\cdot \poly(\eps)$, which is kind of ugly.}
 \end{theorem}
 \begin{proof}
-	The completeness statement of the Theorem is straighforward. We now argue about the soundness statement. This analysis largely follows that of~\cite{ji2016compression}. 
+	The completeness statement of the Theorem is straightforward. We now argue about the soundness statement. This analysis largely follows that of~\cite{ji2016compression}. 
 	
 	Let $\rho_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state in the honest Pauli strategy $\mathcal{S}$. By assumption, the rejection probability with $\rho$ as the shared state is at most $\eps$. %We analyze the rejection probability of the \textsc{Propagation Check} subroutine. 
 	
 	Since $\mathcal{S}$ is an honest Pauli strategy, we have that $\Tr_\rho \left ( \ketbra{0}{0}_{\sC_p}  \right) \geq 1/\poly(N)$, where $\ketbra{0}{0}_{\sC_p}$ is the projection onto the all zeroes state of $\sC_p$. Let $\rho_0 = \ketbra{0}{0}_{\sC_p} \, \rho \, \ketbra{0}{0}_{\sC_p}$. The probability that the \textsc{Propagation Check} subroutine rejects when the shared state is $\rho_0$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
 	
-	Suppose now that the shared state in the \textsc{Propagation Check} is $\rho_0$. We now give an expression for the rejection probability. For all $t \in \{0,1,\ldots,\tau(N)\}$, let $r_t$ denote the rejection probability when $t$ is sampled. If $g_t$ corresponds to a doubled Hadamard gate or a Toffoli gate, by Lemma~\ref{lem:ver_gate_check} the rejection probability is 
+	Suppose now that the shared state in the \textsc{Propagation Check} is $\rho_0$. We now give an expression for the rejection probability. For any $t \in \{0,1,\ldots,\tau(N)\}$, let $r_t$ denote the rejection probability conditioned on the verifier choosing $t$. If $g_t$ corresponds to a doubled Hadamard gate or a Toffoli gate, by Lemma~\ref{lem:ver_gate_check} the rejection probability is 
 	\[
 		r_t \geq \frac{1}{4} \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
 	\]
@@ -273,11 +272,11 @@ The honest Propagation strategy passes the $\textsc{Propagation Check}$ subproto
 	\[
 		\rho' = Q^\dagger \rho_0 Q, \qquad Q = \sum_t \ketbra{t}{t}_{\sC_{mip}} \otimes g_t \cdots g_1.
 	\]
-	Observe that $\E_t  \left [ \ketbra{-_t}{-_t} \right ] =  \cL(L)$ where $\cL(L)$ is the Laplacian of the line graph $L$ of length $\tau(N)+ 1$. Thus we have
+	Observe that $\E_t  \left [ \ketbra{-_t}{-_t} \right ] =  \cL(L)$ where $\cL(L)$ is the Laplacian \tnote{do we need to use a fancy word, especially if we don't define it? Will there be other things than Laplacians of line graphs?} of the line graph $L$ of length $\tau(N)+ 1$. Thus we have
 	\[
 		\Tr_{\rho_0} \left ( Q \cL(L) Q^\dagger \right) \leq \poly(N) \eps.
 	\]
-	Notice that the operator $Q \cL(L) Q^\dagger$ is exactly the same as the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$. This implies that $\rho_0$ is $\poly(N,\eps)$-close to a history state of the computation $g_1g_2\cdots g_{\tau(N)}$.
+	Notice that the operator $Q \cL(L) Q^\dagger$ is exactly the same as the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$. This implies that $\rho_0$ is $\poly(N,\eps)$-close to a history state of the computation $g_1g_2\cdots g_{\tau(N)}$.\tnote{should the last implication refer to a theorem?}
 %	\paragraph{Initialization Check subtest.} The rejection probability in step \emph{(b)} (conditioned on getting past step \emph{(a)}) is
 %	\[
 %		\Tr_{\rho'} ( H_{init} ) \leq \poly(n) \sqrt{\eps}
