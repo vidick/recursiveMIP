@@ -178,7 +178,7 @@ We now specify a specific VTM $V_{UEVC}$. The VTM is specified in high level pse
     \begin{itemize}
     	\item If $r = 1$, run the VTM specified by $V$ on input $(1^n,w,M)$.
 	
-		\item If $r > 1$, do the following. Using the string $w$, determine a type of test to be performed, among \emph{Pauli check}, \emph{Propagation check}, \emph{Input check}, and \emph{Output check}. Once a test type has been chosen, the three phases of the VTM are specified by one of Figures~\ref{fig:pauli_check},~\ref{fig:prop_check},~\ref{fig:input_check}, or Figure~\ref{fig:output_check}.
+		\item If $r > 1$, do the following. Using the string $w$, execute one of the following subroutines: \emph{Pauli check}, \emph{Propagation check}, \emph{Input check}, and \emph{Output check}, described in Figures~\ref{fig:pauli_check},~\ref{fig:prop_check},~\ref{fig:input_check}, and Figure~\ref{fig:output_check} respectively.
 
 		\end{itemize}
     

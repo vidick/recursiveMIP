@@ -2,44 +2,47 @@
 
 \section{Subroutines of the VTM $V_{UEVC}$}
 
-In this section detail the subroutines of the VTM $V_{UEVC}$. Each subroutine is a test that, if passed with high enough probability, forces rigidity of the provers. With each subroutine we present the corresponding rigidity statements.
+In this section detail the checks that are performed in the case $r>1$ of the VTM $V_{UEVC}$ described in Figure~\ref{fig:lambda}. Each subroutine corresponds to a test that is performed by the extended verifier associated with the VTM, such that, provers passing the test with high enough probability must satisfy a certain rigidity property. The tests, together with the associated rigidity properties, are described in the following subsections. 
 
 Furthermore, the random choices made by the subroutines below are based on the random string $w$ that is passed in as input. 
 
-\paragraph{Notation} In what follows, we fix a $r > 0$. The $r$'th level verifier implemented by the circuit $UEVC_{n,r}$ on input $(G_{UEVC},V_{NV},M)$ interacts with a set $\mathcal{P}_r$ of $\kappa(r)$ provers, each playing different roles. The $r$'th level verifier checks that the provers hold a history state of the protocol that's carried by the $(r-1)$-level verifier (that is represented by the circuit $UEVC_{N,r-1}$ for $N = 2^n$) and the set of provers $\mathcal{P}_{r-1}$. 
+\paragraph{Notation} Each of the subroutines follows a similar structure, summarized in Figure~\ref{fig:check_structure}. The subroutines all take the same input $(1^n,w,r,G,V,M)$. $w$ is a string that is used to make all random choices. $r$ is an integer that indicates a ``level'' for the verifier. It is used to parametrize a set $\mathcal{P}_r$ of $\kappa(r)$ provers, each playing different roles. 
+
+The subroutines describe tests that are to be performed by the $r$-th level verifier. The tests are meant to enforce that the provers hold a history state for the protocol that would be carried out by the $(r-1)$-level verifier and the set of provers $\mathcal{P}_{r-1} \subseteq \mathcal{P}_r$. 
 
 The provers in the set $\mathcal{P}_r$ have the following labels and associated roles:
 \begin{itemize}
 	\item $PV$: This prover plays the role of $UEVC_{N,r-1}$
-	\item $PP_1,\ldots,PP_{\kappa(r-1)}$: These provers play the role of the $\kappa(r-1)$ provers that $UEVC_{N,r-1}$ interacts with.
+	\item $PP_1,\ldots,PP_{\kappa(r-1)}$: These provers play the role of the $\kappa(r-1)$ provers $\mathcal{P}_{r-1}$ that the $(r-1)$-th level verifier interacts with.
 	\item $PA_1,\ldots,PA_{\sigma(r)}$: These are ancillary provers.
 \end{itemize}
 
-In the subroutines below, the questions and answers to the provers are denoted by $q_V$, $q_{P,1},\ldots,q_{P,\kappa(r-1)}$, $q_{A,1},\ldots,q_{A,\sigma(r)}$, $a_V$, $a_{P,1},\ldots,a_{P,\kappa(r-1)}$, $a_{A,1},\ldots,a_{A,\sigma(r)}$, respectively.
-
-Furthermore, in what follows, we write $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\{ \sM_{r-1,i} \}_i$ to denote the registers that $UEVC_{N,r-1}$ acts on. We let $\sM_{r-1}$ denote the union of $\{ \sM_{r-1,i} \}_i$, and we let $\sV_{r-1}$ denote the union of $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\sM_{r-1}$. This is to distinguish these registers from $\sC,\sV_{in},\sV_{work}$, and $\sM_i$, which are registers that $UEVC_{n,r}$ acts on.
+In what follows we use the notation $\sC,\sV_{in},\sV_{work}$, and $\sM_i$ introduced in Section~\label{sec:specs} to refer to registers on which the circuit $UEVC_{n,r}$ associated with the VTM acts on. In addition, we write $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\{ \sM_{r-1,i} \}_i$ to denote the registers that $UEVC_{N,r-1}$ acts on. We let $\sM_{r-1}$ denote the union of $\{ \sM_{r-1,i} \}_i$, and we let $\sV_{r-1}$ denote the union of $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\sM_{r-1}$. 
 
 For a given register $\sR$, we write $\supp(\sR)$ to denote the set of qubits in $\sR$.
 
-Furthermore, we divide the $\sC$ register (the one held by the $r$-level verifier) into two parts $\sC_{p}$ and $\sC_{mip}$. The $\sC_{p}$ register is used as the clock register for the \textsc{Pauli Check} subroutine, and $\sC_{mip}$ is used as the clock register for the history state of the $\MIPstar$ protocol performed by $UEVC_{N,r-1}$. 
+
+
+
 
 
 \vspace{10pt}
 \begin{center}
-\begin{mdframed}\tnote{didn't have time to finish this, but just to give the idea, see if it could be useful (see my note later on}
-    All subroutines take an input of the form $(1^n,w,r,G,V,M)$, where $w$ is a random string, \tnote{fill in}.
-		All subroutines are decomposed in three phases. Each phase reads some tapes of the VTM and writes on some others. We specify this common structure, to make it easier to refer to. 
+\begin{mdframed}
+Inptut: $(1^n,w,r,G,V,M)$\\
+  $w$ is a random string, $r$ the level of the verifier, $G$ a GTM, $V$ a VTM, and $M$ a TM.\\
+Each subroutine is decomposed in three phases. Each phase reads some tapes of the VTM and writes on some others. The phases are the following: 
 	\begin{enumerate}
-		\item (\textsc{ClockMeasurement}) In this phase the subroutine writes the description of a cicruit describing a quantum measurement on the measurement specification tape. The measurement will usually involve measuring a clock register. There are different clock registers \tnote{etc}. 
-	\item (\textsc{GenQuestions}) 
-		\item (\textsc{CheckAnswers}) 
+		\item (\textsc{ClockMeasurement}) In this phase the subroutine writes the description of a cicruit describing a quantum measurement on the measurement specification tape. The measurement applies to a clock register $\sC$, divided into two parts, $\sC_{p}$ and $\sC_{mip}$. 
+	\item (\textsc{GenQuestions}) In this phase the subroutine has access to the measurement outcome tape, and writes questions on the player question tape. The questions are denoted  by $q_V$, $q_{P,1},\ldots,q_{P,\kappa(r-1)}$, $q_{A,1},\ldots,q_{A,\sigma(r)}$, where the subscript indicates the label of the prover to which the question is to be sent. 
+		\item (\textsc{CheckAnswers}) In this phase the subroutine has access to the player answer tape, and writes on the referee decision tape. The player answer tape is assumed to contain answers labeled as $a_V$, $a_{P,1},\ldots,a_{P,\kappa(r-1)}$, $a_{A,1},\ldots,a_{A,\sigma(r)}$, where the subscript indicates the label of the prover from which the answer is obtained.
 	\end{enumerate}    
 \end{mdframed}
 
 \end{center}
 \begin{figure}[H]
-\caption{Common structure for subroutines of $V_{UEVC}$}
-\label{fig:prop_check}
+\caption{Template for each of the subroutines of $V_{UEVC}$}
+\label{fig:check_structure}
 \end{figure}
 
 
