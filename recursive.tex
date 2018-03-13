@@ -48,17 +48,16 @@ We let $N = 2^n$.
 \end{itemize}
 
 \begin{restatable}{proposition}{soundness}
-
-
 	Let $G_{UEVC}$ be the GTM for the circuit family $\{UEVC_{n,r}\}$, let $V$ be a VTM for a $2$-prover game, and let $M$ be a nondeterministic Turing machine. For any integer $n$ and $r$ let $\omega_{n,r} = \omega^*(UEVC_{n,r})$, when the input to $UEVC_{n,r}$ is $(G_{UEVC},V_{NV},M)$. 
 	
 	Then for any integer $n$, $N=2^n$, and $r$,
 	\begin{itemize}
 	\item \emph{(Completeness)} If $\omega_{N,r}=1$ then $\omega_{n,r+1}=1$.
-	\item \emph{(Soundness)} In all cases,
+	\item \emph{(Soundness)} For $r \geq 1$ we have
 	\[
-		\omega_{n,r+1} \,\leq\, 1 - \frac{1 - \omega_{N,r}}{\poly(N)}\;.
+		\omega_{n,r+1} \,\leq\, 1 - \frac{(1 - \omega_{N,r})^\alpha}{\poly(N)}\;.
 	\]
+	for some $\alpha > 1$.
 	\end{itemize}
 	\label{prop:uevc_soundness}
 \end{restatable}
@@ -67,6 +66,7 @@ We defer the proof of Proposition~\ref{prop:uevc_soundness} until Section~\ref{s
 
 
 \begin{corollary}
+\label{cor:recursive_enl}
 Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an instance of $\mathcal{L}_R$. There exists a constant $c > 0$ such that the $\kappa(R)$-prover extended verifier specified by the circuit $UEVC_{n,R}$ on input $(G_{UEVC},V_{NV},M)$ has value 
 \begin{align*}
 		&= 1  \quad & \text{if } \langle M,1^n \rangle\in \mathcal{L}_R \\
@@ -83,14 +83,31 @@ where recall $\exp^0_a(-b) = 1/b$ by definition for $b \geq 0$.
 	\]
 	Otherwise, if  $\langle M,1^n \rangle \notin \mathcal{L}_R$, then we have
 	\begin{align*}
-		\omega_{n,R} &\leq 1 - \poly(2^{-n})(1-\omega_{2^n,R-1}) \\
-					&\leq 1 - \poly(\exp^2_2(-n))(1- \omega_{\exp^2_2(n),R-2}) \\
+		\omega_{n,R} &\leq 1 - \poly(2^{-n})(1-\omega_{2^n,R-1})^\alpha \\
+					&\leq 1 - \poly(\exp^2_2(-n))(1- \omega_{\exp^2_2(n),R-2})^{\alpha^2} \\
 					&\vdots \\
-					&\leq 1 - \poly(\exp^{R-1}_2(-n))(1-\omega_{\exp^{R-1}_2(n),1}) \\
+					&\leq 1 - \poly(\exp^{R-1}_2(-n))(1-\omega_{\exp^{R-1}_2(n),1})^{\alpha^{R-1}} \\
 					&\leq 1 - \exp^{R-1}_2(-cn).
 	\end{align*}
 \end{proof}
 
+
+\begin{theorem}[Main]
+	For all integer $R > 0$, 
+	\[
+		\NEXP^{(R)} \subseteq \MIPstar(\kappa(R)+8,1)_{f_R(n)}
+	\]
+	 where $f_n(R) = \exp^{R-1}_2(-cn)$ for some $c > 1$.
+\end{theorem}
+\begin{proof}
+	Fix an instance of $\langle M,1^n \rangle$ of $\mathcal{L}_R$. By Corollary~\ref{cor:recursive_enl} we have an extended non-local game $\what{G}_M$  of size $\poly(n,|M|)$ and involving $\kappa(R)$ provers such that $\omega^*(\what{G}_M) = 1$ if $\langle M,1^n \rangle \in \mathcal{L}_R$, and otherwise $\omega^*(\what{G}_M) \leq 1 - f_R(n)$. 
+	
+	To convert this to an $\MIPstar$ protocol, we use the compression result of~\cite{ji2016compression} as a blackbox, which gives an efficient method to transform any quantum interactive protocol $\mathscr{P}$ involving $r$ provers into a nonlocal game $G_{\mathscr{P}}$ involving $r + 8$ provers with the following property: if $\omega^*(\mathscr{P}) = 1$, then $\omega^*(G_{\mathscr{P}}) = 1$. Otherwise, 
+	\[
+		\omega^*(G_{\mathscr{P}}) \leq 1 - \frac{1 - \omega^*(\mathscr{P})}{\poly(n)}. 
+	\]
+	Since the transformation from $\langle M,1^n \rangle$ to $\what{G}_M$ is efficient and the compression reduction of~\cite{ji2016compression} is efficient, we obtain the desired Theorem statement.
+\end{proof}
 
 \section{Detailed specifications}
 

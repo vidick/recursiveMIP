@@ -18,7 +18,7 @@ Furthermore, for convenience we will define $\exp^0_a(b) = b$ and $\exp^0_a(-b) 
 
 \begin{lemma}
 \label{lem:closeness_to_groundspace}
-	Let $H$ be a positive semidefinite matrix acting on $\C^d$ with minimum eigenvalue $0$. Let $\Delta > 0$ denote the second smallest eigenvalue. Let $\Pi$ denote the projector onto the kernel of $H$. If $\ket{\psi}$ is a state such that $\bra{\psi} H \ket{\psi} \leq \eps$, then there exists a state $\ket{\theta}$ in the kernel of $H$ such that
+	Let $\Hilb_{\sA},\Hilb_{\sR}$ be Hilbert spaces. Let $H$ be a positive semidefinite matrix acting on $\Hilb_{\sA}$ with minimum eigenvalue $0$ and second smallest eigenvalue $\Delta > 0$. If $\ket{\psi}$ is a state on $\Hilb_{\sA} \otimes \Hilb_{\sR}$ such that $\bra{\psi} H_{\sA} \otimes \Id_{\sR} \ket{\psi} \leq \eps$, then there exists a state $\ket{\theta}$ in $\Hilb_{\sA} \otimes \Hilb_{\sR}$ such that $H \ket{\theta} = 0$ and
 	\[
 		\left \| \ket{\psi} - \ket{\theta} \right \| \leq \sqrt{\eps/\Delta}.
 	\]
@@ -52,12 +52,8 @@ with $n$ being the input size.
 We now define a canonically complete language for $\NEXPR$. Define $\mathcal{L}_R$ to be the set of all instances $\langle M, 1^n \rangle$ such that $M$, when interpreted as a nondeterministic Turing Machine, accepts after $\exp^R_2(n)$ steps on a blank tape as input.
 
 \begin{definition}[$\MIPstar$]
-	A language $L$ is in $\MIPstar(m,r)$ if there is a $m$-player, $r$-round quantum interactive proof for $L$.
+	A language $L$ is in $\MIPstar(m,r)_{f(n)}$ if there is a $m$-player, $r$-round quantum interactive proof for $L$ with completeness-soundness gap $f(n)$, where $n$ is the input size. We write $\MIPstar(m,r) = \MIPstar(m,r)_{1/\poly(n)}$.
 \end{definition}
-
-
-
-
 
 \subsection{Games}
 

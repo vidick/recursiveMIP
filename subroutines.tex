@@ -204,6 +204,7 @@ For example, suppose $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$. Suppo
 \begin{center}
 \begin{mdframed}
 	Input $(1^n,w,r,s,g)$ \\
+	\textbf{Toffoli Check} \\
 	Promise: $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$.
     
 	\begin{enumerate}
@@ -212,19 +213,9 @@ For example, suppose $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$. Suppo
 		\item Reject if $a_1 = a_2 = 1 \wedge s \oplus a_3 = 1$, or $a_1 a_2 = 0 \wedge s = 1$.
 		\item Accept otherwise.
 	\end{enumerate}    
-\end{mdframed}
-
-\end{center}
-\begin{figure}[H]
-\caption{Toffoli Check}
-\label{fig:toffoli_check}
-\end{figure}
-
-
-\vspace{10pt}
-\begin{center}
-\begin{mdframed}
-	Input $(1^n,w,r,s,g)$ \\
+	
+	\vspace{10pt}
+	\textbf{Hadamard Check} \\
 	Promise: $g$ is a doubled Hadamard gate acting on qubits $u_1,u_2$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$.
     
 	\begin{enumerate}
@@ -236,13 +227,34 @@ For example, suppose $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$. Suppo
 
 \end{center}
 \begin{figure}[H]
-\caption{Hadamard Check}
-\label{fig:hadamard_check}
+\caption{Toffoli and Hadamard Checks}
+\label{fig:toffoli_hadamard_check}
 \end{figure}
+
+%
+%\vspace{10pt}
+%\begin{center}
+%\begin{mdframed}
+%	Input $(1^n,w,r,s,g)$ \\
+%	Promise: $g$ is a doubled Hadamard gate acting on qubits $u_1,u_2$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$.
+%    
+%	\begin{enumerate}
+%		\item Sample $\alpha \in \{0,1\}$ uniformly at random.
+%		\item If $\alpha = 0$, ask the appropriate prover (depending on who is supposed to hold $u_1,u_2$) to measure the two-qubit observables $X_{u_1} X_{u_2}$ and $Z_{u_1} Z_{u_2}$ simultaneously.\footnote{We assume without loss of generality that the two qubits of a doubled Hadamard gate are held by the same prover.} Let $a_1,a_2$ be the two answer bits. Reject if $s \oplus a_1 = s \oplus a_2 = 1$, accept otherwise.
+%		\item If $\alpha = 1$, ask the appropriate prover to measure the two-qubit observables $X_{u_1} Z_{u_2}$ and $Z_{u_1} X_{u_2}$ simultaneously. Let $a_1,a_2$ be the two answer bits. Reject if $s \oplus a_1 = s \oplus a_2 = 1$ and accept otherwise.
+%	\end{enumerate}    
+%\end{mdframed}
+%
+%\end{center}
+%\begin{figure}[H]
+%\caption{Hadamard Check}
+%\label{fig:hadamard_check}
+%\end{figure}
 
 \begin{lemma}[Hadamard and Toffoli Check~\cite{ji2016compression}]
 \label{lem:ver_gate_check}
-	Let $\mathcal{S}$ be an honest Pauli strategy with $\rho_{\sC_{mip} \sP}$ as the shared state in \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}). Let $U$ denote a doubled Hadamard gate (resp. Toffoli gate). Then the \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}) rejects with probability \tnote{Do we want to use $\Tr_\rho$ as notation? The format for this soundness guarantee is different from the format in Pauli check. Are we going to use this? I am less used to it, but I'm fine either way.}
+	Let $\mathcal{S}$ be an honest Pauli strategy with $\rho_{\sC_{mip} \sP}$ as the shared state in \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}). Let $U$ denote a doubled Hadamard gate (resp. Toffoli gate). Then the \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}) rejects with probability \tnote{Do we want to use $\Tr_\rho$ as notation? The format for this soundness guarantee is different from the format in Pauli check. Are we going to use this? I am less used to it, but I'm fine either way.} \hnote{I think this is a clean format... the Propagation, Input and Output Check analyses all use the $\Tr_\rho$ format for the soundness guarantees.}
+	
 	\[
 		\frac{1}{4} \Tr_{\rho} \left[ \Id - J_t \otimes U \right ]
 	\]
@@ -253,7 +265,7 @@ For example, suppose $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$. Suppo
 	where $\ket{-_t} = \frac{1}{\sqrt{2}} \left( \ket{t} - \ket{t+1} \right)$.
 \end{lemma}
 
-\paragraph{The high level}  At a high level, this test  proceeds as follows. The $r$-th level verifier samples a random time $t \in \{1,\ldots,\tau(N)\}$, and computes the $t$-th gate $g_t$ of $UEVC_{N,r-1}$ using the GTM $G = G_{UEVC}$. Most of the time, the gate $g_t$ is a (doubled) Hadamard or Toffoli gate that is computed by the $(r-1)$-level verifier $UEVC_{N,r-1}$. To check the propagation of such a gate, the $r$-level verifier executes the corresponding Hamadard or Toffoli Check (see Figure~\ref{}) to generate the corresponding questions. %If the gate $g_t$ does not act on any of the $\{ \sM_i\}$ register of $UEVC_{N,r-1}$, then the Hadamard/Toffoli check questions are sent to prover $PV$. If $g_t$ acts partially on the $\sM_i$ register, then the questions are partially sent to $PV$, and partially sent to $PP_i$. If $g_t$ acts fully on $\sM_i$, then all the questions are sent to $PP_i$.
+\paragraph{The high level}  At a high level, this test  proceeds as follows. The $r$-th level verifier samples a random time $t \in \{1,\ldots,\tau(N)\}$, and computes the $t$-th gate $g_t$ of $UEVC_{N,r-1}$ using the GTM $G = G_{UEVC}$. Most of the time, the gate $g_t$ is a (doubled) Hadamard or Toffoli gate that is computed by the $(r-1)$-level verifier $UEVC_{N,r-1}$. To check the propagation of such a gate, the $r$-level verifier executes the corresponding Hamadard or Toffoli Check (see Figure~\ref{fig:toffoli_hadamard_check}) to generate the corresponding questions. %If the gate $g_t$ does not act on any of the $\{ \sM_i\}$ register of $UEVC_{N,r-1}$, then the Hadamard/Toffoli check questions are sent to prover $PV$. If $g_t$ acts partially on the $\sM_i$ register, then the questions are partially sent to $PV$, and partially sent to $PP_i$. If $g_t$ acts fully on $\sM_i$, then all the questions are sent to $PP_i$.
 In some cases the gate $g_t$ is not be a gate, but rather it represents the $i$-th prover's unitary. In that case, prover $i$ is sent the question $\star$.  
 
 Any prover who was not explicitly sent a question is sent a null question, denoted by $\bot$.
@@ -263,45 +275,43 @@ Any prover who was not explicitly sent a question is sent a null question, denot
 
 \paragraph{The honest strategy} For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. An honest Pauli strategy $\mathcal{S}$ is an honest Propagation strategy if the shared state $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$, when projected onto the space where the $\sC_p$ register is all zeroes, is a history state of the computation $g_1g_2\cdots g_{\tau(N)}$. In other words, it has the following form:
 \[
-	\left( \ketbra{0}{0}_{\sC_p} \right) \, \ket{\psi}_{\sC_p \sC_{mip} \sP \sR} = \frac{1}{\poly(N)} \sum_{t = 0}^{\tau(N)} \ket{0}_{\sC_p} \otimes \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}
+	\left( \ketbra{0}{0}_{\sC_p} \right) \, \ket{\psi}_{\sC_p \sC_{mip} \sP \sR} = \ket{0}_{\sC_p} \otimes \frac{1}{\poly(N)} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}
 \]
-where the $r$'th level verifier holds register $\sC = \sC_p \sC_{mip}$ and the provers $PP_1,\ldots,PP_{\kappa(r-1)},PV$ jointly hold $\sP$. The register $\sP$ itself is decomposed into a tensor product of registers $\sC_{r-1}, \sV_{r-1,in}, \sV_{r-1,work}$ (all held by prover $PV$) and registers $\{ \sM_{r-1,i} \}$ (held by provers $\{ PP_i \}$). We can assume that the register $\sP$ has this tensor product structure because the strategy is an honest Pauli strategy. %Furthermore, we also emphasize that the registers $\sC$ are $\sC^N$ are distinct: the first one is the clock register for the $r$-level verifier, and $\sC^N$ is the clock register for the $(r-1)$-level verifier.
+where for all $t$, the state $\ket{\psi_t}_{\sP \sR}$ is defined to be $g_t \ket{\psi_{t-1}}_{\sP \sR}$ with $g_t$ being either a doubled Hadamard, a Toffoli, or a prover reflection acting on the correct registers. The state $\ket{\psi_0}$ is arbitrary. The $r$'th level verifier holds register $\sC = \sC_p \sC_{mip}$ and the provers $PP_1,\ldots,PP_{\kappa(r-1)},PV$ jointly hold $\sP$. The register $\sP$ itself is decomposed into a tensor product of registers $\sC_{r-1}, \sV_{r-1,in}, \sV_{r-1,work}$ (all held by prover $PV$) and registers $\{ \sM_{r-1,i} \}$ (held by provers $\{ PP_i \}$). We can assume that the register $\sP$ has this tensor product structure because the strategy is an honest Pauli strategy. The register $\sR$ is some purifying register (part of which may be shared by the verifier and provers). 
 
-The register $\sR$ is some purifying register (part of which may be shared by the verifier and provers). For all $t$, the state $\ket{\psi_t}_{\sP \sR}$ is defined to be $g_t \ket{\psi_{t-1}}_{\sP \sR}$ with $g_t$ being either a doubled Hadamard, a Toffoli, or a prover reflection acting on the correct registers. The state $\ket{\psi_0}$ is arbitrary.
-
-\begin{theorem}	
-\label{thm:prop_check}
+\begin{lemma}	
+\label{lem:prop_check}
 \begin{enumerate}
-\item (\textbf{Completeness}) The honest Propagation strategy passes the $\textsc{Propagation Check}$ subprotocol with probability $1$. 
-\item (\textbf{Soundness}) All honest Pauli strategies $\mathcal{S}$ that pass the $\textsc{Propagation Check}$ subprotocol with probability at least $1 - \eps$ are $\poly(N,\eps)$-close to an honest Propagation Check strategy. \tnote{do you have a good way to write $\poly(N,\eps)$? I know I used it too. But of course $N^2 = \poly(N,\eps)$, which is not super helpful. I can only think of $\poly(N)\cdot \poly(\eps)$, which is kind of ugly.}
+\item (\textbf{Completeness}) An honest Propagation strategy passes the $\textsc{Propagation Check}$ subprotocol with probability $1$. 
+\item (\textbf{Soundness}) All honest Pauli strategies $\mathcal{S}$ that pass the $\textsc{Propagation Check}$ subprotocol with probability at least $1 - \eps$ are $\poly(N,\eps)$-close to an honest Propagation Check strategy. \tnote{do you have a good way to write $\poly(N,\eps)$? I know I used it too. But of course $N^2 = \poly(N,\eps)$, which is not super helpful. I can only think of $\poly(N)\cdot \poly(\eps)$, which is kind of ugly.} \hnote{Maybe in the end, we can put $O(N^\alpha \eps^\beta)$ once we figure out $\alpha,\beta$, but for now we can just keep it $\poly(N,\eps)$ to make things less ugly.}
 \end{enumerate}
-\end{theorem}
+\end{lemma}
 \begin{proof}
 	The completeness statement of the Theorem is straightforward. We now argue about the soundness statement. This analysis largely follows that of~\cite{ji2016compression}. 
 	
-	Let $\rho_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state in the honest Pauli strategy $\mathcal{S}$. By assumption, the rejection probability with $\rho$ as the shared state is at most $\eps$. %We analyze the rejection probability of the \textsc{Propagation Check} subroutine. 
+	Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state in the honest Pauli strategy $\mathcal{S}$, and let $\rho = \ketbra{\psi}{\psi}$. By assumption, the rejection probability with $\rho$ as the shared state is at most $\eps$.
 	
-	Since $\mathcal{S}$ is an honest Pauli strategy, we have that $\Tr_\rho \left ( \ketbra{0}{0}_{\sC_p}  \right) \geq 1/\poly(N)$, where $\ketbra{0}{0}_{\sC_p}$ is the projection onto the all zeroes state of $\sC_p$. Let 
+	Let $\Pi = \ketbra{0}{0}_{\sC_p}$, the projection onto the all zeroes state of $\sC_p$. Since $\mathcal{S}$ is an honest Pauli strategy, we have that $\Tr_\rho (\Pi) \geq 1/\poly(N)$. Let 
 	\[
-		\rho_0 = \frac{\ketbra{0}{0}_{\sC_p} \, \rho \, \ketbra{0}{0}_{\sC_p}}{\Tr \left ( \ketbra{0}{0}_{\sC_p} \, \rho \right)}.
+		\rho_0 = \frac{\Pi \rho \Pi}{\Tr_\rho(\Pi)} = \frac{\Pi \ketbra{\psi}{\psi} \Pi}{\bra{\psi} \Pi \ket{\psi}}.
 	\]
 	The probability that the \textsc{Propagation Check} subroutine rejects when the shared state is $\rho_0$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
 	
 	Suppose now that the shared state in the \textsc{Propagation Check} is $\rho_0$. We now give an expression for the rejection probability. For any $t \in \{0,1,\ldots,\tau(N)\}$, let $r_t$ denote the rejection probability conditioned on the verifier choosing $t$. If $g_t$ corresponds to a doubled Hadamard gate or a Toffoli gate, by Lemma~\ref{lem:ver_gate_check} the rejection probability is 
 	\[
-		r_t \geq \frac{1}{4} \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
+		r_t = \frac{1}{4} \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
 	\]
 	If $g_t$ corresponds to a prover question to prover $PP_j$, then the rejection probability is equal to
 	\[
-		r_t = \frac{1}{4} \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
+		r_t = \frac{1}{2} \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
 	\]
-	where we define $g_t$ to prover $PP_j$'s reflection upon the question $\star$. The overall rejection probability is then at most 
+	where we define $g_t$ to prover $PP_j$'s reflection upon the question $\star$. The overall rejection probability satisfies
 	\[
-		\poly(N) \eps \geq \E_t r_t  = \frac{1}{4} \E_t \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
+		\eps' \geq \E_t r_t  \geq \frac{1}{4} \E_t \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
 	\]	
 	In other words, we have
 	\[
-		\E_t \Tr_{\rho'} \left ( \ketbra{-_t}{-_t} \right ) \leq \poly(N) \eps
+		\E_t \Tr_{\rho'} \left ( \ketbra{-_t}{-_t} \right ) \leq \eps'
 	\]
 	where we define
 	\[
@@ -310,28 +320,17 @@ The register $\sR$ is some purifying register (part of which may be shared by th
 %	Observe that $\E_t  \left [ \ketbra{-_t}{-_t} \right ] =  \cL(L)$ where $\cL(L)$ is the Laplacian \tnote{do we need to use a fancy word, especially if we don't define it? Will there be other things than Laplacians of line graphs?} of the line graph $L$ of length $\tau(N)+ 1$. 
 Thus we have
 	\[
-		\Tr_{\rho_0} \E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right) \leq \poly(N) \eps.
+		\Tr_{\rho_0} \E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right) \leq \eps'.
 	\]
-	Notice that the operator $\E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right)$ is exactly the same as the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$. The propagation term has spectral gap $1/\poly(N)$ and its zero eigenspace is exactly the space of history states of the aforementioned computation. This, combined with Lemma~\ref{lem:closeness_to_groundspace}, implies that $\rho_0$ is $\poly(N,\eps)$-close to a history state of the computation $g_1g_2\cdots g_{\tau(N)}$.%\tnote{should the last implication refer to a theorem?}
-%	\paragraph{Initialization Check subtest.} The rejection probability in step \emph{(b)} (conditioned on getting past step \emph{(a)}) is
-%	\[
-%		\Tr_{\rho'} ( H_{init} ) \leq \poly(n) \sqrt{\eps}
-%	\]	
-%	where we define 
-%	\[
-%		H_{init} = \frac{1}{v} \sum_i \ketbra{0}{0}_{\sC_H} \otimes \ketbra{1}{1}_{\sV_i} 
-%	\] 
-%	where $v$ is the space complexity of the verifier $V$. %The inequality follows from similar reasoning as above.
-%	
-%	\paragraph{Output Check subtest.} Define $H_{out} = \ketbra{\tau}{\tau}_{\sC_H} \otimes \ketbra{0}{0}_{\sV_O}$ where $\sV_O$ denotes the output qubit of $\sV$. Similarly we have 
-%	\[
-%		\Tr_{\rho'} (H_{out}) \leq \poly(n) \sqrt{\eps}.
-%	\]
-%	Put together we have
-%	\[
-%		\Tr_{\rho'} \left ( H_{init} + H_{prop} + H_{out} \right ) \leq \poly(n) \eps.
-%	\]
-%	The expression $H = H_{init} + H_{prop} + H_{out}$ is nothing but the Feynman-Kitaev Hamiltonian for the computation $G_1, G_2, \ldots, G_\tau$. This implies that $\rho'$ is close to the groundspace of $H$ and therefore $\rho'$ is close to an accepting history state of the computation.	
+	For reasons that will become clear soon, we will let $H_{prop}$ denote the operator $\E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right)$. Notice that $H_{prop}$ is positive semidefinite, has smallest eigenvalue $0$ and the second smallest eigenvalue is at least $1/\poly(N)$. Using Lemma~\ref{lem:closeness_to_groundspace}, we have that $\rho_0$ is $\poly(N,\eps)$-close to a pure state $\ketbra{\theta}{\theta}$ satisfying $H_{prop} \ket{\theta} = 0$. 
+	
+	Now notice that $H_{prop}$ is resembles the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$~\cite{kitaev2002classical}. Thus any state $\ket{\theta}$ in the kernel of $H_{prop}$ must be a history state $\ket{\theta}_{\sC_{mip} \sP \sR} = \frac{1}{\sqrt{\tau(N)+1}} \sum_t \ket{t}_{\sC_{mip}} \otimes \ket{\theta_t}_{\sP \sR}$ where $\ket{\theta_t} = g_t \ket{\theta_{t-1}}$.
+	
+	We can thus construct a new honest Pauli strategy $\mathcal{S}'$ where the prover operators are the same as in $\mathcal{S}$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ (i.e. is a history state for the computation $g_1 g_2 \cdots g_{\tau(N)}$) and otherwise has the form~\eqref{eq:honest-psi}.\footnote{Such a state $\ket{\psi'}$ can be constructed by starting with $\ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ and ``propagating'' the Pauli operators as needed by the Pauli Check.} We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly(N,\eps)$, so $\mathcal{S}'$ is $\poly(N,\eps)$-close to $\mathcal{S}$, and furthermore $\mathcal{S}'$ is an honest Propagation Check strategy. This concludes the proof. \hnote{We will need to write what it means for two strategies to be close.}
+%	The propagation term has spectral gap $1/\poly(N)$ and its zero eigenspace is exactly the space of history states of the aforementioned computation.
+	
+	%This, combined with Lemma~\ref{lem:closeness_to_groundspace}, implies that $\rho_0$ is $\poly(N,\eps)$-close to a history state of the computation $g_1g_2\cdots g_{\tau(N)}$.%\tnote{should the last implication refer to a theorem?}
+	
 \end{proof}
 
 
@@ -377,20 +376,20 @@ An honest Propagation Check strategy $\mathcal{S}$ with shared state
 \[
 	\ket{\psi}_{\sC_{mip} \sC_p \sP \sR} = \frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sC_p \sP \sR}
 \]
-is an honest Input Check strategy if the initial state $\ket{\psi_0}_{\sP \sR}$ is such that the $\sV_{r-1,in}\sV_{r-1,work} \sM_{r-1}$ registers are in the state $\ket{G,V,M} \otimes \ket{0}$. In other words, the $(r-1)$-level verifier is properly initialized.
+is an honest Input Check strategy if the initial state $\ket{\psi_0}_{\sP \sR}$ is such that the $\sV_{r-1} \setminus \sC_{r-1} = \sV_{r-1,in}\sV_{r-1,work} \sM_{r-1}$ registers are in the state $\ket{G,V,M,0}$. In other words, the $(r-1)$-level verifier is properly initialized.
 
 %For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. A strategy $\mathcal{S}$ is an honest Propagation strategy if the Pauli operators are trusted and the shared state has the following form:
 %where $\ket{\psi_t}_{\sP \sE} = g_t \ket{\psi_{t-1}}_{\sP \sE}$ with $g_t$ being either a doubled Hadamard, a Toffoli, or a prover reflection. The state $\ket{\psi_0}$ is arbitrary.
 
 
 
-\begin{theorem}	
-\label{thm:input_check}
+\begin{lemma}	
+\label{lem:input_check}
 \begin{enumerate}
-	\item (\textbf{Completeness}) The honest Input Check strategy passes the $\textsc{Input Check}$ subprotocol with probability $1$. 
+	\item (\textbf{Completeness}) An honest Input Check strategy passes the $\textsc{Input Check}$ subprotocol with probability $1$. 
 	\item (\textbf{Soundness}) All honest Propagation Check strategies $\mathcal{S}$ that pass the $\textsc{Input Check}$ subprotocol with probability at least $1 - \eps$ are $\poly(N,\eps)$-close to the honest Input Check strategy.
 \end{enumerate}
-\end{theorem}
+\end{lemma}
 \begin{proof}
 The completeness statement of the Theorem is straightforward. We now argue about the soundness statement.
 
@@ -399,24 +398,36 @@ Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state. Let $\rho = 
 	\item $\Tr_\rho \left ( \ketbra{0}{0}_{\sC_p} \right) \geq 1/\poly(N)$
 	\item $	\left( \ketbra{0}{0}_{\sC_p} \right) \, \ket{\psi}_{\sC_p \sC_{mip} \sP \sR} = \frac{1}{\poly(N)} \sum_{t = 0}^{\tau(N)} \ket{0}_{\sC_p} \otimes \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}$
 \end{enumerate}
-These two items imply that $\Tr_\rho \left ( \ketbra{0,0}{0,0}_{\sC_p \sC_{mip}} \right) \geq 1/\poly(N)$. Let 
+Let $\Pi = \ketbra{0,0}{0,0}_{\sC_p \sC_{mip}}$. These two items imply that $\Tr_\rho (\Pi) \geq 1/\poly(N)$. Let 
 \[
-	\rho_0 = \frac{\left ( \ketbra{0,0}{0,0}_{\sC_p \sC_{mip}} \right) \, \rho \, \left ( \ketbra{0,0}{0,0}_{\sC_p \sC_{mip}} \right)}{\Tr_\rho \left ( \ketbra{0,0}{0,0}_{\sC_p \sC_{mip}} \right)} = \ketbra{0,0}{0,0}_{\sC} \otimes \ketbra{\psi_0}{\psi_0}_{\sP \sR}.
+	\rho_{00} = \frac{\Pi \rho \Pi}{\Tr_\rho (\Pi)} = \ketbra{0,0}{0,0}_{\sC} \otimes \ketbra{\psi_0}{\psi_0}_{\sP \sR}.
 \]
-The probability that \textsc{Input Check} rejects when the shared state is $\rho_0$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
+The probability that \textsc{Input Check} rejects when the shared state is $\rho_{00}$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
 
-Suppose now that the shared state in \textsc{Input Check} is $\rho_0$. Consider an ordering of the qubits in the registers $\sV_{r-1} \setminus \{ \sC_{r-1} \}$ so that $\sV_{r-1,in}$ goes first, followed by the rest of the registers. Let $x$ denote the string of length $|\sV_{r-1,in}|$ that is $(G,V,M)$ padded with zeroes. The probability of rejection is then
+Suppose now that the shared state in \textsc{Input Check} is $\rho_{00}$. Let $\sA = \sV_{r-1} \setminus \sC_{r-1}$ (i.e. all the qubits of $\sV_{r-1}$ except those in $\sC_{r-1}$) and $\sB = \sP \sR \setminus \sA$ (i.e. all the qubits of $\sP \sR$ except those in $\sA$). Consider an ordering of the qubits in the registers $\sA$  so that $\sV_{r-1,in}$ goes first, followed by the rest of the registers. Let $x$ denote the string of length $|\sV_{r-1,in}|$ that is $(G,V,M)$ padded with zeroes. The probability of rejection is then
 	\begin{equation}
-		\Tr_{\rho_0} ( H_{init} ) \leq \eps'
+		\Tr_{\rho_{00}} ( H_{init} ) \leq \eps'
 		\label{eq:init}
 	\end{equation}
 	where we define 
 	\[
-		H_{init} = \frac{1}{\left | \sV_{r-1} \setminus \{ \sC_{r-1} \} \right|} \left ( \sum_{i \in \sV_{r-1,in}} \ketbra{\overline{x}_i}{\overline{x}_i}_i +  \sum_{i \notin \sV_{r-1,in}} \ketbra{1}{1}_i \right)
+		H_{init} = \frac{1}{\left | \sA \right|} \left ( \sum_{i \in \sV_{r-1,in}} \ketbra{\overline{x}_i}{\overline{x}_i}_i +  \sum_{i \notin \sV_{r-1,in}} \ketbra{1}{1}_i \right)
 	\] 
-	where the first sum is over all the qubits in $\sV_{r-1,in}$ and the second sum is over all qubits in $\sV_{r-1} \setminus \{ \sC_{r-1} \}$ outside of $\sV_{r-1,in}$. We use $\overline{x}_i$ to denote the complement of the bit $x_i$. The subscripts on a projector (such as $\ketbra{1}{1}_i$) indicates which qubit it acts on.
+	where the first sum is over all the qubits in $\sV_{r-1,in}$ and the second sum is over all qubits in $\sA \setminus \sV_{r-1,in}$. We use $\overline{x}_i$ to denote the complement of the bit $x_i$. The subscripts on a projector (such as $\ketbra{1}{1}_i$) indicates which qubit it acts on. We use $|\sA|$ to denote the number of qubits in $\sA$. 
 	
-	The unique eigenvector of eigenvalue $0$ of $H_{init}$ (on the register $\sV_{r-1} \setminus \{ \sC_{r-1} \}$) is the state $\ket{G,V,M} \otimes \ket{0}$. Let $\Big( \rho_0 \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ denote the reduced density matrix of $\rho_0$ on the registers $\sV_{r-1} \setminus \{ \sC_{r-1} \}$. The inequality in~\eqref{eq:init} and Lemma~\ref{lem:closeness_to_groundspace} implies that $\Big( \rho_0 \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ is $\poly(N) \eps'$-close to $\ketbra{G,V,M}{G,V,M} \otimes \ketbra{0}{0}$. This finishes the proof.
+	Notice that $H_{init}$ resembles the term of the Feynman-Kitaev Hamiltonian that checks if the history state is initialized correctly. The unique eigenvector of eigenvalue $0$ of $H_{init}$ (on the register $\sA$) is the state $\ket{G,V,M,0}$. The inequality in~\eqref{eq:init} and Lemma~\ref{lem:closeness_to_groundspace} implies that
+	\[
+		\Norm{ \ket{\psi_0}_{\sP \sR} - \ket{G,V,M,0}_{\sA} \otimes \ket{\theta}_{\sB} }^2 \leq \poly(N,\eps)
+	\]
+	for some state $\ket{\theta}_{\sB}$.
+	
+	Thus we can construct a new honest Propagation strategy $\mathcal{S}'$ where the prover operators are the same as in $\mathcal{S}$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0,0}_{\sC} \otimes \ket{G,V,M,0}_{\sA} \otimes \ket{\theta}_{\sB}$, and otherwise has the form of an honest Propagation strategy. We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly(N,\eps)$, so therefore $\mathcal{S}'$ is $\poly(N,\eps)$-close to $\mathcal{S}$, and furthermore $\mathcal{S}'$ is an honest Input Check strategy. This concludes the proof.
+	
+%	$\Big( \rho_{00} \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ is $\poly(N) \eps'$-close to $\ketbra{G,V,M,0}{G,V,M,0}$. This finishes the proof.
+
+	
+%Let $\Big( \rho_0 \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ denote the reduced density matrix of $\rho_{00}$ on the registers $\sV_{r-1} \setminus \{ \sC_{r-1} \}$. 
+
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%		OUTPUT CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -448,8 +459,8 @@ Suppose now that the shared state in \textsc{Input Check} is $\rho_0$. Consider 
 
 %\paragraph{Honest strategy} 
 
-\begin{theorem}	
-\label{thm:output_check}
+\begin{lemma}	
+\label{lem:output_check}
 Let $\omega_{N,r-1}$ denote the maximum acceptance probability of the protocol that is executed by the verifier $UEVC_{N,r-1}$ on input $(G_{UEVC},V_{NV},M)$. 
 \begin{enumerate}
 	\item (\textbf{Completeness}) If $\omega_{N,r-1} = 1$, then there exists an honest Input Check strategy that passes the Output Check protocol with probability $1$.
@@ -459,7 +470,7 @@ Let $\omega_{N,r-1}$ denote the maximum acceptance probability of the protocol t
 	1 - \frac{1 - \omega_{N,r-1}}{\poly(N)}.
 \] 
 \end{enumerate}
-\end{theorem}
+\end{lemma}
 \begin{proof}
 The Completeness part of the Theorem statement follows from the fact that one can construct an honest Input Check strategy that corresponds to provers using the perfect strategy that achieves $\omega_{N,r-1} = 1$.
 
@@ -473,9 +484,9 @@ with the initial snapshot state $\ket{\psi_0}$ being properly initialized to $\k
 \]
 where $\ketbra{0}{0}_{out}$ is the projector onto the state $\ket{0}$ of the first qubit of the workspace register.
 
-Let $\rho = \ketbra{\psi}{\psi}$. We have that $\Tr \left (  \ketbra{0}{0}_{\sC_p} \otimes \ketbra{\tau(N)}{\tau(N)}_{\sC_{mip}} \, \rho \right) \geq 1/\poly(N)$. Let
+Let $\rho = \ketbra{\psi}{\psi}$. Let $\Pi = \ketbra{0}{0}_{\sC_p} \otimes \ketbra{\tau(N)}{\tau(N)}_{\sC_{mip}}$. We have that $\Tr_\rho (\Pi) \geq 1/\poly(N)$. Let
 \[
-\rho_0 = \frac{\left (\ketbra{0,\tau(N)}{0,\tau(N)}_{\sC} \right) \, \rho \, \left ( \ketbra{0,\tau(N)}{0,\tau(N)}_{\sC} \right)}{\Tr \left (  \ketbra{0,\tau(N)}{0,\tau(N)}_{\sC}\, \rho \right)} = \ketbra{0,\tau(N)}{0,\tau(N)}_{\sC} \otimes \ketbra{\psi_{\tau(N)}}{\psi_{\tau(N)}}.
+\rho_0 = \frac{\Pi \rho \Pi}{\Tr_\rho (\Pi)} = \ketbra{0,\tau(N)}{0,\tau(N)}_{\sC} \otimes \ketbra{\psi_{\tau(N)}}{\psi_{\tau(N)}}.
 \]
 The probability that \textsc{Output Check} rejects when the shared state $\rho_0$ is at most $\eps' = \poly(N) \eps$. The rejection probability when the shared state is $\rho_0$ can also be written as $\Tr \left ( \ketbra{0}{0}_{out} \, \ketbra{\psi_{\tau(N)}}{\psi_{\tau(N)}} \right)$, which is at least $1 - \omega_{N,r-1}$. This implies that
 \[
