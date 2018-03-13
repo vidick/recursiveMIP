@@ -118,7 +118,7 @@ We now define notions of closeness of strategies.
 
 
 \begin{definition}[Closeness of strategies]
-	Let $\mathcal{S} = (\rho,\{M_i\}), \mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL $G$. Then $\mathcal{S}$ is \textbf{$\eps$-close} to $\mathcal{S}'$ if and only if
+	Let $\mathcal{S} = (\rho,\{M_i\}), \mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL game $G$. Then $\mathcal{S}$ is \textbf{$\eps$-close} to $\mathcal{S}'$ if and only if
 	\begin{enumerate}
 		\item $ \norm{ \rho - \rho'}_{tr} \leq \eps$
 		\item For all $i$, for all $q \in \mathcal{Q}_i$, for $\sigma \in \{\rho,\rho'\}$
@@ -127,6 +127,17 @@ We now define notions of closeness of strategies.
 		\]
 	\end{enumerate}
 \end{definition}
+
+\begin{lemma}
+\label{lem:close_strategies}
+	Let $G$ be an ENL game, and let $\mathcal{S},\mathcal{S}'$ be strategies for $G$ that are $\eps$-close. Let $\omega_{\mathcal{S}}(G)$ and $\omega_{\mathcal{S}'}(G)$ denote the success probabilities of $\mathcal{S}$ and $\mathcal{S}'$ respectively in $G$. Then we have that
+	\[
+		\Abs{ \omega_{\mathcal{S}}(G) - \omega_{\mathcal{S}'}(G) } \leq \eps.
+	\]
+\end{lemma}
+\begin{proof}
+	\hnote{Insert proof here.}
+\end{proof}
 
 \begin{definition}
 Given the description of a family of circuits $V$ for the verifier in an ENL, we let $\omega^*(V)$ denote the maximum acceptance probability for a strategy of the provers in the game. 

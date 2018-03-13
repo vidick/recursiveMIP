@@ -203,15 +203,18 @@ A Toffoli or doubled Hadamard gate $g$ returned by the GTM $G$ always comes toge
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
-	Input: $(1^n,w,r,s,g)$, where $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$.
-    
+    \textbf{Toffoli Check} \\
+	Input: $(1^n,w,r,s,g)$, where $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$. 
 	\begin{enumerate}
 		\item Sample $\alpha \in \{0,1\}$ uniformly at random, and accept if $\alpha = 1$. Otherwise, continue.
 		\item Send the questions $Z_{u_1}$, $Z_{u_2}$, and $X_{u_3}$ to the prover holding qubit $u_1$, $u_2$, and $u_3$ respectively. Let $a_1,a_2,a_3 \in \{0,1\}$ be the three answer bits. 
 		\item Reject if $a_1 = a_2 = 1 \wedge s \oplus a_3 = 1$, or $a_1 a_2 = 0 \wedge s = 1$.
 		\item Accept otherwise.
 	\end{enumerate}    
-    
+    \vspace{10pt}
+\textbf{Hadamard Check} \\
+	Input: $(1^n,w,r,s,g)$, where $g$ is a double Hadamard gate acting on qubits $u_1,u_2$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$.
+
 	\begin{enumerate}
 		\item Sample $\alpha \in \{0,1\}$ uniformly at random.
 		\item If $\alpha = 0$, send the questions  $X_{u_1} X_{u_2}$ and $Z_{u_1} Z_{u_2}$ to the prover holding qubits $u_1$ and $u_2$.\footnote{We assume without loss of generality that the two qubits of a doubled Hadamard gate are held by the same prover.} Let $a_1,a_2$ be the two answer bits. Reject if $s \oplus a_1 = s \oplus a_2 = 1$, accept otherwise.
@@ -267,7 +270,7 @@ Any prover who was not explicitly sent a question is sent a null question, denot
 \paragraph{Question types} There are two types of questions in this test: Pauli operations, and a prover reflection question $\star$.
 
 
-\paragraph{The honest strategy} For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. An honest Pauli strategy $\mathcal{S}$ is an honest Propagation strategy if the shared state $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$, when projected onto the space where the $\sC_p$ register is all zeroes, is a history state of the computation $g_1g_2\cdots g_{\tau(N)}$. In other words, it has the following form:
+\paragraph{Honest Propagation Check strategy} For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. An honest Pauli strategy $\mathcal{S}$ is an honest Propagation Check strategy if the shared state $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$, when projected onto the space where the $\sC_p$ register is all zeroes, is a history state of the computation $g_1g_2\cdots g_{\tau(N)}$. In other words, it has the following form:
 \[
 	\left( \ketbra{0}{0}_{\sC_p} \right) \, \ket{\psi}_{\sC_p \sC_{mip} \sP \sR} = \ket{0}_{\sC_p} \otimes \frac{1}{\poly(N)} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}
 \]
@@ -365,7 +368,7 @@ Thus we have
 
 \paragraph{The high level} First, we will assume that the strategy is an honest \textsc{Propagation Check} strategy (and thus an honest Pauli strategy), meaning that the provers will share a history state of the protocol between the $(r-1)$-th level verifier $UEVC_{N,r-1}$ and a number of provers. The \textsc{Input Check} subroutine will check that in the first snapshot of the history state, the prover $PV$ (which is supposed to play the role of $UEVC_{N,r-1}$) has the $\sV_{r-1,in}$ register initialized to the input $(G,V,M)$, and $\sV_{r-1,work} $ set to zeroes. Furthermore, the subroutine will check that the $PP_i$ prover has the message register $\sM_{r-1,i}$ set to all zeroes.
 
-\paragraph{Honest strategy}
+\paragraph{Honest Input Check strategy}
 An honest Propagation Check strategy $\mathcal{S}$ with shared state
 \[
 	\ket{\psi}_{\sC_{mip} \sC_p \sP \sR} = \frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sC_p \sP \sR}
