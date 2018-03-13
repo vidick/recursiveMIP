@@ -16,6 +16,7 @@ The provers in the set $\mathcal{P}_r$ have the following labels and associated 
 	\item $PP_1,\ldots,PP_{\kappa(r-1)}$: These provers play the role of the $\kappa(r-1)$ provers $\mathcal{P}_{r-1}$ that the $(r-1)$-th level verifier interacts with.
 	\item $PA_1,\ldots,PA_{\sigma(r)}$: These are ancillary provers.
 \end{itemize}
+In addition we use the label $P$ to refer to an arbitrary prover $P\in\mathcal{P}_r$. 
 
 In what follows we use the notation $\sC,\sV_{in},\sV_{work}$, and $\sM_i$ introduced in Section~\label{sec:specs} to refer to registers on which the circuit $UEVC_{n,r}$ associated with the VTM acts on. In addition, we write $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\{ \sM_{r-1,i} \}_i$ to denote the registers that $UEVC_{N,r-1}$ acts on. We let $\sM_{r-1}$ denote the union of $\{ \sM_{r-1,i} \}_i$, and we let $\sV_{r-1}$ denote the union of $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\sM_{r-1}$. 
 
@@ -33,7 +34,8 @@ Inptut: $(1^n,w,r,G,V,M)$\\
   $w$ is a random string, $r$ the level of the verifier, $G$ a GTM, $V$ a VTM, and $M$ a TM.\\
 Each subroutine is decomposed in three phases. Each phase reads some tapes of the VTM and writes on some others. The phases are the following: 
 	\begin{enumerate}
-		\item (\textsc{ClockMeasurement}) In this phase the subroutine writes the description of a cicruit describing a quantum measurement on the measurement specification tape. The measurement applies to a clock register $\sC$, divided into two parts, $\sC_{p}$ and $\sC_{mip}$. 
+		\item (\textsc{ClockMeasurement}) In this phase the subroutine writes the description of a cicruit describing a quantum measurement on the measurement specification tape. The measurement applies to a clock register $\sC$, divided into two parts, $\sC_{p}$ and $\sC_{mip}$. To describe the measurements, for any integer $t$ we use the notation 
+$$\ket{\pm_t} \,=\, \frac{1}{\sqrt{2}}\big(\ket{t}\pm\ket{t+1}\big)\;.$$
 	\item (\textsc{GenQuestions}) In this phase the subroutine has access to the measurement outcome tape, and writes questions on the player question tape. The questions are denoted  by $q_V$, $q_{P,1},\ldots,q_{P,\kappa(r-1)}$, $q_{A,1},\ldots,q_{A,\sigma(r)}$, where the subscript indicates the label of the prover to which the question is to be sent. 
 		\item (\textsc{CheckAnswers}) In this phase the subroutine has access to the player answer tape, and writes on the referee decision tape. The player answer tape is assumed to contain answers labeled as $a_V$, $a_{P,1},\ldots,a_{P,\kappa(r-1)}$, $a_{A,1},\ldots,a_{A,\sigma(r)}$, where the subscript indicates the label of the prover from which the answer is obtained.
 	\end{enumerate}    
@@ -54,22 +56,22 @@ Each subroutine is decomposed in three phases. Each phase reads some tapes of th
 \subsection{Pauli check}
 \label{sec:pauli_check}
 
-	In the the \textsc{Pauli Check} subroutine, the verifier interacts with two players, $A$ and $B$. The VTM $V_{UEVC}$, which calls the \textsc{Pauli Check} subroutine, will choose for $A$ and $B$ to be played by different provers. $A$ will always be played by an ancilla prover $PA_i$ for some $i$, and $B$ will be played by one of $PV$ or the $PP_i$'s. See ``question types'' for a description of the format of the questions to the players.
-		
-	In this subroutine, the verifier performs one of several tests, chosen uniformly at random. In each test, the verifier performs a measurement on a subset of the qubits in register $\reg{C}_{p}$ identified as the clock qubits for the Pauli check. This register has dimension $2(N+1)$, and contains a bit $d$ followed by an integer $t\in\{0,\ldots,N\}$ written in binary. %For clarity, we keep the label $\reg{C}_{$ for the register containing the relevant qubits. \tnote{This is a bit convoluted. But there are different clocks this verifier holds. I don't know if we want to give each one a name}
+The \textsc{Pauli Check} subroutine described an interaction between the $r$-th level verifier and provers $PA_1$ and $PV$. In the description of the check we refer to the former as ``player A'' and to the latter as ``player B''. In the subroutine, the verifier performs one of several tests, chosen uniformly at random. The tests are summarized in Figure~\ref{fig:pauli_check} in an ``operational'' language. Formally, each test should be put in the form of actions for the VTM, following the template introduced in Figure~\ref{fig:check_structure}. 
+
+%For clarity, we keep the label $\reg{C}_{$ for the register containing the relevant qubits. \tnote{This is a bit convoluted. But there are different clocks this verifier holds. I don't know if we want to give each one a name}
 
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
     Input: $(1^n,w,r,G,V,M)$ \\
-    Perform one of the tests uniformly at random: 
+    Perform one of the tests uniformly at random. Each test should be interpreted as a three-phase procedure, as described in Figure~\ref{fig:check_structure}. The \textsc{ClockMeasurement} phase involves a measurement on the clock register $\reg{C}_p$ of dimension $2(N+1)$, with computational basis labeled by $\{(d,t)\in \{0,1\}\times \{0,\ldots,N\}\}$.  
 	\begin{enumerate}
  \item \emph{(EPR test)} Measure register $\reg{C}_{p}$ in the computational basis. Accept if the outcome $(d,t)\neq (0,0)$. Otherwise, execute the $2N$-qubit EPR test with A and B.\\
 \tnote{Intended goal: Checks that whenever A or B is sent an EPR question, it applies the corresponding Pauli observable, independently of any other question asked. A consequence of this test and the form of questions to player B is that we can write the observables it applies as a product of an observable for the EPR question, and an observable for the Pauli question, where each observable only depends on the corresponding question (and not on the pair of questions).}
 
 \item \emph{(Propagation check)} Let $t\in\{0,\ldots,N-1\}$ and $d\in\{0,1\}$ be chosen uniformly at random. Measure register $\reg{C}_{p}$ using the three-outcome POVM
-$$\Big\{ \Pi^0 = \proj{d} \otimes \proj{+_t},\; \Pi^1 =  \proj{d} \otimes \proj{-_t},\;\Pi^2 = \Id - \Pi^0-\Pi^1 \Big\}\;,$$
-where $\ket{\pm_t} = \frac{1}{\sqrt{2}}(\ket{t}\pm\ket{t+1})$. If the outcome is $c=2$, accept. Otherwise, if $d=0$, send $B$ the question $CZ_{t}$. If $d=1$, send B the question $CX_t$. Check that the answer reported by B equals $(-1)^c$, where $c\in\{0,1\}$ is the outcome obtained by the verifier.\\
+$$\Big\{ \Pi^0 = \proj{d} \otimes \proj{+_t},\; \Pi^1 =  \proj{d} \otimes \proj{-_t},\;\Pi^2 = \Id - \Pi^0-\Pi^1 \Big\}\;.$$
+If the outcome is $c=2$, accept. Otherwise, if $d=0$, send $B$ the question $CZ_{t}$. If $d=1$, send B the question $CX_t$. Check that the answer reported by B equals $(-1)^c$, where $c\in\{0,1\}$ is the outcome obtained by the verifier.\\
 \tnote{Intended goal: Check that the state shared by the players takes the form of a history state, where the reflection applied on Bob's registers $BB'$ at step $2$ only acts on register $B$ and the appropriate qubit of $B'$.}
 
 \item \emph{(CTL check)} Measure register $\reg{C}_{p}$ in the computational basis to obtain an outcome $(d,t)$. Send player A the EPR question $X'_{N+t}$ ($d=1$) or $X'_t$ ($d=0$).  Send player B the same EPR question as player A, as well as the Pauli question $X_t$ (if $d=1)$ or $Z_t$ (if $d=0$).  Reject if the product of the three answer bits received is not $1$.
@@ -161,18 +163,17 @@ The relations~\eqref{eq:x-com} and~\eqref{eq:z-com} are sufficient to verify tha
 \begin{center}
 \begin{mdframed}
     Input: $(1^n,w,r,G,V,M)$
-    \tnote{This figure is slightly inconsistent in that for 1. you write ``write into the tape...'', which is accurate, whereas for 2,3 you just write ``compute the questions''. For the Pauli check, I messed it up, I forgot these were meant to be VTMs. One suggestion is to have an additional figure, that can be used as a skeleton for all the checks, and sets some common language and notation (such as the clocks, things like $\ket{+_t}$, what is ``$a_P$'' (in item 3 below), etc. It would also make it easier to enforce consistency across tests}
 	\begin{enumerate}
-		\item (\textsc{ClockMeasurement}) Use $w$ to select a uniformly random time $1 \leq t \leq \tau(N)$, where $N = 2^n$. Write into the measurement specification tape a description for the circuit $C_M$ that implements the following measurement, which is a tensor product of a two-outcome POVM $F$ acting on register $\reg{C}_p$ and a three outcome POVM $\Pi_t$ acting on register $\reg{C}_{mip}$: %\tnote{how about a single zero for the $F^0$ projector? Right now the Pauli clock has two registers, but maybe this will change, so it'll be easier to remain consistent}
+		\item (\textsc{ClockMeasurement}) Select a uniformly random integer $t\in\{1,\ldots, \tau(N)\}$, where $N = 2^n$. Write on the measurement specification tape a description for the circuit $C_M$ that implements the following measurement, which is a tensor product of a two-outcome POVM $F$ acting on clock register $\reg{C}_p$ and a three outcome POVM $\Pi_t$ acting on clock register $\reg{C}_{mip}$: 
 \[
-	\{F^0 = \ketbra{0}{0}, F^1 = \Id - F^0 \}
+	\{F^0 = \ketbra{0}{0}, F^1 = \Id - F^0 \}\;,
 \]
 \[
 	\{ 	\Pi^0 = \ketbra{+_t}{+_t}, 
 	\Pi^1 = \ketbra{-_t}{-_t}, 
-	\Pi^2 = \Id - \Pi^0 - \Pi^1 \},
+	\Pi^2 = \Id - \Pi^0 - \Pi^1 \}\;.
 \]	
-where $\ket{\pm_t} = \frac{1}{\sqrt{2}} \left( \ket{t} \pm \ket{t+1} \right)$. Let $(p,s) \in \{0,1\} \times \{0,1,2\}$ denote the result of the six-outcome measurement $F \otimes \Pi_t$.
+Let $(p,s) \in \{0,1\} \times \{0,1,2\}$ denote the result of the six-outcome measurement $F \otimes \Pi_t$.
 
 	\item (\textsc{GenQuestions}) Execute the GTM $G$ to compute $g = G(N,r-1,t)$. 
 	\begin{itemize}
@@ -194,34 +195,27 @@ where $\ket{\pm_t} = \frac{1}{\sqrt{2}} \left( \ket{t} \pm \ket{t+1} \right)$. L
 \label{fig:prop_check}
 \end{figure}
 
-For completeness, we include the full descriptions of \textsc{Toffoli Check} and \textsc{Hadamard Check} from~\cite{ji2016compression}. Note that we implicitly combine the phases \textsc{ClockMeasurement}, \textsc{GenQuestions}, and \textsc{CheckAnswers} in the description of these protocols, but it should be clear what the phases are.
+The procedures  \textsc{Toffoli Check} and \textsc{Hadamard Check} are taken from~\cite{ji2016compression}. For completeness, we include a description. For simplicity we give an ``operational'' description of the procedures, with the understanding that each should be broken down into three phases, as described in Figure~\ref{fig:check_structure}.
 
-Furthermore, a Toffoli or doubled Hadamard gate $g$ acts on a set of qubits that the $(r-1)$-level verifier $UEVC_{N,r-1}$ is supposed to act on, and in the protocol executed by the $r$-level verifier $UEVC_{n,r}$, these qubits are distributed between the provers. Depending on which qubits the gate $g$ acts on, questions will be sent to different provers. 
+A Toffoli or doubled Hadamard gate $g$ returned by the GTM $G$ always comes together with labels for a set of qubits on which the gate acts on. These qubits refer to qubits on which the $(r-1)$-level verifier $UEVC_{N,r-1}$ acts on. In the protocol executed by the $r$-level verifier $UEVC_{n,r}$, the qubits are distributed among the provers. In the description of the tests, we refer to the ``prover holding qubit $u$'' to specify the appropriate prover. For example, if $u$ is a qubit in $\reg{V}_{r-1,in}$ then the prover is $PV$; if it is a qubit in $\reg{M}_{r-1,j}$ then the prover is $PP_j$, etc. 
 
-For example, suppose $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$. Suppose that $u_1,u_2$ are qubits in the register $\reg{V}_{r-1,in}$, and $u_3$ is a qubit in register $\reg{M}_{r-1,j}$ for some prover $P_j$. Then two Pauli questions will be sent to prover $PV$ and one Pauli question will be sent to prover $PP_j$, because $PP_j$ is supposed to hold the $\reg{M}_{r-1,j}$ register. \tnote{Maybe, rather than a ``for example'', we need a summary of how qubits are distributed between provers somewhere, that we can easily refer to?}
 
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
-	Input $(1^n,w,r,s,g)$ \\
-	\textbf{Toffoli Check} \\
-	Promise: $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$.
+	Input: $(1^n,w,r,s,g)$, where $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$.
     
 	\begin{enumerate}
 		\item Sample $\alpha \in \{0,1\}$ uniformly at random, and accept if $\alpha = 1$. Otherwise, continue.
-		\item Depending on which provers are supposed to hold the qubits $u_1,u_2,u_3$, send the appropriate provers the questions $\{Z_{u_1}, Z_{u_2}, X_{u_3} \}$. Let $a_1,a_2,a_3 \in \{0,1\}$ be the three answer bits. 
+		\item Send the questions $Z_{u_1}$, $Z_{u_2}$, and $X_{u_3}$ to the prover holding qubit $u_1$, $u_2$, and $u_3$ respectively. Let $a_1,a_2,a_3 \in \{0,1\}$ be the three answer bits. 
 		\item Reject if $a_1 = a_2 = 1 \wedge s \oplus a_3 = 1$, or $a_1 a_2 = 0 \wedge s = 1$.
 		\item Accept otherwise.
 	\end{enumerate}    
-	
-	\vspace{10pt}
-	\textbf{Hadamard Check} \\
-	Promise: $g$ is a doubled Hadamard gate acting on qubits $u_1,u_2$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$.
     
 	\begin{enumerate}
 		\item Sample $\alpha \in \{0,1\}$ uniformly at random.
-		\item If $\alpha = 0$, ask the appropriate prover (depending on who is supposed to hold $u_1,u_2$) to measure the two-qubit observables $X_{u_1} X_{u_2}$ and $Z_{u_1} Z_{u_2}$ simultaneously.\footnote{We assume without loss of generality that the two qubits of a doubled Hadamard gate are held by the same prover.} Let $a_1,a_2$ be the two answer bits. Reject if $s \oplus a_1 = s \oplus a_2 = 1$, accept otherwise.
-		\item If $\alpha = 1$, ask the appropriate prover to measure the two-qubit observables $X_{u_1} Z_{u_2}$ and $Z_{u_1} X_{u_2}$ simultaneously. Let $a_1,a_2$ be the two answer bits. Reject if $s \oplus a_1 = s \oplus a_2 = 1$ and accept otherwise.
+		\item If $\alpha = 0$, send the questions  $X_{u_1} X_{u_2}$ and $Z_{u_1} Z_{u_2}$ to the prover holding qubits $u_1$ and $u_2$.\footnote{We assume without loss of generality that the two qubits of a doubled Hadamard gate are held by the same prover.} Let $a_1,a_2$ be the two answer bits. Reject if $s \oplus a_1 = s \oplus a_2 = 1$, accept otherwise.
+		\item If $\alpha = 1$, send the questions $X_{u_1} Z_{u_2}$ and $Z_{u_1} X_{u_2}$ to the prover holding qubits $u_1$ and $u_2$. Let $a_1,a_2$ be the two answer bits. Reject if $s \oplus a_1 = s \oplus a_2 = 1$ and accept otherwise.
 	\end{enumerate}    
 \end{mdframed}
 
