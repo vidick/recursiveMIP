@@ -128,9 +128,18 @@ We now define notions of closeness of strategies.
 	\end{enumerate}
 \end{definition}
 
+\begin{definition}[Isometric strategies]
+	Let $\mathcal{S} = (\rho,\{M_i\}), \mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL game $G = (\mathcal{Q},\mathcal{A},\mu,V)$, where $\rho \in \Dens(\sC \sP_1 \cdots \sP_r)$ and $\rho \in \Dens(\sC \sP_1' \cdots \sP_r')$. Then $\mathcal{S}$ is \textbf{$\eps$-isometric} to $\mathcal{S}'$ if and only if there exists isometries $I_1,\ldots,I_r$ where each $I_i$ maps $\sP_i$ to $\sP_i'$ such that the strategy $\wt{\mathcal{S}} = (\wt{\rho}, \set{ \wt{M}_i })$ is $\eps$-close to $\mathcal{S}'$, where $\wt{\mathcal{S}}$ is defined by
+	\begin{enumerate}
+		\item $\wt{\rho} = (I_1 \otimes \cdots \otimes I_r) \rho (I_1 \otimes \cdots \otimes I_r)^\dagger$
+		\item For all $i$, for all $(q,a) \in \mathcal{Q}_i \times \mathcal{A}_i$, $\wt{M}_i(q,a) = I_i M_i(q,a) I_i^\dagger$.
+	\end{enumerate}
+\end{definition}
+
+
 \begin{lemma}
 \label{lem:close_strategies}
-	Let $G$ be an ENL game, and let $\mathcal{S},\mathcal{S}'$ be strategies for $G$ that are $\eps$-close. Let $\omega_{\mathcal{S}}(G)$ and $\omega_{\mathcal{S}'}(G)$ denote the success probabilities of $\mathcal{S}$ and $\mathcal{S}'$ respectively in $G$. Then we have that
+	Let $G$ be an ENL game, and let $\mathcal{S}$ be a strategy that is $\eps$-isometric to $\mathcal{S}'$. Let $\omega_{\mathcal{S}}(G)$ and $\omega_{\mathcal{S}'}(G)$ denote the success probabilities of $\mathcal{S}$ and $\mathcal{S}'$ respectively in $G$. Then we have that
 	\[
 		\Abs{ \omega_{\mathcal{S}}(G) - \omega_{\mathcal{S}'}(G) } \leq \eps.
 	\]
