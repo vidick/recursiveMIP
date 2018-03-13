@@ -23,6 +23,29 @@ For a given register $\sR$, we write $\supp(\sR)$ to denote the set of qubits in
 
 Furthermore, we divide the $\sC$ register (the one held by the $r$-level verifier) into two parts $\sC_{p}$ and $\sC_{mip}$. The $\sC_{p}$ register is used as the clock register for the \textsc{Pauli Check} subroutine, and $\sC_{mip}$ is used as the clock register for the history state of the $\MIPstar$ protocol performed by $UEVC_{N,r-1}$. 
 
+
+\vspace{10pt}
+\begin{center}
+\begin{mdframed}\tnote{didn't have time to finish this, but just to give the idea, see if it could be useful (see my note later on}
+    All subroutines take an input of the form $(1^n,w,r,G,V,M)$, where $w$ is a random string, \tnote{fill in}.
+		All subroutines are decomposed in three phases. Each phase reads some tapes of the VTM and writes on some others. We specify this common structure, to make it easier to refer to. 
+	\begin{enumerate}
+		\item (\textsc{ClockMeasurement}) In this phase the subroutine writes the description of a cicruit describing a quantum measurement on the measurement specification tape. The measurement will usually involve measuring a clock register. There are different clock registers \tnote{etc}. 
+	\item (\textsc{GenQuestions}) 
+		\item (\textsc{CheckAnswers}) 
+	\end{enumerate}    
+\end{mdframed}
+
+\end{center}
+\begin{figure}[H]
+\caption{Common structure for subroutines of $V_{UEVC}$}
+\label{fig:prop_check}
+\end{figure}
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%		PAULI CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Pauli check}
