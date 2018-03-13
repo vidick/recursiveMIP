@@ -3,6 +3,8 @@
 \usepackage{float}
 \usepackage{quoting}
 \usepackage{mdframed}
+\usepackage{thm-restate}
+\usepackage{cleveref}
 \quotingsetup{vskip=0pt,leftmargin=20pt,rightmargin=20pt}
 
 % options for preamble
@@ -18,6 +20,8 @@
 
 \input{macros}
 \setcounter{page}{1}
+
+\declaretheorem[name=Proposition,numberwithin=section]{proposition}
 
 %%%%%%%%%%%% Paper specific macros
 
@@ -38,6 +42,7 @@
 
 
 \newcommand*{\annotaterel}[2]{\stackrel{\scriptscriptstyle\text{#1}}{#2}}
+
 
 \DeclareUrlCommand\email{}
 
@@ -110,6 +115,7 @@
 \input{prelim}
 \input{recursive}
 \input{subroutines}
+\input{soundness}
 
 \bibliography{recursive}
 \bibliographystyle{alpha}

@@ -2,6 +2,7 @@
 
 \section{Preliminaries}
 
+
 \paragraph{Iterated exponential}
 Let $a,b \in \mathbb{R}$, and let $a > 0$. Let $R \geq 1$ be an integer. We define the iterated exponential function as
 \[
@@ -13,6 +14,19 @@ for $R > 1$, and when $R=1$ define $\exp^1_a(b) = a^b$. Equivalently,
 \]
 Furthermore, for convenience we will define $\exp^0_a(b) = b$ and $\exp^0_a(-b) = 1/b$ when $b \geq 0$.
 
+\subsection{Quantum information theory}
+
+\begin{lemma}
+\label{lem:closeness_to_groundspace}
+	Let $H$ be a positive semidefinite matrix acting on $\C^d$ with minimum eigenvalue $0$. Let $\Delta > 0$ denote the second smallest eigenvalue. Let $\Pi$ denote the projector onto the kernel of $H$. If $\ket{\psi}$ is a state such that $\bra{\psi} H \ket{\psi} \leq \eps$, then there exists a state $\ket{\theta}$ in the kernel of $H$ such that
+	\[
+		\left \| \ket{\psi} - \ket{\theta} \right \| \leq \sqrt{\eps/\Delta}.
+	\]
+\end{lemma}
+\begin{proof}
+	Follows from the Gentle Measurement Lemma~\cite{ogawa2002new}.
+	\hnote{Say more here?}
+\end{proof}
 
 \subsection{Quantum interactive protocols} 
 

@@ -108,6 +108,7 @@ Player A applies the honest strategy for the EPR test, using the $2N$-qubit regi
 The following lemma states completeness of the check. 
 
 \begin{lemma}[Completeness of the Pauli check]
+\label{lem:pauli_check_completeness}
 Let $\ket{\psi}_{\reg{BR}} \in \cH_\reg{B} \otimes \cH_\reg{R}$ be a state, such that $\reg{B}$ is an $N$-qubit quantum register. Let $X(a)$ and $Z(b)$, for $a,b\in\{0,1\}^N$, be Pauli operators on $\reg{B}$. Let $\reg{A}'$, $\reg{B}'$ be $2N$-qubit registers, and 
 \begin{equation}\label{eq:honest-psi}\ket{\Psi}_{\reg{C}_{p} \reg{A'B'BR}} \,=\, \frac{1}{\sqrt{2(N+1)}} \sum_{\substack{d\in\{0,1\} \\ t\in\{0,\ldots,N\}}} \ket{d,t}_{\reg{C}_{p}}  \frac{1}{2^N} \sum_{a,b \in \{0,1\}^N} \ket{a,b}_{\reg{A}'} \ket{a,b}_{\reg{B}'} \big(X(d\cdot a_{\leq t}) Z(b_{\leq t})\otimes \Id_R\big)\ket{\psi}_\reg{BR}\;.
 \end{equation}
@@ -118,6 +119,7 @@ The next lemma states soundness of the check.
 
 
 \begin{lemma}[Soundness of the Pauli check]
+\label{lem:pauli_check_soundness}
 Suppose players A and B sharing state $\ket{\psi}_{\reg{C}_p\reg{A'B'BR}}$ succeed with probability at least $1-\eps$ in \textsc{Pauli Check}. Here $\reg{C}_p$ is part of the register sent to the verifier, $\reg{A'}$ and $\reg{B'B}$ are held by $A$ and $B$ respectively, and $\reg{R}$ is arbitrary. 
 
 Then there exists a $\delta = \poly(n,\eps)$ and local isometries $V_A: \cH_A \to \cH_A \otimes \cH_{A'}$, $V_B:\cH_{B}\to  (\C^2)^{\otimes N} \otimes \cH_{B'} \otimes \cH_{B''}$ such that   for all Pauli questions $(W_1(w_1),W_2(w_2),W_3(w_3))$ and all triples of answers $(a_1,a_2,a_3)$, if $W^{abc}$ is the associated POVM for player B then 
@@ -307,7 +309,7 @@ Thus we have
 	\[
 		\Tr_{\rho_0} \E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right) \leq \poly(N) \eps.
 	\]
-	Notice that the operator $\E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right)$ is exactly the same as the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$. This implies that $\rho_0$ is $\poly(N,\eps)$-close to a history state of the computation $g_1g_2\cdots g_{\tau(N)}$.\tnote{should the last implication refer to a theorem?}
+	Notice that the operator $\E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right)$ is exactly the same as the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$. The propagation term has spectral gap $1/\poly(N)$ and its zero eigenspace is exactly the space of history states of the aforementioned computation. This, combined with Lemma~\ref{lem:closeness_to_groundspace}, implies that $\rho_0$ is $\poly(N,\eps)$-close to a history state of the computation $g_1g_2\cdots g_{\tau(N)}$.%\tnote{should the last implication refer to a theorem?}
 %	\paragraph{Initialization Check subtest.} The rejection probability in step \emph{(b)} (conditioned on getting past step \emph{(a)}) is
 %	\[
 %		\Tr_{\rho'} ( H_{init} ) \leq \poly(n) \sqrt{\eps}
@@ -411,7 +413,7 @@ Suppose now that the shared state in \textsc{Input Check} is $\rho_0$. Consider 
 	\] 
 	where the first sum is over all the qubits in $\sV_{r-1,in}$ and the second sum is over all qubits in $\sV_{r-1} \setminus \{ \sC_{r-1} \}$ outside of $\sV_{r-1,in}$. We use $\overline{x}_i$ to denote the complement of the bit $x_i$. The subscripts on a projector (such as $\ketbra{1}{1}_i$) indicates which qubit it acts on.
 	
-	The unique eigenvector of eigenvalue $0$ of $H_{init}$ (on the register $\sV_{r-1} \setminus \{ \sC_{r-1} \}$) is the state $\ket{G,V,M} \otimes \ket{0}$. Let $\Big( \rho_0 \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ denote the reduced density matrix of $\rho_0$ on the registers $\sV_{r-1} \setminus \{ \sC_{r-1} \}$. The inequality in~\eqref{eq:init} impies that $\Big( \rho_0 \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ is $\poly(N) \eps'$-close to $\ketbra{G,V,M}{G,V,M} \otimes \ketbra{0}{0}$. This finishes the proof.
+	The unique eigenvector of eigenvalue $0$ of $H_{init}$ (on the register $\sV_{r-1} \setminus \{ \sC_{r-1} \}$) is the state $\ket{G,V,M} \otimes \ket{0}$. Let $\Big( \rho_0 \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ denote the reduced density matrix of $\rho_0$ on the registers $\sV_{r-1} \setminus \{ \sC_{r-1} \}$. The inequality in~\eqref{eq:init} and Lemma~\ref{lem:closeness_to_groundspace} implies that $\Big( \rho_0 \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ is $\poly(N) \eps'$-close to $\ketbra{G,V,M}{G,V,M} \otimes \ketbra{0}{0}$. This finishes the proof.
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%		OUTPUT CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -445,13 +447,20 @@ Suppose now that the shared state in \textsc{Input Check} is $\rho_0$. Consider 
 
 \begin{theorem}	
 \label{thm:output_check}
-Let $\omega_{N,r-1}$ denote the maximum acceptance probability of the protocol that is executed by the verifier $UEVC_{N,r-1}$ on input $(G_{UEVC},V_{NV},M)$. All honest Input Check strategies pass the $\textsc{Output Check}$ subprotocol with probability at most 
+Let $\omega_{N,r-1}$ denote the maximum acceptance probability of the protocol that is executed by the verifier $UEVC_{N,r-1}$ on input $(G_{UEVC},V_{NV},M)$. 
+\begin{enumerate}
+	\item (\textbf{Completeness}) If $\omega_{N,r-1} = 1$, then there exists an honest Input Check strategy that passes the Output Check protocol with probability $1$.
+	
+	\item (\textbf{Soundness}) All honest Input Check strategies pass the Output Chek subprotocol with probability at most 
 \[
 	1 - \frac{1 - \omega_{N,r-1}}{\poly(N)}.
 \] 
+\end{enumerate}
 \end{theorem}
 \begin{proof}
-Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state. Let the rejection probability with this shared state be $\eps$. Since the strategy is an honest Input Check strategy, the shared state (when conditioned on $\sC_p$ register being zero) is a history state of the protocol executed by the verifier $UEVC_{N,r-1}$ with a number of provers,
+The Completeness part of the Theorem statement follows from the fact that one can construct an honest Input Check strategy that corresponds to provers using the perfect strategy that achieves $\omega_{N,r-1} = 1$.
+
+We now argue the Soundness part of the Theorem statement. Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state. Let the rejection probability with this shared state be $\eps$. Since the strategy is an honest Input Check strategy, the shared state (when conditioned on $\sC_p$ register being zero) is a history state of the protocol executed by the verifier $UEVC_{N,r-1}$ with a number of provers,
 \[
 \frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}
 \]
@@ -469,7 +478,8 @@ The probability that \textsc{Output Check} rejects when the shared state $\rho_0
 \[
 	\eps \geq \frac{1 - \omega_{N,r-1}}{\poly(N)}
 \]
-which concludes the proof.
+
+
 \end{proof}
 
 

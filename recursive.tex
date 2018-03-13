@@ -47,8 +47,8 @@ We let $N = 2^n$.
 \item If $r>0$ the verifier executes the $\kappa(r)$-prover extended game that corresponds to checking the history state for the $r$-prover extended verifier whose circuit is $CKT(G,1^N,r-1)$, with input to that circuit being $(G,V,M)$. Note that $UEVC_{n,r}$ cannot compute the entirety of $CKT(G,1^N,r-1)$ in $\poly(n)$ time. But it is enough for $UEVC_{n,r}$ to use the procedure $G(N,r-1,t)$ for a random value of $1\leq t\leq N$.
 \end{itemize}
 
-\begin{proposition}
-\label{prop:uevc_soundness}
+\begin{restatable}{proposition}{soundness}
+
 
 	Let $G_{UEVC}$ be the GTM for the circuit family $\{UEVC_{n,r}\}$, let $V$ be a VTM for a $2$-prover game, and let $M$ be a nondeterministic Turing machine. For any integer $n$ and $r$ let $\omega_{n,r} = \omega^*(UEVC_{n,r})$, when the input to $UEVC_{n,r}$ is $(G_{UEVC},V_{NV},M)$. 
 	
@@ -60,7 +60,10 @@ We let $N = 2^n$.
 		\omega_{n,r+1} \,\leq\, 1 - \frac{1 - \omega_{N,r}}{\poly(N)}\;.
 	\]
 	\end{itemize}
-\end{proposition}
+	\label{prop:uevc_soundness}
+\end{restatable}
+
+We defer the proof of Proposition~\ref{prop:uevc_soundness} until Section~\ref{sec:soundness}. 
 
 
 \begin{corollary}
