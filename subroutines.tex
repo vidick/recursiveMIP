@@ -8,7 +8,7 @@ Furthermore, the random choices made by the subroutines below are based on the r
 
 \paragraph{Notation} Each of the subroutines follows a similar structure, summarized in Figure~\ref{fig:check_structure}. The subroutines all take the same input $(1^n,w,r,G,V,M)$. $w$ is a string that is used to make all random choices. $r$ is an integer that indicates a ``level'' for the verifier. It is used to parametrize a set $\mathcal{P}_r$ of $\kappa(r)$ provers, each playing different roles. 
 
-The subroutines describe tests that are to be performed by the $r$-th level verifier. The tests are meant to enforce that the provers hold a history state for the protocol that would be carried out by the $(r-1)$-level verifier and the set of provers $\mathcal{P}_{r-1} \subseteq \mathcal{P}_r$. 
+The subroutines describe tests that are to be performed by the $r$-th level verifier. The tests are meant to enforce that the provers hold a history state for the protocol that would be carried out by the $(r-1)$-th level verifier and the set of provers $\mathcal{P}_{r-1} \subseteq \mathcal{P}_r$. 
 
 The provers in the set $\mathcal{P}_r$ have the following labels and associated roles:
 \begin{itemize}
@@ -259,7 +259,7 @@ A Toffoli or doubled Hadamard gate $g$ returned by the GTM $G$ always comes toge
 	where $\ket{-_t} = \frac{1}{\sqrt{2}} \left( \ket{t} - \ket{t+1} \right)$.
 \end{lemma}
 
-\paragraph{The high level}  At a high level, this test  proceeds as follows. The $r$-th level verifier samples a random time $t \in \{1,\ldots,\tau(N)\}$, and computes the $t$-th gate $g_t$ of $UEVC_{N,r-1}$ using the GTM $G = G_{UEVC}$. Most of the time, the gate $g_t$ is a (doubled) Hadamard or Toffoli gate that is computed by the $(r-1)$-level verifier $UEVC_{N,r-1}$. To check the propagation of such a gate, the $r$-level verifier executes the corresponding Hamadard or Toffoli Check (see Figure~\ref{fig:toffoli_hadamard_check}) to generate the corresponding questions. %If the gate $g_t$ does not act on any of the $\{ \sM_i\}$ register of $UEVC_{N,r-1}$, then the Hadamard/Toffoli check questions are sent to prover $PV$. If $g_t$ acts partially on the $\sM_i$ register, then the questions are partially sent to $PV$, and partially sent to $PP_i$. If $g_t$ acts fully on $\sM_i$, then all the questions are sent to $PP_i$.
+\paragraph{The high level}  At a high level, this test  proceeds as follows. The $r$-th level verifier samples a random time $t \in \{1,\ldots,\tau(N)\}$, and computes the $t$-th gate $g_t$ of $UEVC_{N,r-1}$ using the GTM $G = G_{UEVC}$. Most of the time, the gate $g_t$ is a (doubled) Hadamard or Toffoli gate that is computed by the $(r-1)$-th level verifier $UEVC_{N,r-1}$. To check the propagation of such a gate, the $r$-level verifier executes the corresponding Hamadard or Toffoli Check (see Figure~\ref{fig:toffoli_hadamard_check}) to generate the corresponding questions. %If the gate $g_t$ does not act on any of the $\{ \sM_i\}$ register of $UEVC_{N,r-1}$, then the Hadamard/Toffoli check questions are sent to prover $PV$. If $g_t$ acts partially on the $\sM_i$ register, then the questions are partially sent to $PV$, and partially sent to $PP_i$. If $g_t$ acts fully on $\sM_i$, then all the questions are sent to $PP_i$.
 In some cases the gate $g_t$ is not be a gate, but rather it represents the $i$-th prover's unitary. In that case, prover $i$ is sent the question $\star$.  
 
 Any prover who was not explicitly sent a question is sent a null question, denoted by $\bot$.
@@ -363,14 +363,14 @@ Thus we have
 \label{fig:input_check}
 \end{figure}
 
-\paragraph{The high level} First, we will assume that the strategy is an honest \textsc{Propagation Check} strategy (and thus an honest Pauli strategy), meaning that the provers will share a history state of the protocol between the $(r-1)$-level verifier $UEVC_{N,r-1}$ and a number of provers. The \textsc{Input Check} subroutine will check that in the first snapshot of the history state, the prover $PV$ (which is supposed to play the role of $UEVC_{N,r-1}$) has the $\sV_{r-1,in}$ register initialized to the input $(G,V,M)$, and $\sV_{r-1,work} $ set to zeroes. Furthermore, the subroutine will check that the $PP_i$ prover has the message register $\sM_{r-1,i}$ set to all zeroes.
+\paragraph{The high level} First, we will assume that the strategy is an honest \textsc{Propagation Check} strategy (and thus an honest Pauli strategy), meaning that the provers will share a history state of the protocol between the $(r-1)$-th level verifier $UEVC_{N,r-1}$ and a number of provers. The \textsc{Input Check} subroutine will check that in the first snapshot of the history state, the prover $PV$ (which is supposed to play the role of $UEVC_{N,r-1}$) has the $\sV_{r-1,in}$ register initialized to the input $(G,V,M)$, and $\sV_{r-1,work} $ set to zeroes. Furthermore, the subroutine will check that the $PP_i$ prover has the message register $\sM_{r-1,i}$ set to all zeroes.
 
 \paragraph{Honest strategy}
 An honest Propagation Check strategy $\mathcal{S}$ with shared state
 \[
 	\ket{\psi}_{\sC_{mip} \sC_p \sP \sR} = \frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sC_p \sP \sR}
 \]
-is an honest Input Check strategy if the initial state $\ket{\psi_0}_{\sP \sR}$ is such that the $\sV_{r-1} \setminus \sC_{r-1} = \sV_{r-1,in}\sV_{r-1,work} \sM_{r-1}$ registers are in the state $\ket{G,V,M,0}$. In other words, the $(r-1)$-level verifier is properly initialized.
+is an honest Input Check strategy if the initial state $\ket{\psi_0}_{\sP \sR}$ is such that the $\sV_{r-1} \setminus \sC_{r-1} = \sV_{r-1,in}\sV_{r-1,work} \sM_{r-1}$ registers are in the state $\ket{G,V,M,0}$. In other words, the $(r-1)$-th level verifier is properly initialized.
 
 %For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. A strategy $\mathcal{S}$ is an honest Propagation strategy if the Pauli operators are trusted and the shared state has the following form:
 %where $\ket{\psi_t}_{\sP \sE} = g_t \ket{\psi_{t-1}}_{\sP \sE}$ with $g_t$ being either a doubled Hadamard, a Toffoli, or a prover reflection. The state $\ket{\psi_0}$ is arbitrary.

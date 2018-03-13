@@ -16,9 +16,27 @@ Furthermore, for convenience we will define $\exp^0_a(b) = b$ and $\exp^0_a(-b) 
 
 \subsection{Quantum information theory}
 
+A quantum register is a named finite dimensional Hilbert space. We use san-serif script to denote registers, such as $\sA$, $\sB$, etc. 
+
+Let $\sA$ denote a register.
+\begin{enumerate}
+	\item $\Dens(\sA)$ denotes the set of density matrices on $\sA$.
+	\item $\Lin(\sA)$ denotes the set of linear operators on $\sA$.
+\end{enumerate}
+
+
+\paragraph{State-dependent distance measures}
+
+For a quantum state $\rho \in \Dens(\sA)$ and psd operators $M,N \in \Lin(\sA)$, we define 
+\begin{align}
+	\Tr_\rho(M) &:= \Tr(M \rho) \\
+	\langle M, N \rangle_\rho &:= \Tr_\rho (M^\dagger N) \\
+	\Norm{ M }_\rho & := \sqrt{ \langle M, M \rangle_\rho}.
+\end{align}
+
 \begin{lemma}
 \label{lem:closeness_to_groundspace}
-	Let $\Hilb_{\sA},\Hilb_{\sR}$ be Hilbert spaces. Let $H$ be a positive semidefinite matrix acting on $\Hilb_{\sA}$ with minimum eigenvalue $0$ and second smallest eigenvalue $\Delta > 0$. If $\ket{\psi}$ is a state on $\Hilb_{\sA} \otimes \Hilb_{\sR}$ such that $\bra{\psi} H_{\sA} \otimes \Id_{\sR} \ket{\psi} \leq \eps$, then there exists a state $\ket{\theta}$ in $\Hilb_{\sA} \otimes \Hilb_{\sR}$ such that $H \ket{\theta} = 0$ and
+	Let $\sA, \sR$ be registers. Let $H$ be a positive semidefinite matrix acting on $\sA$ with minimum eigenvalue $0$ and second smallest eigenvalue $\Delta > 0$. If $\ket{\psi}$ is a state on $\sA \sR$ such that $\bra{\psi} H_{\sA} \otimes \Id_{\sR} \ket{\psi} \leq \eps$, then there exists a state $\ket{\theta}$ in $\sA \sR$ such that $H \ket{\theta} = 0$ and
 	\[
 		\left \| \ket{\psi} - \ket{\theta} \right \| \leq \sqrt{\eps/\Delta}.
 	\]
@@ -55,25 +73,65 @@ We now define a canonically complete language for $\NEXPR$. Define $\mathcal{L}_
 	A language $L$ is in $\MIPstar(m,r)_{f(n)}$ if there is a $m$-player, $r$-round quantum interactive proof for $L$ with completeness-soundness gap $f(n)$, where $n$ is the input size. We write $\MIPstar(m,r) = \MIPstar(m,r)_{1/\poly(n)}$.
 \end{definition}
 
-\subsection{Games}
+\subsection{Games and strategies}
 
-\paragraph{Extended non-local (ENL) games} In an extended non-local (ENL) game, a quantum referee (which we will also call the \textbf{Extended Verifier}) interacts with one or more quantum players $P_1,\ldots,P_r$. Before the game starts, the players distribute a shared state $\rho_{\sR \sP_1 \cdots \sP_r}$ where the referee gets register $\sR$, and player $i$ gets register $\sP_i$. 
+\paragraph{Non-local games} An $r$-player non-local game $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mu,V)$ where $\mathcal{Q} = \mathcal{Q}_1 \times \cdots \times \mathcal{Q}_r$ and $\mathcal{A} = \mathcal{A}_1 \times \cdots \times \mathcal{A}_r$ are $r$-partite alphabets, $\mu$ is a distribution over $\mathcal{Q}$, and $V: \mathcal{Q} \times \mathcal{A} \to \{0,1\}$ is a verification predicate. 
+
+
+
+%In a non-local game, a classical referee (also called the \textbf{verifier}) interacts with two or more quantum players $P_1,\ldots,P_r$. 
+
+Such a non-local game is played in the following manner. Before the game starts, the players distribute a shared state $\rho_{\sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$. In the game, the referee uses private randomness to sample a tuple of \emph{questions} $(q_1,\ldots,q_r)$ from $\mu$, and sends $q_i$ to player $i$, who then performs local measurements on register $\sP_i$ of $\rho$ and returns the measurement outcome $a_i \in \mathcal{A}_i$ (called an \emph{answer}) to the referee. The referee accepts if and only if $V(q_1,\ldots,q_r,a_1,\ldots,a_r) = 1$. 
+
+
+\paragraph{Extended non-local (ENL) games} In an extended non-local (ENL) game, a quantum referee (which we will also call the \textbf{Extended Verifier}) interacts with one or more quantum players $P_1,\ldots,P_r$. Before the game starts, the players distribute a shared state $\rho_{\sC \sP_1 \cdots \sP_r}$ where the referee gets register $\sC$, and player $i$ gets register $\sP_i$. 
 
 In the game, the referee measures its part of the state, and based on the measurement outcome $s$, generates questions $q_1,\ldots,q_r$ and sends $q_i$ to player $P_i$, who measures $\sP_i$ (depending on $q_i$) and  responds with answer $a_i$. The referee then decides to accept or reject based on a predicate $V(s,q_1,\ldots,q_r,a_1,\ldots,a_r)$.
 
 An extended verifier can thus be described by three circuits: the first is a quantum circuit for the measurement to be performed on $\sR$, the second is a classical circuit that computes questions to the players, as a function of the input and the measurement outcome, and the third is a classical circuit that computes the referee's decision as a function of the measurement outcome, the questions, and the players' answers. 
 
+
+\hnote{TODO: Make the presentation of definitions of nonlocal games and ENL games consistent}
+
+\paragraph{Strategies}
+
+A strategy $\mathcal{S}$ for an $r$-player ENL game $G$ consists of a pair $(\rho,\{M_i\})$ where
+\begin{enumerate}
+	\item $\rho$ is a shared state on registers $\sC \sP_1 \cdots \sP_r$.
+	\item For each player $i$, $M_i$ is a map from $\mathcal{Q}_i \times \mathcal{A}_i$ to the set of positive semidefinite operators acting on $\sP_i$, satisfying the constraint that for all $q \in \mathcal{Q}_i$,
+	\[
+		\sum_{a \in \mathcal{A}_i} M_i(q,a) = \Id_{\sP_i}.
+	\]
+	That is, for all $q \in \mathcal{Q}_i$, $M_i(q) = \{M_i(q,a)\}_a$ is a POVM on $\sP_i$.
+	%For each player $i$, for each question $q \in \mathcal{Q}_i$, a POVM $\{ M_q^a \}_{a \in \mathcal{A}_i}$ acting on $\sP_i$. That is, these operators satisfy $\sum_{a \in \mathcal{A}_i} M_q^a = \Id$.
+\end{enumerate}
+
+
+We now define notions of closeness of strategies. 
+
+\begin{definition}[State-dependent closeness of POVMs]
+	Let $\rho \in \Dens(\sA)$ be a state and let $M = \{M^a\}_a,N = \{N^a\}_a$ be two POVMs that have the same set of possible outcomes. Then define 
+	\begin{align}
+		d_\rho \Paren{ M, N } := \Brac{ \sum_a \Norm{ M^a - N^a }_\rho^2 }^{1/2}.
+	\end{align}
+\end{definition}
+
+
+\begin{definition}[Closeness of strategies]
+	Let $\mathcal{S} = (\rho,\{M_i\}), \mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL $G$. Then $\mathcal{S}$ is \textbf{$\eps$-close} to $\mathcal{S}'$ if and only if
+	\begin{enumerate}
+		\item $ \norm{ \rho - \rho'}_{tr} \leq \eps$
+		\item For all $i$, for all $q \in \mathcal{Q}_i$, for $\sigma \in \{\rho,\rho'\}$
+		\[
+		d_\sigma(M_i(q),M_i(q)') \leq \eps.
+		\]
+	\end{enumerate}
+\end{definition}
+
 \begin{definition}
 Given the description of a family of circuits $V$ for the verifier in an ENL, we let $\omega^*(V)$ denote the maximum acceptance probability for a strategy of the provers in the game. 
 \end{definition}
 
-%\begin{theorem}[Single-shot compression]
-%	Let $G$ be an $r$-player ENL game such that the extended verifier circuit has size $S$, and furthermore there exists a gate Turing Machine $T_G$ such that on input $1 \leq t \leq S$ (written in binary), $T_G$ outputs the description of the $t$'th gate in $S$ in time $O(\poly \log(S))$. Then there exists an $r+1$-player ENL game $G'$ such that the extended verifier has size $O(\poly \log(S))$, and has value 
-%	\[
-%		1 - (1 - \omega^*(G))/\poly(S).
-%	\]
-%	Furthermore, there exists a gate Turing Machine $T_{G'}$ that specifies the $t$'th gate of the extended verifier of $G'$ in $\poly \log \log(S)$ time.
-%\end{theorem}
 
 \subsection{Turing machines}
 \label{sec:turing_machines}
