@@ -7,11 +7,11 @@ Here we give a proof of Proposition~\ref{prop:uevc_soundness}, which establishes
 
 \begin{proof}
 	
-	The Completeness statement of the Proposition follows from combining the Completeness statements of Lemmas~\ref{lem:pauli_check_completeness},~\ref{lem:prop_check},~\ref{lem:input_check}, and~\ref{lem:output_check}.
+	The Completeness statement of the Proposition follows from combining the Completeness statements of Lemmas~\ref{lem:pauli_check},~\ref{lem:prop_check},~\ref{lem:input_check}, and~\ref{lem:output_check}.
 	
 	We now prove the Soundness statement. Let $r > 1$. Let $\mathcal{S}$ be a prover strategy that succeeds with the optimal probability $\omega_{n,r} = 1 - \eps$ in the protocol executed by $UEVC_{n,r}$ on input $(G_{UEVC},N_{NV},M)$. Then in particular, it succeeds with probability at least $1 - 4\eps$ in each of the Pauli Check, Propagation Check, Input Check, and Output Check subroutines. 
 	
-	By Lemma~\ref{lem:pauli_check_soundness}, there exists an honest Pauli strategy $\mathcal{S}_1$ that is, up to $\poly(N,\eps)$-isometric to $\mathcal{S}$. Since isometries do not change the success probability of a strategy in the protocol, this implies that $\mathcal{S}_1$ succeeds in the Propagation, Input and Output Check subroutines with probability at least $1 - \poly(N,\eps)$ (using Lemma~\ref{lem:close_strategies}).
+	By Lemma~\ref{lem:pauli_check}, there exists an honest Pauli strategy $\mathcal{S}_1$ that is $\poly(N,\eps)$-isometric to $\mathcal{S}$. Since isometries do not change the success probability of a strategy in the protocol, this implies that $\mathcal{S}_1$ succeeds in the Propagation, Input and Output Check subroutines with probability at least $1 - \poly(N,\eps)$ (using Lemma~\ref{lem:close_strategies}).
 	
 	By Lemma~\ref{lem:prop_check}, there exists an honest Propagation Check strategy $\mathcal{S}_2$ that is $\poly(N,\eps)$-close to $\mathcal{S}_1$. This implies that $\mathcal{S}_2$ succeeds in the Input and Output Check subroutines with probability at least $1 - \poly(N,\eps)$ (using Lemma~\ref{lem:close_strategies} again).
 	
