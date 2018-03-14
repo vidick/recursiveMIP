@@ -301,7 +301,7 @@ A Toffoli or doubled Hadamard gate $g$ returned by the GTM $G$ always comes toge
 
 \begin{lemma}[Hadamard and Toffoli Check~\cite{ji2016compression}]
 \label{lem:ver_gate_check}
-	Let $\mathcal{S}$ be an honest Pauli strategy with $\rho_{\sC_{mip} \sP}$ as the shared state in \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}). Let $U$ denote a doubled Hadamard gate (resp. Toffoli gate). Then the \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}) rejects with probability \tnote{Do we want to use $\Tr_\rho$ as notation? The format for this soundness guarantee is different from the format in Pauli check. Are we going to use this? I am less used to it, but I'm fine either way.} \hnote{I think this is a clean format... the Propagation, Input and Output Check analyses all use the $\Tr_\rho$ format for the soundness guarantees.}
+	Let $\mathcal{S}$ be an honest Pauli strategy with $\rho_{\sC_{mip} \sP}$ as the shared state in \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}). Let $U$ denote a doubled Hadamard gate (resp. Toffoli gate). Then the \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}) rejects with probability \tnote{Do we want to use $\Tr_\rho$ as notation? The format for this soundness guarantee is different from the format in Pauli check. Are we going to use this? I am less used to it, but I'm fine either way.} \hnote{Update: the soundness guarantee of Pauli check doesn't need to use the $\Tr_\rho$ notation.}
 	
 	\[
 		\frac{1}{4} \Tr_{\rho} \left[ \Id - J_t \otimes U \right ]
@@ -336,6 +336,7 @@ For all $i$, the $\sB_{PP_i}$ register also has the name $\sM_{r-1,i}$. From thi
 
 \begin{lemma}	
 \label{lem:prop_check}
+\leavevmode
 \begin{enumerate}
 \item (\textbf{Completeness}) An honest Propagation strategy passes the $\textsc{Propagation Check}$ subprotocol with probability $1$. 
 \item (\textbf{Soundness}) All honest Pauli strategies $\mathcal{S}$ that pass the $\textsc{Propagation Check}$ subprotocol with probability at least $1 - \eps$ are $\poly(N,\eps)$-close to an honest Propagation Check strategy. \tnote{do you have a good way to write $\poly(N,\eps)$? I know I used it too. But of course $N^2 = \poly(N,\eps)$, which is not super helpful. I can only think of $\poly(N)\cdot \poly(\eps)$, which is kind of ugly.} \hnote{Maybe in the end, we can put $O(N^\alpha \eps^\beta)$ once we figure out $\alpha,\beta$, but for now we can just keep it $\poly(N,\eps)$ to make things less ugly.}
@@ -440,6 +441,7 @@ is an honest Input Check strategy if the initial state $\ket{\psi_0}_{\sP \sR}$ 
 
 \begin{lemma}	
 \label{lem:input_check}
+\leavevmode
 \begin{enumerate}
 	\item (\textbf{Completeness}) An honest Input Check strategy passes the $\textsc{Input Check}$ subprotocol with probability $1$. 
 	\item (\textbf{Soundness}) All honest Propagation Check strategies $\mathcal{S}$ that pass the $\textsc{Input Check}$ subprotocol with probability at least $1 - \eps$ are $\poly(N,\eps)$-close to the honest Input Check strategy.
