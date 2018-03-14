@@ -11,17 +11,21 @@ Here we give a proof of Proposition~\ref{prop:uevc_soundness}, which establishes
 	
 	We now prove the Soundness statement. Let $r > 1$. Let $\mathcal{S}$ be a prover strategy that succeeds with the optimal probability $\omega_{n,r} = 1 - \eps$ in the protocol executed by $UEVC_{n,r}$ on input $(G_{UEVC},N_{NV},M)$. Then in particular, it succeeds with probability at least $1 - 4\eps$ in each of the Pauli Check, Propagation Check, Input Check, and Output Check subroutines. 
 	
-	By Lemma~\ref{lem:pauli_check}, there exists an honest Pauli strategy $\mathcal{S}_1$ that is $\poly(N,\eps)$-isometric to $\mathcal{S}$. Since isometries do not change the success probability of a strategy in the protocol, this implies that $\mathcal{S}_1$ succeeds in the Propagation, Input and Output Check subroutines with probability at least $1 - \poly(N,\eps)$ (using Lemma~\ref{lem:close_strategies}).
+	By Lemma~\ref{lem:pauli_check}, there exists an honest Pauli strategy $\mathcal{S}_1$ such that $\mathcal{S}$ is $\poly[N;\eps]$-isometric to $\mathcal{S}_1$. Since isometries do not change the success probability of a strategy in the protocol, this implies that $\mathcal{S}_1$ succeeds in the Propagation, Input and Output Check subroutines with probability at least $1 - \poly[N;\eps]$ (using Lemma~\ref{lem:close_strategies}).
 	
-	By Lemma~\ref{lem:prop_check}, there exists an honest Propagation Check strategy $\mathcal{S}_2$ that is $\poly(N,\eps)$-close to $\mathcal{S}_1$. This implies that $\mathcal{S}_2$ succeeds in the Input and Output Check subroutines with probability at least $1 - \poly(N,\eps)$ (using Lemma~\ref{lem:close_strategies} again).
+	By Lemma~\ref{lem:prop_check}, there exists an honest Propagation Check strategy $\mathcal{S}_2$ that is $\poly[N;\eps]$-close to $\mathcal{S}_1$. This implies that $\mathcal{S}_2$ succeeds in the Input and Output Check subroutines with probability at least $1 - \poly[N;\eps]$ (using Lemma~\ref{lem:close_strategies} again).
 	
-	Now applying Lemma~\ref{lem:input_check}, there exists an honest Input Check strategy $\mathcal{S}_3$ that is $\poly(N,\eps)$-close to $\mathcal{S}_2$ that succeeds in the Output Check subroutine with probability at least $1 - \poly(N,\eps)$ (using Lemma~\ref{lem:close_strategies} once more).
+	Now applying Lemma~\ref{lem:input_check}, there exists an honest Input Check strategy $\mathcal{S}_3$ that is $\poly[N;\eps]$-close to $\mathcal{S}_2$ that succeeds in the Output Check subroutine with probability at least $1 - \poly[N;\eps]$ (using Lemma~\ref{lem:close_strategies} once more).
 	
 	Finally, applying Lemma~\ref{lem:output_check}, the success probability of $\mathcal{S}_3$ in the Output Check is at most 
 	\[
 		1 - \frac{1 - \omega_{N,r-1}}{\poly(N)}.
 	\]
-	This implies that
+	This implies that there exists $\beta > 0, 0 < \gamma < 1$ such that
+	\[
+		1 - N^\beta \eps^\gamma \leq 1 - \frac{1 - \omega_{N,r-1}}{\poly(N)}
+	\]
+	which implies
 	\[
 		\omega_{n,r} = 1 - \eps \leq 1 - \frac{(1 - \omega_{N,r-1})^\alpha}{\poly(N)}
 	\]

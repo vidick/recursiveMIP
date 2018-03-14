@@ -2,6 +2,7 @@
 
 \section{Preliminaries}
 
+For a positive integer quantity $N$ that tends to infinity, and a positive real quantity $\eps$ that tends to zero, we write $\poly[N;\eps]$ to denote a function of the form $N^\alpha \cdot \eps^\beta$ for constants $\alpha, \beta > 0$ that are independent of $N$ and $\eps$.
 
 \paragraph{Iterated exponential}
 Let $a,b \in \mathbb{R}$, and let $a > 0$. Let $R \geq 1$ be an integer. We define the iterated exponential function as
@@ -121,18 +122,19 @@ We now define notions of closeness of strategies.
 	Let $\mathcal{S} = (\rho,\{M_i\}), \mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL game $G$. Then $\mathcal{S}$ is \textbf{$\eps$-close} to $\mathcal{S}'$ if and only if
 	\begin{enumerate}
 		\item $ \norm{ \rho - \rho'}_{tr} \leq \eps$
-		\item For all $i\in\{1,\ldots,r\}$, for all $q \in \mathcal{Q}_i$, for $\sigma \in \{\rho,\rho'\}$ \tnote{why this? the first condition says that having the second for $\rho$ or $\rho'$ is enough}
+		\item For all $i\in\{1,\ldots,r\}$, for all $q \in \mathcal{Q}_i$,
+		%\tnote{why this? the first condition says that having the second for $\rho$ or $\rho'$ is enough}
 		\[
-		d_\sigma(M_i(q),M_i'(q)) \leq \eps.
+		d_\rho(M_i(q),M_i'(q)) \leq \eps.
 		\]
 	\end{enumerate}
 \end{definition}
 
 \begin{definition}[Isometric strategies]
-	Let $\mathcal{S} = (\rho,\{M_i\})$ and $\mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL game $G = (\mathcal{Q},\mathcal{A},\mu,V)$, where $\rho \in \Dens(\sC \sP_1 \cdots \sP_r)$ and $\rho' \in \Dens(\sC \sP_1' \cdots \sP_r')$. Then $\mathcal{S}$ is \textbf{$\eps$-isometric} to $\mathcal{S}'$ if and only if for each $i\in\{1,\ldots,r\}$ there is an isometry $I_i$ from $\sP_i$ to $\sP_i'$ such that the strategy $\wt{\mathcal{S}} = (\wt{\rho}, \set{ \wt{M}_i })$ is $\eps$-close to $\mathcal{S}'$, where $\wt{\mathcal{S}}$ is defined by
+	Let $\mathcal{S} = (\rho,\{M_i\})$ and $\mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL game $G = (\mathcal{Q},\mathcal{A},\mu,V)$, where $\rho \in \Dens(\sC \sP_1 \cdots \sP_r)$ and $\rho' \in \Dens(\sC \sP_1' \cdots \sP_r')$. Then $\mathcal{S}$ is \textbf{$\eps$-isometric} to $\mathcal{S}'$ if and only if there exist isometries: $I_i : \sP_i \to \sP_i'$ for each $i\in\{1,\ldots,r\}$ such that the strategy $\wt{\mathcal{S}} = (\wt{\rho}, \set{ \wt{M}_i })$ is $\eps$-close to $\mathcal{S}'$, where $\wt{\mathcal{S}}$ is defined by
 	\begin{enumerate}
 		\item $\wt{\rho} = (I_\sC \otimes I_1 \otimes \cdots \otimes I_r) \rho (I_\sC \otimes I_1 \otimes \cdots \otimes I_r)^\dagger$
-		\item For all $i$, for all $(q,a) \in \mathcal{Q}_i \times \mathcal{A}_i$, $\wt{M}_i(q,a) = I_i M_i(q,a) I_i^\dagger$.
+		\item For all $i$, for all $(q,a) \in \mathcal{Q}_i \times \mathcal{A}_i$, $\wt{M}_i(q,a) = I_i \, M_i(q,a)\, I_i^\dagger$.
 	\end{enumerate}
 \end{definition}
 
@@ -141,11 +143,12 @@ We now define notions of closeness of strategies.
 \label{lem:close_strategies}
 	Let $G$ be an ENL game, and let $\mathcal{S}$ be a strategy that is $\eps$-isometric to $\mathcal{S}'$. Let $\omega_{\mathcal{S}}(G)$ and $\omega_{\mathcal{S}'}(G)$ denote the success probabilities of $\mathcal{S}$ and $\mathcal{S}'$ respectively in $G$. Then we have that
 	\[
-		\Abs{ \omega_{\mathcal{S}}(G) - \omega_{\mathcal{S}'}(G) } \leq \eps.
+		\Abs{ \omega_{\mathcal{S}}(G) - \omega_{\mathcal{S}'}(G) } \leq O(\eps^c)
 	\]
+	for some universal constant $c > 0$.
 \end{lemma}
 \begin{proof}
-	\hnote{Insert proof here.}\tnote{there will be constants, and maybe even exponents, right?}
+	\hnote{Insert proof here.} 
 \end{proof}
 
 \begin{definition}
