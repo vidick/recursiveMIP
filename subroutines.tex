@@ -325,7 +325,14 @@ Any prover who was not explicitly sent a question is sent a null question, denot
 \[
 	\left( \ketbra{0}{0}_{\sC_p} \right) \, \ket{\psi}_{\sC_p \sC_{mip} \sP \sR} = \ket{0}_{\sC_p} \otimes \frac{1}{\poly(N)} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}
 \]
-where for all $t$, the state $\ket{\psi_t}_{\sP \sR}$ is defined to be $g_t \ket{\psi_{t-1}}_{\sP \sR}$ with $g_t$ being either a doubled Hadamard, a Toffoli, or a prover reflection acting on the correct registers. The state $\ket{\psi_0}$ is arbitrary. The $r$'th level verifier holds register $\sC = \sC_p \sC_{mip}$ and the provers $PP_1,\ldots,PP_{\kappa(r-1)},PV$ jointly hold $\sP$. The register $\sP$ itself is decomposed into a tensor product of registers $\sC_{r-1}, \sV_{r-1,in}, \sV_{r-1,work}$ (all held by prover $PV$) and registers $\{ \sM_{r-1,i} \}$ (held by provers $\{ PP_i \}$). We can assume that the register $\sP$ has this tensor product structure because the strategy is an honest Pauli strategy. The register $\sR$ is some purifying register (part of which may be shared by the verifier and provers). 
+where for all $t$, the state $\ket{\psi_t}_{\sP \sR}$ is defined to be $g_t \ket{\psi_{t-1}}_{\sP \sR}$ with $g_t$ being either a doubled Hadamard, a Toffoli, or a prover reflection acting on the correct registers. The state $\ket{\psi_0}$ is arbitrary. The $r$'th level verifier holds register $\sC = \sC_p \sC_{mip}$ and the provers in $\mathcal{P}_r$ jointly hold $\sP$. The register $\sP$ itself is decomposed into a tensor product of registers $\bigotimes_P \sP_P$. 
+
+Since $\mathcal{S}$ is an honest Pauli Check strategy, the register $\sP_P$ corresponding to a non-ancillary prover $P \in \mathcal{R}_r$ has additional structure: it includes two registers $\sB_P' \sB_P$. We will further refine the naming of these registers.
+
+The register $\sB_{PV}$ (belonging to prover $PV$) consists of $N$ qubits, and is divided into three registers $\sC_{r-1}, \sV_{r-1,in}, \sV_{r-1,work}$, each of size $N/3$ qubits \hnote{Subject to change...}. 
+For all $i$, the $\sB_{PP_i}$ register also has the name $\sM_{r-1,i}$. From this point on, we will not refer to the $\sB_P$ registers and use these new names.
+
+% (all held by prover $PV$) and registers $\{ \sM_{r-1,i} \}$ (held by provers $\{ PP_i \}$). We can assume that the register $\sP$ has this tensor product structure because the strategy is an honest Pauli strategy. The register $\sR$ is some purifying register (part of which may be shared by the verifier and provers). 
 
 \begin{lemma}	
 \label{lem:prop_check}
