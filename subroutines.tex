@@ -18,11 +18,10 @@ The provers in the set $\mathcal{P}_r$ have the following labels and associated 
 %	\item $PA_1,\ldots,PA_{\kappa(r-1)}$: These are ancillary provers.
 \end{itemize}
 %We match the ancillary provers with the other provers in $\mathcal{P}_r$ in the following way: the ancillary prover corresponding to $PV$ is $PA_V$, and the ancillary prover corresponding to $PP_i$ is $PA_i$ for all $i$. 
-We will let $\mathcal{R}_r$ denote the set $\{PV,PP_1,\ldots,PP_{\kappa(r-1)} \} \subset \mathcal{P}_r$ to denote the set of non-ancillary provers. Furthermore, we order the provers in $\mathcal{P}_r$ for notational convenience: $PV < PP_1 < \cdots < PP_{\kappa(r-1)} < PA$. 
-
+We let $\mathcal{R}_r$ denote the set $\{PV,PP_1,\ldots,PP_{\kappa(r-1)} \} \subset \mathcal{P}_r$ to denote the set of non-ancillary provers. Furthermore, we order the provers in $\mathcal{P}_r$ for notational convenience: $PV < PP_1 < \cdots < PP_{\kappa(r-1)} < PA$. 
 We use the label $P$ to refer to an arbitrary prover $P\in\mathcal{P}_r$. 
 
-In what follows we use the notation $\sC,\sV_{in},\sV_{work}$, and $\sM_i$ introduced in Section~\label{sec:specs} to refer to registers on which the circuit $UEVC_{n,r}$ associated with the VTM acts on. In addition, we write $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\{ \sM_{r-1,i} \}_i$ to denote the registers that $UEVC_{N,r-1}$ acts on. We let $\sM_{r-1}$ denote the union of $\{ \sM_{r-1,i} \}_i$, and we let $\sV_{r-1}$ denote the union of $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\sM_{r-1}$. 
+In what follows we use the notation $\sC,\sV_{in},\sV_{work}$, and $\sM_i$ introduced in Section~\ref{sec:specs} to refer to registers on which the circuit $UEVC_{n,r}$ associated with the VTM acts on. In addition, we write $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\{ \sM_{r-1,i} \}_i$ to denote the registers that $UEVC_{N,r-1}$ acts on. We let $\sM_{r-1}$ denote the union of $\{ \sM_{r-1,i} \}_i$, and we let $\sV_{r-1}$ denote the union of $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\sM_{r-1}$. 
 
 For a given register $\sR$, we write $\supp(\sR)$ to denote the set of qubits in $\sR$.
 
@@ -60,7 +59,7 @@ $$\ket{\pm_t} \,=\, \frac{1}{\sqrt{2}}\big(\ket{t}\pm\ket{t+1}\big)\;.$$
 \subsection{Pauli check}
 \label{sec:pauli_check}
 
-The \textsc{Pauli Check} subroutine describes an interaction between the $r$-th level verifier and the provers $\mathcal{P}_r$. In the subroutine, the verifier will call prover $PA$ ``player A'', and then pick a random prover from the set $\mathcal{R}_r = \{ PV, PP_1,\ldots,PP_{\kappa(r-1)}\}$, and call this prover ``player B''. For the rest of the subroutine, the verifier will only interact with players A and B. 
+The \textsc{Pauli Check} subroutine describes an interaction between the $r$-th level verifier and the provers $\mathcal{P}_r$. In the subroutine, the verifier interacts with two players, taken from the set $\mathcal{P}_r$. The first player is always $PA$, and called ``player A'' in the subroutine. The second player is called ``player B'', and it is chosen randomly among the set $\mathcal{R}_r = \{ PV, PP_1,\ldots,PP_{\kappa(r-1)}\}$. For the rest of the subroutine, the verifier will only interact with players A and B. \tnote{Added, check it's true:}Note that player A is always told which prover plays the role of player B.  
 %provers $PA_1$ and $PV$. In the description of the check we refer to the former as ``player A'' and to the latter as ``player B''. 
 
 In the subroutine, the verifier performs one of several tests, chosen uniformly at random. The tests are summarized in Figure~\ref{fig:pauli_check} in an ``operational'' language. Formally, each test should be put in the form of actions for the VTM, following the template introduced in Figure~\ref{fig:check_structure}. 
@@ -71,16 +70,16 @@ In the subroutine, the verifier performs one of several tests, chosen uniformly 
     Input: $(1^n,w,r,G,V,M)$ \\
     \\
 	Let player A denote prover $PA$.
-    Choose a random prover $P^*$ from the set of non-ancillary provers $\mathcal{R}_r$, and let player B denote prover $P^*$. \\
+    Choose a random prover $P^*$ from the set of non-ancillary provers $\mathcal{R}_r$, and let player B denote prover $P^*$. \tnote{should we write we are telling them who they are, and who the other is?}\\
 %    Let player A denote the ancillary prover corresponding to $P$ (see the Notation subsection above). \\
     \\
-    Perform one of the tests uniformly at random. Each test should be interpreted as a three-phase procedure, as described in Figure~\ref{fig:check_structure}. \hnote{This is already stated in the paragraph above the box.} The \textsc{ClockMeasurement} phase involves a measurement on the clock register $\reg{C}_p$ of dimension $2(\kappa(r-1)+1)(N+1)$, with computational basis labeled by 
+    Perform one of the tests uniformly at random. Each test should be interpreted as a three-phase procedure, as described in Figure~\ref{fig:check_structure}. \hnote{This is already stated in the paragraph above the box.}\tnote{Yeah but I'm strongly in favor of redundancy, especially with boxes. Someone might look up just the box, and not realize stuff is defined elsewhere. Since this is the ``template box'' I think it doesn't hurt. But I'm ok removing if you find it too ugly} The \textsc{ClockMeasurement} phase involves a measurement on the clock register $\reg{C}_p$ of dimension $2(N+1)(\kappa(r-1)+1)$, with computational basis labeled by 
     \[
     (d,t,P)\in \{0,1\}\times \{0,\ldots,N\} \times \mathcal{R}_r .
     \]
     
 	\begin{enumerate}
- \item \emph{(EPR test)} Measure register $\reg{C}_{p}$ in the computational basis. Accept if the outcome $(t,P)\neq (0,P^*)$ (we do not care what $d$ is). Otherwise, execute the $2N$-qubit EPR test with A and B, where A's questions are augmented by $P^*$ (i.e. which prover that player B corresponds to). \\
+ \item \emph{(EPR test)} Measure register $\reg{C}_{p}$ in the computational basis. Accept if the outcome $(t,P)\neq (0,P^*)$ (we do not care what $d$ is\tnote{who is ``we''??? Please don't write this kind of stuff, then I need to fix the language and add notes all over the place}). Otherwise, execute the $2N$-qubit EPR test with A and B, where A's questions are augmented by $P^*$ (i.e. which prover that player B corresponds to). \\
 \tnote{Intended goal: Checks that whenever A or B is sent an EPR question, it applies the corresponding Pauli observable, independently of any other question asked. A consequence of this test and the form of questions to player B is that we can write the observables it applies as a product of an observable for the EPR question, and an observable for the Pauli question, where each observable only depends on the corresponding question (and not on the pair of questions).}
 
 \item \emph{(Propagation check)} Let $t\in\{0,\ldots,N-1\}$ and $d\in\{0,1\}$ be chosen uniformly at random. Measure register $\reg{C}_{p}$ using the three-outcome POVM
@@ -119,19 +118,19 @@ $$\{W_1(w_1),W_2(w_2),W_3(w_3)\}\,\subseteq\,\{X(a),Z(b)\,|\; a,b\in\{0,1\}^N\}$
 Player A is always sent an EPR question and the identity of player B. Player B is always sent a pair consisting of an EPR question and a Pauli, or CTL-Pauli question. In the test as described in Figure~\ref{fig:pauli_check} Pauli questions consist of a single Pauli operator. In fact, the Pauli question is always embedded in a triple of commuting Pauli operators of weight at most $3$, where the other two operators are chosen uniformly among pairs that mutually commute and commute with the ``real'' question. In addition, even if the test only calls for a Pauli question, an EPR question is asked and chosen at random. (For a CTL-Pauli question of the form $CX_i$ (resp. $CZ_j$), the EPR question can be any question not involving the index $i$ (resp. $n+j$).) In all cases, only the player's answer to the ``real'' question is taken into account in the verifier's decision. 
 
 \paragraph{The honest Pauli Check strategy}
-A strategy $\mathcal{S} = (\rho,\{ M_P \})$ is an \textbf{honest Pauli Check strategy} if the following conditions are met. First, $\rho$ is a pure state $\ketbra{\psi}{\psi}$ on registers $\sC \sP_1 \cdots \sP_{\kappa(r)} \sR$, where $\sC = \sC_p \sC_{mip}$ is given to the $r$-th level verifier, $\sP_1 \cdots \sP_{\kappa(r)}$ is distributed among the provers in $\mathcal{P}_r$, and $\sR$ is a purifying register (parts of which may also be shared by the provers). For all provers $P \in \mathcal{P}_r$, the register $\sP_P$ is given to $P$.\footnote{Here we label the prover registers in two ways. To refer to prover $P$'s registers, we use $\sP_P$. If we are simply iterating over them, then we use an integer index such as $\sP_i$.}  For each non-ancillary prover $P \in \mathcal{R}_r$, the register $\sP_P$ includes two registers $\sB_P' \sB_P$, where $\sB_P'$ consists of $2N$ qubits and $\sB_P$ consists of $N$ qubits. The register $\sP_{PA}$ (corresponding to ancillary prover $PA$) includes registers $\{ \sA_P' \}_{P \in \mathcal{R}_r}$, where $\sA_P'$ consists of $2N$ qubits.
+A strategy $\mathcal{S} = (\rho,\{ M_P \})$ is an \textbf{honest Pauli Check strategy} if the following conditions are met. First, $\rho$ is a pure state $\ketbra{\psi}{\psi}$ on registers $\sC \sP_1 \cdots \sP_{\kappa(r)} \sR$, where $\sC = \sC_p \sC_{mip}$ is given to the $r$-th level verifier, $\sP_1 \cdots \sP_{\kappa(r)}$ is distributed among the provers in $\mathcal{P}_r$, and $\sR$ is a purifying register (parts of which may also be shared by the provers\tnote{this comment is confusing, do we need it?}). For all provers $P \in \mathcal{P}_r$, the register $\sP_P$ is given to $P$.\footnote{Here we label the prover registers in two ways. To refer to prover $P$'s registers, we use $\sP_P$. If we are simply iterating over them, then we use an integer index such as $\sP_i$.}  For each non-ancillary prover $P \in \mathcal{R}_r$, the register $\sP_P$ includes two registers $\sB'_P \sB_P$, where $\sB'_P$ consists of $2N$ qubits and $\sB_P$ consists of $N$ qubits. The register $\sP_{PA}$ (corresponding to ancillary prover $PA$) includes registers $\{ \sA_P' \}_{P \in \mathcal{R}_r}$, where $\sA_P'$ consists of $2N$ qubits.
 \hnote{At some point we should make a picture of all the provers with all the registers.}
 
 The state $\ket{\psi}$ has the following form:
 \begin{equation}
-	\ket{\psi} = \frac{1}{\sqrt{\dim \sC_p}} \sum_{\substack{d \in \set{0,1} \\ t \in \set{0,\ldots,N} \\ P \in \mathcal{R}_r}} \ket{d,t,P}_{\sC_p} \otimes \ket{\psi_{d,t,P}}_{\sC_{mip} \sP \sR}
+	\ket{\psi} = \frac{1}{\sqrt{\dim \sC_p}} \sum_{\substack{d \in \set{0,1} \\ t \in \set{0,\ldots,N} \\ P \in \mathcal{R}_r}} \ket{d,t,P}_{\sC_p} \otimes \ket{\psi_{d,t,P}}_{\sC_{mip} \sP \sR}\;,
 	\label{eq:honest-psi}
 \end{equation}
 where 
 \[
-	\ket{\psi_{1,0,PV}}_{\sC_{mip} \sP \sR} = \ket{\psi_{0,0,PV}}_{\sC_{mip} \sP \sR} = \Paren{ \bigotimes_{P \in \mathcal{R}_r} \ket{\Phi}_{\sA_P' \sB_P'}} \otimes \ket{\theta}_{\sC_{mip} \sB_{PV} \cdots \sB_{PP_{\kappa(r-1)}} \sR}
-\]
-for some state $\ket{\theta}$. Here, the state $\ket{\Phi}_{\sA_P' \sB_P'}$ is a tensor product of $2N$ EPR pairs, shared between $\sA_P'$ and $\sB_P'$. 
+	\ket{\psi_{1,0,PV}}_{\sC_{mip} \sP \sR} = \ket{\psi_{0,0,PV}}_{\sC_{mip} \sP \sR} = \Paren{ \bigotimes_{P \in \mathcal{R}_r} \ket{\Phi}_{\sA_P' \sB_P'}} \otimes \ket{\theta}_{\sC_{mip} \sB_{PV} \cdots \sB_{PP_{\kappa(r-1)}} \sR}\;,
+\]\tnote{earlier you wrote $\sP_P$ ``includes'' $\sB_P$ and $\sB'_P$, so it might seem like some registers are missing above}
+for some state $\ket{\theta}$. Here, the state $\ket{\Phi}_{\sA_P' \sB_P'}$ is a tensor product of $2N$ EPR pairs across registers $\sA_P'$ and $\sB_P'$. 
 %We identify the register $\sP$ with a tensor product of registers $\sA_P' \sB_P' \sB_P$ for each $P \in \mathcal{R}_r$. Each $\sB_P$ register is isomorphic to $(\C^2)^{\otimes N}$. Each prover $P \in \mathcal{R}_r$ gets registers $\sB_P' \sB_P$. Prover $PA$ gets the registers $\{ \sA_P' \}$.
 
 We define the rest of the states inductively. For $t > 0$ and $P \in \mathcal{R}_r$, define
@@ -139,6 +138,7 @@ We define the rest of the states inductively. For $t > 0$ and $P \in \mathcal{R}
 	\ket{\psi_{0,t,P}} = CZ_t \ket{\psi_{0,t-1,P}} \\
 	\ket{\psi_{1,t,P}} = CX_t CZ_t \ket{\psi_{1,t-1,P}}
 \end{align}
+\tnote{I think the second line should only have $CX_t$, because when $d=1$ this means all the $CZ_t$ have been applied already}
 where $CZ_t$ (resp. $CX_t$) is a controlled-$Z$ (resp. controlled-$X$) gate whose control qubit is the $\sB_P'$ part of the $t$-th EPR pair (resp. $(N+t)$-th EPR pair) of $\ket{\Phi}_{\sA_P' \sB_P'}$, and whose target qubit is the $t$-th qubit of $\sB_P$. 
 
 %The players share a state of the form~\eqref{eq:honest-psi}, where $\ket{\psi}_{\reg{BR}}$ is arbitrary and $\{X_i,Z_j:\, i,j\in\{1,\ldots,N\}\}$ are observables on $\mathcal{H}_\reg{B}$ that satisfy the Pauli relations. For $a,b\in \{0,1\}^N$ and $t\in\{0,\ldots,n\}$ let $X(a_{\leq t}) = X_t^{a_t}\cdots X_1^{a_1}$ and $Z(b_{\leq t}) = Z_t^{b_t}\cdots Z_1^{b_1}$. We also write $X(a)$ and $Z(b)$ for $X(a_{\leq N})$ and $Z(b_{\leq N})$ respectively. 
@@ -181,7 +181,7 @@ This finishes the specification of the state $\rho$. The next part of the specif
 \begin{enumerate}
 	\item (\textbf{Completeness}) Any honest Pauli Check strategy passes the Pauli Check subroutine with probability $1$.
 	
-	\item (\textbf{Soundness}) Any strategy $\mathcal{S}$ that passes the Pauli Check with probability at least $1 - \eps$ is $\delta$-isometric to an honest Pauli Check strategy for some $\delta = \poly(N,\eps)$.
+	\item (\textbf{Soundness}) Any strategy $\mathcal{S}$ that passes the Pauli Check with probability at least $1 - \eps$ is $\delta$-isometric to an honest Pauli Check strategy for some $\delta = \poly(N,\eps)$.\tnote{seriously we need a better notation for it. How about, $\delta \in \poly[N,\eps]$, where we'd define this notation to mean, any function of $N$ and $\eps$ such that for fixed $\eps$, the function is bounded by some $\poly_\eps(N)$, and for fixed $N$, it is bounded by a $\poly_N(\eps)$ that moreover goes to $0$ as $\eps\to 0$ (i.e. no constant term). }
 \end{enumerate}
 \end{lemma}
 
@@ -301,7 +301,7 @@ A Toffoli or doubled Hadamard gate $g$ returned by the GTM $G$ always comes toge
 
 \begin{lemma}[Hadamard and Toffoli Check~\cite{ji2016compression}]
 \label{lem:ver_gate_check}
-	Let $\mathcal{S}$ be an honest Pauli strategy with $\rho_{\sC_{mip} \sP}$ as the shared state in \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}). Let $U$ denote a doubled Hadamard gate (resp. Toffoli gate). Then the \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}) rejects with probability \tnote{Do we want to use $\Tr_\rho$ as notation? The format for this soundness guarantee is different from the format in Pauli check. Are we going to use this? I am less used to it, but I'm fine either way.} \hnote{Update: the soundness guarantee of Pauli check doesn't need to use the $\Tr_\rho$ notation.}
+	Let $\mathcal{S}$ be an honest Pauli strategy with $\rho_{\sC_{mip} \sP}$ as the shared state in \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}). Let $U$ denote a doubled Hadamard gate (resp. Toffoli gate). Then the \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}) rejects with probability 
 	
 	\[
 		\frac{1}{4} \Tr_{\rho} \left[ \Id - J_t \otimes U \right ]
@@ -339,7 +339,7 @@ For all $i$, the $\sB_{PP_i}$ register also has the name $\sM_{r-1,i}$. From thi
 \leavevmode
 \begin{enumerate}
 \item (\textbf{Completeness}) An honest Propagation strategy passes the $\textsc{Propagation Check}$ subprotocol with probability $1$. 
-\item (\textbf{Soundness}) All honest Pauli strategies $\mathcal{S}$ that pass the $\textsc{Propagation Check}$ subprotocol with probability at least $1 - \eps$ are $\poly(N,\eps)$-close to an honest Propagation Check strategy. \tnote{do you have a good way to write $\poly(N,\eps)$? I know I used it too. But of course $N^2 = \poly(N,\eps)$, which is not super helpful. I can only think of $\poly(N)\cdot \poly(\eps)$, which is kind of ugly.} \hnote{Maybe in the end, we can put $O(N^\alpha \eps^\beta)$ once we figure out $\alpha,\beta$, but for now we can just keep it $\poly(N,\eps)$ to make things less ugly.}
+\item (\textbf{Soundness}) All honest Pauli strategies $\mathcal{S}$ that pass the $\textsc{Propagation Check}$ subprotocol with probability at least $1 - \eps$ are $\poly(N,\eps)$-close to an honest Propagation Check strategy. \tnote{do you have a good way to write $\poly(N,\eps)$? I know I used it too. But of course $N^2 = \poly(N,\eps)$, which is not super helpful. I can only think of $\poly(N)\cdot \poly(\eps)$, which is kind of ugly.} \hnote{Maybe in the end, we can put $O(N^\alpha \eps^\beta)$ once we figure out $\alpha,\beta$, but for now we can just keep it $\poly(N,\eps)$ to make things less ugly.}\tnote{we'll never figure out the exponents :-)}
 \end{enumerate}
 \end{lemma}
 \begin{proof}
