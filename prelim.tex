@@ -43,7 +43,7 @@ For a quantum state $\rho \in \Dens(\sA)$ and psd operators $M,N \in \Lin(\sA)$,
 \end{lemma}
 \begin{proof}
 	Follows from the Gentle Measurement Lemma~\cite{ogawa2002new}.
-	\hnote{Say more here?}
+	\hnote{Say more here?}\tnote{yes :-) Is there not a reference?}
 \end{proof}
 
 \subsection{Quantum interactive protocols} 
@@ -88,7 +88,7 @@ Such a non-local game is played in the following manner. Before the game starts,
 
 In the game, the referee measures its part of the state, and based on the measurement outcome $s$, generates questions $q_1,\ldots,q_r$ and sends $q_i$ to player $P_i$, who measures $\sP_i$ (depending on $q_i$) and  responds with answer $a_i$. The referee then decides to accept or reject based on a predicate $V(s,q_1,\ldots,q_r,a_1,\ldots,a_r)$.
 
-An extended verifier can thus be described by three circuits: the first is a quantum circuit for the measurement to be performed on $\sR$, the second is a classical circuit that computes questions to the players, as a function of the input and the measurement outcome, and the third is a classical circuit that computes the referee's decision as a function of the measurement outcome, the questions, and the players' answers. 
+An extended verifier can thus be described by three circuits: the first is a quantum circuit for the measurement to be performed on $\sR$\tnote{should this be $\sC$? It would be good to clarify what is part of the definition of the game, such as the $\sC$ (its dimension), and what is not, but is part of the definition of a strategy, such as $\sP_i$}, the second is a classical circuit that computes questions to the players, as a function of the input and the measurement outcome, and the third is a classical circuit that computes the referee's decision as a function of the measurement outcome, the questions, and the players' answers. 
 
 
 \hnote{TODO: Make the presentation of definitions of nonlocal games and ENL games consistent}
@@ -97,12 +97,12 @@ An extended verifier can thus be described by three circuits: the first is a qua
 
 A strategy $\mathcal{S}$ for an $r$-player ENL game $G$ consists of a pair $(\rho,\{M_i\})$ where
 \begin{enumerate}
-	\item $\rho$ is a shared state on registers $\sC \sP_1 \cdots \sP_r$.
-	\item For each player $i$, $M_i$ is a map from $\mathcal{Q}_i \times \mathcal{A}_i$ to the set of positive semidefinite operators acting on $\sP_i$, satisfying the constraint that for all $q \in \mathcal{Q}_i$,
+	\item $\rho$ is a state on $(r+1)$ registers denoted $\sC$, $\sP_1,\ldots, \sP_r$.
+	\item For each $i\in\{1,\ldots,r\}$, $M_i$ is a map from $\mathcal{Q}_i \times \mathcal{A}_i$ to the set of positive semidefinite operators acting on $\sP_i$, satisfying the constraint that for all $q \in \mathcal{Q}_i$,
 	\[
-		\sum_{a \in \mathcal{A}_i} M_i(q,a) = \Id_{\sP_i}.
+		\sum_{a \in \mathcal{A}_i} M_i(q,a) = \Id_{\sP_i}\;.
 	\]
-	That is, for all $q \in \mathcal{Q}_i$, $M_i(q) = \{M_i(q,a)\}_a$ is a POVM on $\sP_i$.
+	For each $q \in \mathcal{Q}_i$, we write $M_i(q) = \{M_i(q,a)\}_a$ to denote the associated POVM on $\sP_i$.
 	%For each player $i$, for each question $q \in \mathcal{Q}_i$, a POVM $\{ M_q^a \}_{a \in \mathcal{A}_i}$ acting on $\sP_i$. That is, these operators satisfy $\sum_{a \in \mathcal{A}_i} M_q^a = \Id$.
 \end{enumerate}
 
@@ -121,17 +121,17 @@ We now define notions of closeness of strategies.
 	Let $\mathcal{S} = (\rho,\{M_i\}), \mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL game $G$. Then $\mathcal{S}$ is \textbf{$\eps$-close} to $\mathcal{S}'$ if and only if
 	\begin{enumerate}
 		\item $ \norm{ \rho - \rho'}_{tr} \leq \eps$
-		\item For all $i$, for all $q \in \mathcal{Q}_i$, for $\sigma \in \{\rho,\rho'\}$
+		\item For all $i\in\{1,\ldots,r\}$, for all $q \in \mathcal{Q}_i$, for $\sigma \in \{\rho,\rho'\}$ \tnote{why this? the first condition says that having the second for $\rho$ or $\rho'$ is enough}
 		\[
-		d_\sigma(M_i(q),M_i(q)') \leq \eps.
+		d_\sigma(M_i(q),M_i'(q)) \leq \eps.
 		\]
 	\end{enumerate}
 \end{definition}
 
 \begin{definition}[Isometric strategies]
-	Let $\mathcal{S} = (\rho,\{M_i\}), \mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL game $G = (\mathcal{Q},\mathcal{A},\mu,V)$, where $\rho \in \Dens(\sC \sP_1 \cdots \sP_r)$ and $\rho \in \Dens(\sC \sP_1' \cdots \sP_r')$. Then $\mathcal{S}$ is \textbf{$\eps$-isometric} to $\mathcal{S}'$ if and only if there exists isometries $I_1,\ldots,I_r$ where each $I_i$ maps $\sP_i$ to $\sP_i'$ such that the strategy $\wt{\mathcal{S}} = (\wt{\rho}, \set{ \wt{M}_i })$ is $\eps$-close to $\mathcal{S}'$, where $\wt{\mathcal{S}}$ is defined by
+	Let $\mathcal{S} = (\rho,\{M_i\})$ and $\mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL game $G = (\mathcal{Q},\mathcal{A},\mu,V)$, where $\rho \in \Dens(\sC \sP_1 \cdots \sP_r)$ and $\rho' \in \Dens(\sC \sP_1' \cdots \sP_r')$. Then $\mathcal{S}$ is \textbf{$\eps$-isometric} to $\mathcal{S}'$ if and only if for each $i\in\{1,\ldots,r\}$ there is an isometry $I_i$ from $\sP_i$ to $\sP_i'$ such that the strategy $\wt{\mathcal{S}} = (\wt{\rho}, \set{ \wt{M}_i })$ is $\eps$-close to $\mathcal{S}'$, where $\wt{\mathcal{S}}$ is defined by
 	\begin{enumerate}
-		\item $\wt{\rho} = (I_1 \otimes \cdots \otimes I_r) \rho (I_1 \otimes \cdots \otimes I_r)^\dagger$
+		\item $\wt{\rho} = (I_\sC \otimes I_1 \otimes \cdots \otimes I_r) \rho (I_\sC \otimes I_1 \otimes \cdots \otimes I_r)^\dagger$
 		\item For all $i$, for all $(q,a) \in \mathcal{Q}_i \times \mathcal{A}_i$, $\wt{M}_i(q,a) = I_i M_i(q,a) I_i^\dagger$.
 	\end{enumerate}
 \end{definition}
@@ -145,7 +145,7 @@ We now define notions of closeness of strategies.
 	\]
 \end{lemma}
 \begin{proof}
-	\hnote{Insert proof here.}
+	\hnote{Insert proof here.}\tnote{there will be constants, and maybe even exponents, right?}
 \end{proof}
 
 \begin{definition}
