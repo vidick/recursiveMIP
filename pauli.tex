@@ -72,7 +72,7 @@ Follows from Theorem~\ref{thm:epr-test} for $k=2N$.
 \end{proof}
 
 \begin{claim}\label{claim:pauli-propagation}
-Let $\mathcal{S}$ be a strategy such that the restriction of $\mS$ to EPR questions is a honest $2N$-qubit EPR strategy. Suppose further that $\mS$ passes the propagation test with probability at least $1-\eps_2$ each. Then $\mathcal{S}$ is $\delta_2$-isometric to an honest Propagation Check strategy with the following properties:
+Let $\mathcal{S}$ be a strategy such that the restriction of $\mS$ to EPR questions is a honest $2N$-qubit EPR strategy. Suppose further that $\mS$ passes the propagation test with probability at least $1-\eps_2$. Then $\mathcal{S}$ is $\delta_2$-isometric to an honest Propagation Check strategy with the following properties:
 \begin{itemize}
 \item The clock register is the register $\sC_p$. It has clock states ordered as $(0,0),(1,0),(0,1),(1,1),(0,2),(1,2),\ldots,(0,N),(1,N)$. 
 \item The initial state for the computation takes the form 
@@ -80,17 +80,20 @@ Let $\mathcal{S}$ be a strategy such that the restriction of $\mS$ to EPR questi
 \ket{\Phi}_{\sA'_A\sB'_B} \ket{\psi}_{\sB\sR}\;,
 \end{equation}
 where $\ket{\Phi}_{\sA'_A\sB'_B}$ is the $2N$-qubit maximally entangled state associated with the honest EPR strategy;
-\item The gate applied between times $(0,t)$ and times $(1,t)$ is $CZ_t$; between time $(1,t)$ and time $(0,t+1)$ it is $CX_t$. Here $CZ_t$ is an arbitrary reflection that acts only on the $t$-th qubit (resp. $N+t$-th qubit) of register $\sB'_B$ and on register $\sB$. 
 \end{itemize}
 \end{claim}
 
 \begin{proof}
-The fact that $\mS$ is isometric to an honest Propagation Check strategy follows from the assumption that  $\mS$ passes both the propagation test with probability $1-\eps_2$, and the soundness statement in Lemma~\ref{lem:prop_check} \tnote{probably this Lemma should be adapted a little?}. The form of the initial state follows from the assumption that $\mS$ is an honest EPR strategy, so we may choose the isometry for the Propagation check so that the provers' shared state has the form~\eqref{eq:pauli-prop-1}. 
-
-To complete the proof it remains to argue about the form for the gates. Consider first the case of the gate $G$ applied between times $(0,t)$ and $(1,t)$; the other case is similar. In general the reflection $G$ has an expansion in the Pauli basis of the form 
-$$ G = \sum_{a,b} X(a)Z(b)\otimes G_{a,b}\;,$$
-where $G_{a,b}$ is arbitrary acting on $\sB$. 
+The fact that $\mS$ is isometric to an honest Propagation Check strategy follows from the assumption that  $\mS$ passes both the propagation test with probability $1-\eps_2$, and the soundness statement in Lemma~\ref{lem:prop_check} \tnote{the Lemma should be adapted a little for this to work out.}. The form of the initial state follows from the assumption that $\mS$ is an honest EPR strategy, so we may choose the isometry for the Propagation check so that the provers' shared state has the form~\eqref{eq:pauli-prop-1}. 
+\end{proof}
 
 
+\begin{claim}\label{claim:pauli-ctl}
+Let $\mathcal{S}$ be a strategy such that the restriction of $\mS$ to EPR questions is a honest $2N$-qubit EPR strategy, and $\mS$ is an honest Propagation Check strategy as described in Claim~\ref{claim:pauli-propagation}. Suppose further that $\mS$ passes the CTL chack test with probability at least $1-\eps_3$. Then $\mS$ is $\delta_3$-close to a strategy in which the observables associated with Pauli questions $W_i$, $i\in\{1,\ldots,n\}$, $W\in\{X,Z\}$, are observables that act on $\sB$ only, and furthermore in the history state computation the gate applied between times $(0,t)$ and times $(1,t)$ is $CTL-Z_t$, controlled on the $(N+t)$-th qubit in $\sB'$; between time $(1,t)$ and time $(0,t+1)$ it is $CTL-X_t$, controlled on the $t$-th qubit in $\sB$'. 
+\end{claim}
+
+\begin{proof}
+Let $W_i$ be the observable associated with the question having the same label in $\mS$. 
 
 \end{proof}
+

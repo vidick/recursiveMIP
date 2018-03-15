@@ -293,7 +293,7 @@ In the Hadamard and Toffoli Checks, the verifier will send to each prover a pair
 \end{lemma}
 
 \paragraph{The high level}  At a high level, this test  proceeds as follows. The $r$-th level verifier samples a random time $t \in \{1,\ldots,\tau(N)\}$, and computes the $t$-th gate $g_t$ of $UEVC_{N,r-1}$ using the GTM $G = G_{UEVC}$. Most of the time, the gate $g_t$ is a (doubled) Hadamard or Toffoli gate that is computed by the $(r-1)$-th level verifier $UEVC_{N,r-1}$. To check the propagation of such a gate, the $r$-level verifier executes the corresponding Hamadard or Toffoli Check (see Figure~\ref{fig:toffoli_hadamard_check}) to generate the corresponding questions. %If the gate $g_t$ does not act on any of the $\{ \sM_i\}$ register of $UEVC_{N,r-1}$, then the Hadamard/Toffoli check questions are sent to prover $PV$. If $g_t$ acts partially on the $\sM_i$ register, then the questions are partially sent to $PV$, and partially sent to $PP_i$. If $g_t$ acts fully on $\sM_i$, then all the questions are sent to $PP_i$.
-In some cases the gate $g_t$ is not be a gate, but rather it represents the $i$-th prover's unitary. In that case, prover $i$ is sent the question $\star$.  
+In some cases the gate $g_t$ is not a gate, but rather it represents the $i$-th prover's unitary. In that case, prover $i$ is sent the question $\star$.  
 
 Any prover who was not explicitly sent a question is sent a null question, denoted by $\bot$.
 
@@ -338,7 +338,7 @@ For all $i$, the $\sB_{PP_i}$ register also has the name $\sM_{r-1,i}$. From thi
 	\[
 		r_t = \frac{1}{2} \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
 	\]
-	where we define $g_t$ to prover $PP_j$'s reflection upon the question $\star$. The overall rejection probability satisfies
+	where we define $g_t$ to be prover $PP_j$'s reflection upon the question $\star$. The overall rejection probability satisfies
 	\[
 		\eps' \geq \E_t r_t  \geq \frac{1}{4} \E_t \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
 	\]	
@@ -356,7 +356,7 @@ Thus we have
 	\]
 	For reasons that will become clear soon, we will let $H_{prop}$ denote the operator $\E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right)$. Notice that $H_{prop}$ is positive semidefinite, has smallest eigenvalue $0$ and the second smallest eigenvalue is at least $1/\poly(N)$. Using Lemma~\ref{lem:closeness_to_groundspace}, we have that $\rho_0$ is $\poly[N;\eps]$-close to a pure state $\ketbra{\theta}{\theta}$ satisfying $H_{prop} \ket{\theta} = 0$. 
 	
-	Now notice that $H_{prop}$ is resembles the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$~\cite{kitaev2002classical}. Thus any state $\ket{\theta}$ in the kernel of $H_{prop}$ must be a history state $\ket{\theta}_{\sC_{mip} \sP \sR} = \frac{1}{\sqrt{\tau(N)+1}} \sum_t \ket{t}_{\sC_{mip}} \otimes \ket{\theta_t}_{\sP \sR}$ where $\ket{\theta_t} = g_t \ket{\theta_{t-1}}$.
+	Now notice that $H_{prop}$ resembles the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$~\cite{kitaev2002classical}. Thus any state $\ket{\theta}$ in the kernel of $H_{prop}$ must be a history state $\ket{\theta}_{\sC_{mip} \sP \sR} = \frac{1}{\sqrt{\tau(N)+1}} \sum_t \ket{t}_{\sC_{mip}} \otimes \ket{\theta_t}_{\sP \sR}$ where $\ket{\theta_t} = g_t \ket{\theta_{t-1}}$.
 	
 	We can thus construct a new honest Pauli strategy $\mathcal{S}'$ where the prover operators are the same as in $\mathcal{S}$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ (i.e. is a history state for the computation $g_1 g_2 \cdots g_{\tau(N)}$) and otherwise has the form~\eqref{eq:honest-psi}.\footnote{Such a state $\ket{\psi'}$ can be constructed by starting with $\ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ and ``propagating'' the Pauli operators as needed by the Pauli Check.} We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so $\mathcal{S}'$ is $\poly[N;\eps]$-close to $\mathcal{S}$, and furthermore $\mathcal{S}'$ is an honest Propagation Check strategy. This concludes the proof. %\hnote{We will need to write what it means for two strategies to be close.}
 %	The propagation term has spectral gap $1/\poly(N)$ and its zero eigenspace is exactly the space of history states of the aforementioned computation.
