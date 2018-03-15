@@ -70,7 +70,7 @@ In the subroutine, the verifier performs one of several tests, chosen uniformly 
     Input: $(1^n,w,r,G,V,M)$ \\
     \\
 	Let player A denote prover $PA$.
-    Choose a random prover $P^*$ from the set of non-ancilla provers $\mathcal{R}_r$, and let player B denote prover $P^*$. \tnote{should we write we are telling them who they are, and who the other is?} \hnote{It is important that player B not know we're performing the Pauli check, so we shouldn't be telling player B any additional information beyond the EPR/Pauli questions.} \\
+    Choose a random prover $P^*$ from the set of non-ancilla provers $\mathcal{R}_r$, and let player B denote prover $P^*$. Send player A the label $P^*$. \\
     \\
     Perform one of the tests uniformly at random. Each test should be interpreted as a three-phase procedure, as described in Figure~\ref{fig:check_structure}. The \textsc{ClockMeasurement} phase involves a measurement on the clock register $\reg{C}_p$ of dimension $2(N+1)(\kappa(r-1)+1)$, with computational basis labeled by 
     \[
@@ -78,7 +78,7 @@ In the subroutine, the verifier performs one of several tests, chosen uniformly 
     \]
     
 	\begin{enumerate}
- \item \emph{(EPR test)} Measure register $\reg{C}_{p}$ in the computational basis. Accept if the outcome $(t,P)\neq (0,P^*)$. Otherwise, execute the $2N$-qubit EPR test with A and B, where A's questions are augmented by $P^*$ (i.e. which prover that player B corresponds to). \\
+ \item \emph{(EPR test)} Measure register $\reg{C}_{p}$ in the computational basis. Accept if the outcome $(t,P)\neq (0,P^*)$. Otherwise, execute the $2N$-qubit EPR test with A and B. \\
 \tnote{Intended goal: Checks that whenever A or B is sent an EPR question, it applies the corresponding Pauli observable, independently of any other question asked. A consequence of this test and the form of questions to player B is that we can write the observables it applies as a product of an observable for the EPR question, and an observable for the Pauli question, where each observable only depends on the corresponding question (and not on the pair of questions).}
 
 \item \emph{(Propagation check)} Let $t\in\{0,\ldots,N-1\}$ and $d\in\{0,1\}$ be chosen uniformly at random. Measure register $\reg{C}_{p}$ using the three-outcome POVM
@@ -86,7 +86,7 @@ $$\Set{ \Pi^0 = \proj{d} \otimes \proj{+_t} \otimes \proj{P^*},\; \Pi^1 =  \proj
 If the outcome is $c=2$, accept. Otherwise, if $d=0$, send $B$ the question $CZ_{t}$. If $d=1$, send B the question $CX_t$. Check that the answer reported by B equals $(-1)^c$, where $c\in\{0,1\}$ is the outcome obtained by the verifier.\\
 \tnote{Intended goal: Check that the state shared by the players takes the form of a history state, where the reflection applied on Bob's registers $BB'$ at step $2$ only acts on register $B$ and the appropriate qubit of $B'$.}
 
-\item \emph{(CTL check)} Measure register $\reg{C}_{p}$ in the computational basis to obtain an outcome $(d,t,P)$. If $P \neq P^*$, then accept. Send player A the EPR question $X'_{N+t}$ ($d=1$) or $X'_t$ ($d=0$), as well as the identity of player B.  Send player B the same EPR question as player A, as well as the Pauli question $X_t$ (if $d=1)$ or $Z_t$ (if $d=0$).  Reject if the product of the three answer bits received is not $1$.
+\item \emph{(CTL check)} Measure register $\reg{C}_{p}$ in the computational basis to obtain an outcome $(d,t,P)$. If $P \neq P^*$, then accept. Send player A the EPR question $X'_{N+t}$ ($d=1$) or $X'_t$ ($d=0$).  Send player B the same EPR question as player A, as well as the Pauli question $X_t$ (if $d=1)$ or $Z_t$ (if $d=0$).  Reject if the product of the three answer bits received is not $1$.
 %\item Send player B the same EPR question as player A, as well as the CTL-Pauli question $CX_t$ ($d=1)$ or $CZ_t$ ($d=0$).  Reject if B's second answer is not $1$, or if A's answer and B's first answer do not match.
 \tnote{Intended goal: Check that the reflection applied by B on question $CX_i$ (resp. $CZ_j$) is a controlled observable, controlled on the qubit in register $B'_i$ (resp. $B'_{n+j}$) only, and that it matches the observable applies on question $X_i$ (resp. $Z_j$), which only acts on register $B$.}
 
@@ -180,7 +180,7 @@ This finishes the specification of the state $\rho$. The next part of the specif
 \begin{enumerate}
 	\item (\textbf{Completeness}) Any honest Pauli Check strategy passes the Pauli Check subroutine with probability $1$.
 	
-	\item (\textbf{Soundness}) Any strategy $\mathcal{S}$ that passes the Pauli Check with probability at least $1 - \eps$ is $\delta$-isometric to an honest Pauli Check strategy for some $\delta = \poly[N;\eps]$.\tnote{seriously we need a better notation for it. How about, $\delta \in \poly[N,\eps]$, where we'd define this notation to mean, any function of $N$ and $\eps$ such that for fixed $\eps$, the function is bounded by some $\poly_\eps(N)$, and for fixed $N$, it is bounded by a $\poly_N(\eps)$ that moreover goes to $0$ as $\eps\to 0$ (i.e. no constant term). }
+	\item (\textbf{Soundness}) Any strategy $\mathcal{S}$ that passes the Pauli Check with probability at least $1 - \eps$ is $\delta$-isometric to an honest Pauli Check strategy for some $\delta = \poly[N;\eps]$.
 \end{enumerate}
 \end{lemma}
 

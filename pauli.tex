@@ -1,0 +1,96 @@
+\section{Analysis of the Pauli check}
+
+
+\subsection{The EPR test}
+
+Let $k\geq 4$ be an integer. 
+
+The EPR test is an elementary test that aims to verify that two players A and B share $n$ EPR pairs, on which they measure one or two commuting single-qubit Pauli operators when asked to do so. 
+
+The test can be built from any test for a single EPR pair, such as the Magic Square test. We recall the properties of the test in a form that is useful for us. 
+
+\begin{theorem}[Magic Square test, Theorem 5.9 in~\cite{coladangelo2017robust}]\label{thm:ms-rigid}
+There exists a two-player test $\MS$ with the following properties:
+\begin{enumerate}
+\item Queries $(q_A,q_B)$ in the game are drawn uniformly from $\QMS \times \QMS$, where $\QMS$ contains a subset of elements designated as $(W,W')$ for $W,W'\in\{X,Z\}$. 
+\item Each player replies with $2$ bits in $\{\pm 1\}^2$;
+\item (Completeness) There is a strategy for the players in the game that consists of sharing two EPR pairs and making Pauli measurements. 
+\item For any $\eps\geq 0$ there is a $\delta = O(\sqrt{\eps})$ such that
+  for any strategy with success probability at least $1-\eps$, the strategy is $\delta$-isometric to the honest strategy. 
+\end{enumerate}
+\end{theorem}
+
+By replacing the use of the CHSH test with the Magic Square test in the EPR test from~\cite{reichardt} we obtain the following test and guarantees. 
+
+\vspace{10pt}
+\begin{center}
+\begin{mdframed}
+    Input: an integer $k$ and a set of $2k$ labels, $\{W_i|\, W\in\{X,Z\},\,i\in\{1,\ldots,k\}\}$.\\
+		The verifier perfors each of the following with equal probability:
+		\begin{enumerate}
+		\item Select $i\neq j\in\{1,\ldots,k\}$ and $W,W'\in\{X,Z\}$ uniformly at random. Send $((W,W'),(i,j))$ to both players. Receive bits $a,a'$ from player A and $b,b'$ from player $B$. Accept if and only if $a=a'$ and $b=b'$.
+		\item Select pairwise distinct $i,j,k,\ell\in\{1,\ldots,k\}$, a pair of questions $(Q,Q') \in \QMS\times\QMS$ in the Magic Square test, a uniform $Q''\in\QMS$. Send $(Q,(i,j))$ to player A and the unordered pair $(Q',(i,j))$ and $(Q'',(k,\ell))$ to player B. Accept if and only if the players' answers associated with $(Q,Q')$ are valid answers in the Magic Square test. 
+   \end{enumerate}    
+\end{mdframed}
+\end{center}
+\begin{figure}[H]
+\caption{$k$-qubit EPR test~\cite{reichardt}}
+\label{fig:epr_test}
+\end{figure}
+
+The following follows from the results in~\cite{reichardt}. 
+
+\begin{theorem}\label{thm:epr-test}
+Let $k \geq 2$ be an integer. The $k$-qubit Pauli test has the following guarantees. 
+\begin{itemize}
+\item (Completeness) There is a strategy for the players based on sharing a $k$-qubit maximally entangled state, and such that for any $i\in\{1,\ldots,k\}$ and $W\in\{X,Z\}$, a player measures the observable $\sigma_W$ on qubit $i$ to determine its answer to a question that includes the symbol $W_i$. 
+\item (Soundness) Any strategy that succeeds with probability at least $1-\eps$ for some $\eps\geq 0$ is $\delta$-isometric to the honest strategy, for some $\delta = \poly[k;\eps]$. 
+\end{itemize}
+\end{theorem}
+
+\subsection{Completeness of the Pauli check}
+
+\begin{lemma}\label{lem:paulicheck-compleness}
+Let $\mS$ be an honest Pauli Check strategy. Then the strategy is accepted with probability $1$ in the Pauli check.
+\end{lemma}
+
+
+\subsection{Soundness of the Pauli check}
+
+\begin{lemma}\label{lem:paulicheck-soundness}
+Any strategy $\mathcal{S}$ that passes the Pauli Check with probability at least $1 - \eps$ is $\delta$-isometric to an honest Pauli Check strategy for some $\delta = \poly[N;\eps]$.
+\end{lemma}
+
+The lemma is proved using a sequence of claims that analyze each of the tests that constitute the Pauli check. We start with the EPR test. 
+
+\begin{claim}
+Let $\mathcal{S}$ be a strategy that passes the EPR test with probability at least $1 - \eps_1$. Then $\mathcal{S}$ is $\delta_1$-isometric to an extension of the honest $2N$-qubit EPR strategy for some $\delta_1 = \poly[N;\eps_1]$.
+\end{claim}
+
+\begin{proof}
+Follows from Theorem~\ref{thm:epr-test} for $k=2N$. 
+\end{proof}
+
+\begin{claim}\label{claim:pauli-propagation}
+Let $\mathcal{S}$ be a strategy such that the restriction of $\mS$ to EPR questions is a honest $2N$-qubit EPR strategy. Suppose further that $\mS$ passes the propagation test with probability at least $1-\eps_2$ each. Then $\mathcal{S}$ is $\delta_2$-isometric to an honest Propagation Check strategy with the following properties:
+\begin{itemize}
+\item The clock register is the register $\sC_p$. It has clock states ordered as $(0,0),(1,0),(0,1),(1,1),(0,2),(1,2),\ldots,(0,N),(1,N)$. 
+\item The initial state for the computation takes the form 
+\begin{equation}\label{eq:pauli-prop-1}
+\ket{\Phi}_{\sA'_A\sB'_B} \ket{\psi}_{\sB\sR}\;,
+\end{equation}
+where $\ket{\Phi}_{\sA'_A\sB'_B}$ is the $2N$-qubit maximally entangled state associated with the honest EPR strategy;
+\item The gate applied between times $(0,t)$ and times $(1,t)$ is $CZ_t$; between time $(1,t)$ and time $(0,t+1)$ it is $CX_t$. Here $CZ_t$ is an arbitrary reflection that acts only on the $t$-th qubit (resp. $N+t$-th qubit) of register $\sB'_B$ and on register $\sB$. 
+\end{itemize}
+\end{claim}
+
+\begin{proof}
+The fact that $\mS$ is isometric to an honest Propagation Check strategy follows from the assumption that  $\mS$ passes both the propagation test with probability $1-\eps_2$, and the soundness statement in Lemma~\ref{lem:prop_check} \tnote{probably this Lemma should be adapted a little?}. The form of the initial state follows from the assumption that $\mS$ is an honest EPR strategy, so we may choose the isometry for the Propagation check so that the provers' shared state has the form~\eqref{eq:pauli-prop-1}. 
+
+To complete the proof it remains to argue about the form for the gates. Consider first the case of the gate $G$ applied between times $(0,t)$ and $(1,t)$; the other case is similar. In general the reflection $G$ has an expansion in the Pauli basis of the form 
+$$ G = \sum_{a,b} X(a)Z(b)\otimes G_{a,b}\;,$$
+where $G_{a,b}$ is arbitrary acting on $\sB$. 
+
+
+
+\end{proof}
