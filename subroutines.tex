@@ -38,7 +38,8 @@ Inptut: $(1^n,w,r,G,V,M)$\\
 Each subroutine is decomposed in three phases. Each phase reads some tapes of the VTM and writes on some others. The phases are the following: 
 	\begin{enumerate}
 		\item (\textsc{ClockMeasurement}) In this phase the subroutine writes the description of a cicruit describing a quantum measurement on the measurement specification tape. The measurement applies to a clock register $\sC$, divided into two parts, $\sC_{p}$ and $\sC_{mip}$. To describe the measurements, for any integer $t$ we use the notation 
-$$\ket{\pm_t} \,=\, \frac{1}{\sqrt{2}}\big(\ket{t}\pm\ket{t+1}\big)\;.$$
+$$\ket{\pm_{t,t'}} \,=\, \frac{1}{\sqrt{2}}\big(\ket{t}\pm\ket{t'}\big)\;.$$
+If $t'$ is not specified it is understood that $t'=t+1$.
 	\item (\textsc{GenQuestions}) In this phase the subroutine has access to the measurement outcome tape, and writes questions on the player question tape. The questions are denoted  by $q_V$, $q_{P,1},\ldots,q_{P,\kappa(r-1)}$, $q_{A,1},\ldots,q_{A,\sigma(r)}$, where the subscript indicates the label of the prover to which the question is to be sent. 
 		\item (\textsc{CheckAnswers}) In this phase the subroutine has access to the player answer tape, and writes on the referee decision tape. The player answer tape is assumed to contain answers labeled as $a_V$, $a_{P,1},\ldots,a_{P,\kappa(r-1)}$, $a_{A,1},\ldots,a_{A,\sigma(r)}$, where the subscript indicates the label of the prover from which the answer is obtained.
 	\end{enumerate}    
@@ -74,28 +75,20 @@ In the subroutine, the verifier performs one of several tests, chosen uniformly 
     \\
     Perform one of the tests uniformly at random. Each test should be interpreted as a three-phase procedure, as described in Figure~\ref{fig:check_structure}. The \textsc{ClockMeasurement} phase involves a measurement on the clock register $\reg{C}_p$ of dimension $2(N+1)(\kappa(r-1)+1)$, with computational basis labeled by 
     \[
-    (d,t,P)\in \{0,1\}\times \{0,\ldots,N\} \times \mathcal{R}_r .
+    (t,t')\in \{0,\ldots,2N\} \times \{0,\ldots,2N\}\; .
     \]
     
 	\begin{enumerate}
- \item \emph{(EPR test)} Measure register $\reg{C}_{p}$ in the computational basis. Accept if the outcome $(t,P)\neq (0,P^*)$. Otherwise, execute the $2N$-qubit EPR test with A and B. \\
+ \item \emph{(EPR test)} Measure the first register of $\reg{C}_{p}$ in the computational basis to obtain an outcome $t\in\{0,\ldots,2N\}$. Select $t'\in\{1,\ldots,2N\}$ uniformly at random. Measure the second register of $\reg{C}_{p}$ using a basis containing $\{\ket{+_{0,t'}},\ket{-_{0,t'}}$. Accept if neither of these two outcomes is obtained. Generate questions $(q_A,q_B)$ as in the $2N$-qubit EPR test with A and B. Send $q_A$ to Alice, and $(q_B,W_t)$ to B. Accept if and only if (either $t\neq 0$ or the answers to the EPR questions are valid) and B's answer to the Pauli question has the same sign as the outcome of the verifier's clock measurement.\\
 \tnote{Intended goal: Checks that whenever A or B is sent an EPR question, it applies the corresponding Pauli observable, independently of any other question asked. A consequence of this test and the form of questions to player B is that we can write the observables it applies as a product of an observable for the EPR question, and an observable for the Pauli question, where each observable only depends on the corresponding question (and not on the pair of questions).}
 
-\item \emph{(Propagation check)} Let $t\in\{0,\ldots,N-1\}$ and $d\in\{0,1\}$ be chosen uniformly at random. Measure register $\reg{C}_{p}$ using the three-outcome POVM
-$$\Set{ \Pi^0 = \proj{d} \otimes \proj{+_t} \otimes \proj{P^*},\; \Pi^1 =  \proj{d} \otimes \proj{-_t} \otimes \proj{P^*},\;\Pi^2 = \Id - \Pi^0-\Pi^1 }.$$
-If the outcome is $c=2$, accept. Otherwise, if $d=0$, send $B$ the question $CZ_{t}$. If $d=1$, send B the question $CX_t$. Check that the answer reported by B equals $(-1)^c$, where $c\in\{0,1\}$ is the outcome obtained by the verifier.\\
-\tnote{Intended goal: Check that the state shared by the players takes the form of a history state, where the reflection applied on Bob's registers $BB'$ at step $2$ only acts on register $B$ and the appropriate qubit of $B'$.}
+\item \emph{(Propagation check)} Let $t\in\{0,\ldots,2N\}$ be chosen uniformly at random. Measure register $\reg{C}_{p}$ using the three-outcome POVM
+$$\Set{ \Pi^0 =  \proj{+_t} \otimes \proj{0},\; \Pi^1 =  \proj{-_t} \otimes \proj{0},\;\Pi^2 = \Id - \Pi^0-\Pi^1 }.$$
+If the outcome is $c=2$, accept. Otherwise, send $B$ the Pauli question $CW_{t}$, where $W=X$ is $t$ is even and $W=Z$ if $t$ is odd. Accept if and only if the answer reported by B equals $(-1)^c$, where $c\in\{0,1\}$ is the outcome obtained by the verifier.
 
-\item \emph{(CTL check)} Measure register $\reg{C}_{p}$ in the computational basis to obtain an outcome $(d,t,P)$. If $P \neq P^*$, then accept. Send player A the EPR question $X'_{N+t}$ ($d=1$) or $X'_t$ ($d=0$).  Send player B the same EPR question as player A, as well as the Pauli question $X_t$ (if $d=1)$ or $Z_t$ (if $d=0$).  Reject if the product of the three answer bits received is not $1$.
-%\item Send player B the same EPR question as player A, as well as the CTL-Pauli question $CX_t$ ($d=1)$ or $CZ_t$ ($d=0$).  Reject if B's second answer is not $1$, or if A's answer and B's first answer do not match.
-\tnote{Intended goal: Check that the reflection applied by B on question $CX_i$ (resp. $CZ_j$) is a controlled observable, controlled on the qubit in register $B'_i$ (resp. $B'_{n+j}$) only, and that it matches the observable applies on question $X_i$ (resp. $Z_j$), which only acts on register $B$.}
+\item \emph{(CTL check)} Measure the second register of $\reg{C}_{p}$ in the computational basis to obtain an outcome $t'\in\{0,\ldots,n\}$, and the first register in a basis containing $\{\ket{+_t},\ket{-_t}\}$ to obtain an outcome $(c,t)$ where $c\in\{\pm 1\}$. If $t'=0$, send player A the EPR question $X_{t}$, and send player $B$ the Pauli question $W_t$. Accept if and only if, either A's answer is $0$ and $c=1$, or A's answer is $1$ and $c$ matches B's answer to the Pauli question. %If $t'>0$, accept if $t\neq t'$. Send player A the EPR question $X_t$ and accept if the answer is not $1$. Send player B the Pauli question $W'_t$ and accept if and only if the outcome matches $c$.
 
-\item{\emph{(Pauli relation check)}} Measure register $\reg{C}_p$  in the computational basis to obtain an outcome $(d,t,P)$. Accept if $(d,t,P)\neq (1,N,P^*)$. Perform either of the following, with probability half each:
-\begin{enumerate}
-\item Choose $i\in\{1,\ldots,N\}$ uniformly at random. Send player A the EPR question $X'_i$ with the identity of player B. Send player B the same EPR question as player A, as well as the Pauli question $X_i$. Reject if the product of the three answer bits is not $+1$. 
-\item Choose $j\in\{1,\ldots,N\}$ uniformly at random. Send player A the EPR question $(Z'_j,X'_{j+N})$  with the identity of player B. Send player B the EPR question $X'_{j+N}$, as well as the Pauli question $Z_j$. Reject if the product of all answer bits is not $+1$. 
-\end{enumerate}
-\tnote{Intended goal: check the Pauli relations, in the format of Lemma~\ref{lem:gh}. For (b), the $Z'_i$ operator for Alice corrects for the phase in $Z_jX(a)X(b)=(-1)^{a_j}X(a)Z(b+e_j)$.}
+\item{\emph{(Pauli relation check)}} Measure the first register of $\reg{C}_p$  in the computational basis to obtain an outcome $t\in\{0,\ldots,2N\}$. Accept if $t\neq 2N$. Send A the EPR question $X_u$, and B the EPR question $Z_u$ and the Pauli question $W_u$. If $u$ is even, accept if and only if the product of the three answers is $1$. If $u$ is odd, accept if and only if the product of A's answer and B's answer to the Pauli question is $1$. 
 	\end{enumerate}    
 \end{mdframed}
 \end{center}
@@ -122,23 +115,23 @@ A strategy $\mathcal{S} = (\rho,\{ M_P \})$ is an \textbf{honest Pauli Check str
 
 The state $\ket{\psi}$ has the following form:
 \begin{equation}
-	\ket{\psi} = \frac{1}{\sqrt{\dim \sC_p}} \sum_{\substack{d \in \set{0,1} \\ t \in \set{0,\ldots,N} \\ P \in \mathcal{R}_r}} \ket{d,t,P}_{\sC_p} \otimes \ket{\psi_{d,t,P}}_{\sC_{mip} \sP \sR}\;,
+	\ket{\psi} = \frac{1}{\sqrt{\dim \sC_p}} \sum_{ t,t' \in \set{0,\ldots,2N} } \ket{t,t'}_{\sC_p} \otimes \ket{\psi_{t,t'}}_{\sC_{mip} \sP \sR}\;,
 	\label{eq:honest-psi}
 \end{equation}
 where 
 \[
-	\ket{\psi_{1,0,PV}}_{\sC_{mip} \sP \sR} = \ket{\psi_{0,0,PV}}_{\sC_{mip} \sP \sR} = \Paren{ \bigotimes_{P \in \mathcal{R}_r} \ket{\Phi}_{\sA_P' \sB_P'}} \otimes \ket{\theta}_{\sC_{mip} \sB_{PV} \cdots \sB_{PP_{\kappa(r-1)}} \sZ \sR}\;,
-\]%\tnote{earlier you wrote $\sP_P$ ``includes'' $\sB_P$ and $\sB'_P$, so it might seem like some registers are missing above}
-for some state $\ket{\theta}$. Here, the state $\ket{\Phi}_{\sA_P' \sB_P'}$ is a tensor product of $2N$ EPR pairs across registers $\sA_P'$ and $\sB_P'$. 
-%We identify the register $\sP$ with a tensor product of registers $\sA_P' \sB_P' \sB_P$ for each $P \in \mathcal{R}_r$. Each $\sB_P$ register is isomorphic to $(\C^2)^{\otimes N}$. Each prover $P \in \mathcal{R}_r$ gets registers $\sB_P' \sB_P$. Prover $PA$ gets the registers $\{ \sA_P' \}$.
-
-We define the rest of the states inductively. For $t > 0$ and $P \in \mathcal{R}_r$, define
+	\ket{\psi_{0,0}}_{\sC_{mip} \sP \sR} = \Paren{ \bigotimes_{P \in \mathcal{R}_r} \ket{\Phi}_{\sA_P' \sB_P'}} \otimes \ket{\theta}_{\sC_{mip} \sB_{PV} \cdots \sB_{PP_{\kappa(r-1)}} \sZ \sR}\;,
+\]
+for some state $\ket{\theta}$. Here, the state $\ket{\Phi}_{\sA_P' \sB_P'}$ is a tensor product of $2N$ EPR pairs across registers $\sA_P'$ and $\sB_P'$. For $t\geq 0$ and 
+$P \in \mathcal{R}_r$, define inductively
 \begin{align}
-	\ket{\psi_{0,t,P}} = CZ_t \ket{\psi_{0,t-1,P}} \\
-	\ket{\psi_{1,t,P}} = CX_t CZ_t \ket{\psi_{1,t-1,P}}
+	\ket{\psi_{0,t+1,P}} =  CW_t \ket{\psi_{0,t}} \;,
 \end{align}
-\tnote{I think the second line should only have $CX_t$, because when $d=1$ this means all the $CZ_t$ have been applied already} \hnote{In what you wrote before, the operator applied was $X(d \cdot a_{\leq t}) Z (b_{\leq t})$ which seems like the $X$'s and $Z$'s are applied only up to the $t$'th qubit, together. Is this what you meant?}
-where $CZ_t$ (resp. $CX_t$) is a controlled-$Z$ (resp. controlled-$X$) gate whose control qubit is the $\sB_P'$ part of the $t$-th EPR pair (resp. $(N+t)$-th EPR pair) of $\ket{\Phi}_{\sA_P' \sB_P'}$, and whose target qubit is the $t$-th qubit of $\sB_P$. 
+and for $t' > 0$ define 
+\begin{align}
+	\ket{\psi_{t',t,P}} =  W_{t'} \ket{\psi_{0,t}} \;,
+\end{align}
+where if $t$ or $t'$ is even (resp. odd), $CW_t$ or $W_{t'}$ is a controlled-$X$ or $X$ (resp. controlled-$Z$ or $Z$) gate whose control qubit is the $\sB_P'$ part of the $t$-th EPR pair of $\ket{\Phi}_{\sA_P' \sB_P'}$, and whose target qubit is the $\lceil t/2\rceil$-th qubit of $\sB_P$. 
 
 %The players share a state of the form~\eqref{eq:honest-psi}, where $\ket{\psi}_{\reg{BR}}$ is arbitrary and $\{X_i,Z_j:\, i,j\in\{1,\ldots,N\}\}$ are observables on $\mathcal{H}_\reg{B}$ that satisfy the Pauli relations. For $a,b\in \{0,1\}^N$ and $t\in\{0,\ldots,n\}$ let $X(a_{\leq t}) = X_t^{a_t}\cdots X_1^{a_1}$ and $Z(b_{\leq t}) = Z_t^{b_t}\cdots Z_1^{b_1}$. We also write $X(a)$ and $Z(b)$ for $X(a_{\leq N})$ and $Z(b_{\leq N})$ respectively. 
 
