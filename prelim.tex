@@ -76,20 +76,28 @@ We now define a canonically complete language for $\NEXPR$. Define $\mathcal{L}_
 
 \subsection{Games and strategies}
 
-\paragraph{Non-local games} An $r$-player non-local game $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mu,V)$ where $\mathcal{Q} = \mathcal{Q}_1 \times \cdots \times \mathcal{Q}_r$ and $\mathcal{A} = \mathcal{A}_1 \times \cdots \times \mathcal{A}_r$ are $r$-partite alphabets, $\mu$ is a distribution over $\mathcal{Q}$, and $V: \mathcal{Q} \times \mathcal{A} \to \{0,1\}$ is a verification predicate. 
+\paragraph{Non-local games} An $r$-player \textbf{non-local game} $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mu,V)$ where $\mathcal{Q} = \mathcal{Q}_1 \times \cdots \times \mathcal{Q}_r$ and $\mathcal{A} = \mathcal{A}_1 \times \cdots \times \mathcal{A}_r$ are $r$-partite alphabets, $\mu$ is a distribution over $\mathcal{Q}$, and $V: \mathcal{Q} \times \mathcal{A} \to \{0,1\}$ is a verification predicate. 
+
+A non-local game is played in the following manner. Before the game starts, the players distribute a shared state $\rho_{\sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$. In the game, the referee uses private randomness to sample a tuple of \emph{questions} $(q_1,\ldots,q_r)$ from $\mu$, and sends $q_i$ to player $i$, who then performs local measurements on register $\sP_i$ of $\rho$ and returns the measurement outcome $a_i \in \mathcal{A}_i$ (called an \emph{answer}) to the referee. The referee accepts if and only if $V(q_1,\ldots,q_r,a_1,\ldots,a_r) = 1$. 
 
 
+\paragraph{Extended non-local (ENL) games} An $r$-player \textbf{extended non-local (ENL) game} $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mathcal{M},\{\mu_w\},\{M_w\},V)$ where there exist integers $d, n> 0$ such that
+\begin{enumerate}
+	\item $\mathcal{Q}$ and $\mathcal{A}$ are $r$-partite question and answer alphabets, respectively
+	\item $\mathcal{M}$ is a finite alphabet of \emph{measurement outcomes}
+	\item $\{\mu_w\}_{w \in \{0,1\}^n}$ is a \emph{family} of distributions over $\mathcal{Q}$, indexed by $w \in \{0,1\}^n$
+	\item $\{ M_w \}_{w \in \{0,1\}^n}$ is a \emph{family} of POVMs $\{M_w^m\}_{m \in \mathcal{M}}$ acting on $\C^d$ with outcomes in $\mathcal{M}$ (i.e. $\sum_{m \in \mathcal{M}} M^m_w = \Id$ for all $w \in \{0,1\}^n$), indexed by $w \in \{0,1\}^n$
+	\item $V: \{0,1\}^n \times \mathcal{Q} \times \mathcal{A} \times \mathcal{M} \to \{0,1\}$ is a verification predicate.
+\end{enumerate} 
+An extended non-local game is played between a referee (also called an \textbf{extended verifier}) and $r$ players, just like in an non-local game, except the referee now gets to measure a quantum state as part of the verification process. Before the game starts, the players distribute a shared state $\rho_{\sC \sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$ and the referee gets register $\sC$ which is isomorphic to $\C^d$. In the game, the referee:
+\begin{enumerate}
+	\item Generates a private random string $w \in \{0,1\}^n$
+	\item Performs POVM $M_w$ on register $\sC$ to obtain measurement outcome $m$
+	\item The referee samples the question tuple $(q_1,\ldots,q_r)$ from the distribution $\mu_w$, and sends $q_i$ to player $i$. 
+\end{enumerate}
+Player $i$ performs a local measurement on register $\sP_i$ of $\rho$ and returns answer $a_i$ to the referee. The referee acepts if and only if $V(w,q_1,\ldots,q_r,a_1,\ldots,a_r,m) = 1$. 
 
-%In a non-local game, a classical referee (also called the \textbf{verifier}) interacts with two or more quantum players $P_1,\ldots,P_r$. 
-
-Such a non-local game is played in the following manner. Before the game starts, the players distribute a shared state $\rho_{\sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$. In the game, the referee uses private randomness to sample a tuple of \emph{questions} $(q_1,\ldots,q_r)$ from $\mu$, and sends $q_i$ to player $i$, who then performs local measurements on register $\sP_i$ of $\rho$ and returns the measurement outcome $a_i \in \mathcal{A}_i$ (called an \emph{answer}) to the referee. The referee accepts if and only if $V(q_1,\ldots,q_r,a_1,\ldots,a_r) = 1$. 
-
-
-\paragraph{Extended non-local (ENL) games} In an extended non-local (ENL) game, a quantum referee (which we will also call the \textbf{Extended Verifier}) interacts with one or more quantum players $P_1,\ldots,P_r$. Before the game starts, the players distribute a shared state $\rho_{\sC \sP_1 \cdots \sP_r}$ where the referee gets register $\sC$, and player $i$ gets register $\sP_i$. 
-
-In the game, the referee measures its part of the state, and based on the measurement outcome $s$, generates questions $q_1,\ldots,q_r$ and sends $q_i$ to player $P_i$, who measures $\sP_i$ (depending on $q_i$) and  responds with answer $a_i$. The referee then decides to accept or reject based on a predicate $V(s,q_1,\ldots,q_r,a_1,\ldots,a_r)$.
-
-An extended verifier can thus be described by three circuits: the first is a quantum circuit for the measurement to be performed on $\sR$\tnote{should this be $\sC$? It would be good to clarify what is part of the definition of the game, such as the $\sC$ (its dimension), and what is not, but is part of the definition of a strategy, such as $\sP_i$}, the second is a classical circuit that computes questions to the players, as a function of the input and the measurement outcome, and the third is a classical circuit that computes the referee's decision as a function of the measurement outcome, the questions, and the players' answers. 
+An extended verifier can thus be described by three circuits: the first is a quantum circuit for the measurement to be performed on $\sC$\tnote{should this be $\sC$? It would be good to clarify what is part of the definition of the game, such as the $\sC$ (its dimension), and what is not, but is part of the definition of a strategy, such as $\sP_i$}, the second is a classical circuit that computes questions to the players, as a function of the input and the measurement outcome, and the third is a classical circuit that computes the referee's decision as a function of the measurement outcome, the questions, and the players' answers. 
 
 
 \hnote{TODO: Make the presentation of definitions of nonlocal games and ENL games consistent}
