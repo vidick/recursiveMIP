@@ -7,13 +7,19 @@ For a positive integer quantity $N$ that tends to infinity, and a positive real 
 \paragraph{Iterated exponential}
 Let $a,b \in \mathbb{R}$, and let $a > 0$. Let $R \geq 1$ be an integer. We define the iterated exponential function as
 \[
-	\exp^R_a(b) := \exp^{R-1}_a(a^b)
+	\exp^R_a(b) := 
+	\left \{ \begin{array}{ll}
+		\exp^{R-1}_a(a^b)	& \mbox{if } b \geq 0 \\
+		1/\exp^{R-1}_a(a^{|b|}) & \mbox {if } b < 0
+	\end{array}
+	\right.
 \]
 for $R > 1$, and when $R=1$ define $\exp^1_a(b) = a^b$. Equivalently, 
-\[
-	\exp^R_a(b) := \underbrace{a^{a^{\cdot^{\cdot^{a^b}}}}}_{R}.
-\]
-Furthermore, for convenience we will define $\exp^0_a(b) = b$ and $\exp^0_a(-b) = 1/b$ when $b \geq 0$.
+\begin{align*}
+	\exp^R_a(b) &:= \underbrace{a^{a^{\cdot^{\cdot^{a^b}}}}}_{R} \qquad \mbox{if } b \geq 0 \\
+	\exp^R_a(b) &:= \underbrace{a^{-a^{\cdot^{\cdot^{a^{|b|}}}}}}_{R} \qquad \mbox{if } b < 0
+\end{align*}
+Furthermore, for convenience we will define $\exp^0_a(b) = b$.% and $\exp^0_a(-b) = 1/b$ when $b \geq 0$.
 
 \subsection{Quantum information theory}
 
@@ -39,70 +45,59 @@ For a quantum state $\rho \in \Dens(\sA)$ and psd operators $M,N \in \Lin(\sA)$,
 \label{lem:closeness_to_groundspace}
 	Let $\sA, \sR$ be registers. Let $H$ be a positive semidefinite matrix acting on $\sA$ with minimum eigenvalue $0$ and second smallest eigenvalue $\Delta > 0$. If $\ket{\psi}$ is a state on $\sA \sR$ such that $\bra{\psi} H_{\sA} \otimes \Id_{\sR} \ket{\psi} \leq \eps$, then there exists a state $\ket{\theta}$ in $\sA \sR$ such that $H \ket{\theta} = 0$ and
 	\[
-		\left \| \ket{\psi} - \ket{\theta} \right \| \leq \sqrt{\eps/\Delta}.
+		\left \| \ketbra{\psi}{\psi} - \ketbra{\theta}{\theta} \right \|_1 \leq 4\sqrt{\eps/\Delta}.
 	\]
 \end{lemma}
 \begin{proof}
-	Follows from the Gentle Measurement Lemma~\cite{ogawa2002new}.
-	\hnote{Say more here?}\tnote{yes :-) Is there not a reference?}
+	Let $P$ denote the projector onto the ground space of $H$ (i.e. the kernel of $H$). Let $Q = \Id - P$. Then since $\Delta Q \preceq H$ we have $\bra{\psi} Q \ket{\psi} \leq \eps/\Delta$. The Gentle Measurement Lemma~\cite{ogawa2002new} states that for all density matrices $\rho$ and for all psd operators $X$ satisfying $0 \preceq X \preceq \Id$, we have
+	\[
+		\left \| \rho - \sqrt{X}\rho \sqrt{X}  \right \|_1 \leq 2 \sqrt{ \Tr(\rho (\Id - X))}.
+	\]
+	Setting $\rho = \ketbra{\psi}{\psi}$, $X = P$ and applying the Gentle Measurement Lemma, we obtain the desired conclusion with
+	\[
+		\ket{\theta} := \frac{ P \ket{\psi}}{\sqrt{ \bra{\psi} P \ket{\psi}}}.
+	\]
 \end{proof}
 
 \subsection{Quantum interactive protocols} 
 
-We define general quantum interactive protocols between a quantum verifier $V$ and provers $P_1,P_2,\ldots,P_r$. For simplicity, we will restrict our attention to protocols with a single prover $P$. Extending the discussion to multiple provers will be straightforward. 
+We define general quantum interactive protocols between a quantum verifier $V$ and provers $P_1,P_2,\ldots,P_r$. For simplicity, we will restrict our attention to protocols with a single prover $P$. Extending the discussion to multiple provers is straightforward. 
 
-We can model a single-prover protocol as follows: our Hilbert space consists of three registers: $\sV, \sM, \sP$. The verifier $V$ acts on registers $\sV$ (the verifier's local memory) and $\sM$ (the message register). The prover $P$ acts on $\sM$ and $\sP$ (the prover's local memory). The $\sV$ register initially starts off in the $\ket{0}$ state, but the $\sM$ and $\sP$ registers are arbitrary. The verifier applies a polynomial-size circuit $V_1$ to $\sV \sM$. The prover then applies some unitary $W_1$ (which in general will not be representable by a polynomial size circuit) to $\sM \sP$. The verifier applies $V_2$ to $\sV \sM$, and so on. This continues for polynomially-many steps until the verifier applies a final circuit $V_k$, and the first output qubit of $\sV$ is measured to determine whether the verifier accepts or rejects.
+We model a single-prover protocol as follows: our Hilbert space consists of three registers: $\sV, \sM, \sP$. The verifier $V$ acts on registers $\sV$ (the verifier's local memory) and $\sM$ (the message register). The prover $P$ acts on $\sM$ and $\sP$ (the prover's local memory). The $\sV$ register initially starts off in the $\ket{0}$ state, but the $\sM$ and $\sP$ registers are arbitrary. The verifier applies a polynomial-size circuit $V_1$ to $\sV \sM$. The prover then applies some unitary $W_1$ (which in general will not be representable by a polynomial size circuit) to $\sM \sP$. The verifier applies $V_2$ to $\sV \sM$, and so on. This continues for polynomially-many steps until the verifier applies a final circuit $V_k$, and the first output qubit of $\sV$ is measured to determine whether the verifier accepts or rejects.
 
 
 We can assume without loss of generality that every operation in this protocol is a reflection. The gates applied by the verifier $V$ are either the Hadamard gate ($H$) or the Toffoli gate ($T$) which are reflections. The prover's unitaries $W_1, W_2,\ldots$ can be made reflections by introducing an ancilla qubit that indicates whether the unitary is to be run forward or backward. In other words, every unitary $W$ can be embedded in a reflection as $\wt{W} = \ketbra{1}{0} \otimes W + \ketbra{0}{1} \otimes W^\dagger$. 
 
 We can now describe the execution of this interactive protocol as a sequence of gates $G_1,G_2,\ldots,G_\tau$ corresponding to the sequence of Hadamard and Toffoli gates of the verifier circuits interleaved with the prover's unitaries $W_i$. In other words, the gate sequence $\{G_t\}$ consists entirely of Hadamard and Toffoli gates except for the prover's unitaries. %Note that $\tau = \poly(n)$ since the interactive protocol runs in polynomial time.
 
-\subsection{Complexity classes}
-
-\begin{definition}[Nondeterministic iterated exponential time]
-	Let $R$ be a positive integer. Then we define
-	\[
-		\NEXPR = \NTIME[\exp^R_2(n)]
-	\]
-\end{definition}
-with $n$ being the input size. 
-
-We now define a canonically complete language for $\NEXPR$. Define $\mathcal{L}_R$ to be the set of all instances $\langle M, 1^n \rangle$ such that $M$, when interpreted as a nondeterministic Turing Machine, accepts after $\exp^R_2(n)$ steps on a blank tape as input.
-
-\begin{definition}[$\MIPstar$]
-	A language $L$ is in $\MIPstar(m,r)_{f(n)}$ if there is a $m$-player, $r$-round quantum interactive proof for $L$ with completeness-soundness gap $f(n)$, where $n$ is the input size. We write $\MIPstar(m,r) = \MIPstar(m,r)_{1/\poly(n)}$.
-\end{definition}
-
 \subsection{Games and strategies}
 
 \paragraph{Non-local games} An $r$-player \textbf{non-local game} $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mu,V)$ where $\mathcal{Q} = \mathcal{Q}_1 \times \cdots \times \mathcal{Q}_r$ and $\mathcal{A} = \mathcal{A}_1 \times \cdots \times \mathcal{A}_r$ are $r$-partite alphabets, $\mu$ is a distribution over $\mathcal{Q}$, and $V: \mathcal{Q} \times \mathcal{A} \to \{0,1\}$ is a verification predicate. 
 
-A non-local game is played in the following manner. Before the game starts, the players distribute a shared state $\rho_{\sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$. In the game, the referee uses private randomness to sample a tuple of \emph{questions} $(q_1,\ldots,q_r)$ from $\mu$, and sends $q_i$ to player $i$, who then performs local measurements on register $\sP_i$ of $\rho$ and returns the measurement outcome $a_i \in \mathcal{A}_i$ (called an \emph{answer}) to the referee. The referee accepts if and only if $V(q_1,\ldots,q_r,a_1,\ldots,a_r) = 1$. 
+A non-local game is played in the following manner. Before the game starts, the players distribute a shared state $\rho_{\sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$. In the game, the referee uses private randomness to sample a tuple of \emph{questions} $\vec{q} = (q_1,\ldots,q_r)$ from $\mu$, and sends $q_i$ to player $i$, who then performs local measurements on register $\sP_i$ of $\rho$ and returns the measurement outcome $a_i \in \mathcal{A}_i$ (called an \emph{answer}) to the referee. The referee accepts if and only if $V(\vec{q},\vec{a}) = 1$, where $\vec{a} = (a_1,\ldots,a_r)$.
 
 
-\paragraph{Extended non-local (ENL) games} An $r$-player \textbf{extended non-local (ENL) game} $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mathcal{M},\{\mu_w\},\{M_w\},V)$ where there exist integers $d, n> 0$ such that
+\paragraph{Extended non-local (ENL) games} An $r$-player \textbf{extended non-local (ENL) game} $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mathcal{M},\{\mu_w\},\{C_w\},V)$ where there exist integers $d, n \geq 0$ such that
 \begin{enumerate}
 	\item $\mathcal{Q}$ and $\mathcal{A}$ are $r$-partite question and answer alphabets, respectively
 	\item $\mathcal{M}$ is a finite alphabet of \emph{measurement outcomes}
 	\item $\{\mu_w\}_{w \in \{0,1\}^n}$ is a \emph{family} of distributions over $\mathcal{Q}$, indexed by $w \in \{0,1\}^n$
-	\item $\{ M_w \}_{w \in \{0,1\}^n}$ is a \emph{family} of POVMs $\{M_w^m\}_{m \in \mathcal{M}}$ acting on $\C^d$ with outcomes in $\mathcal{M}$ (i.e. $\sum_{m \in \mathcal{M}} M^m_w = \Id$ for all $w \in \{0,1\}^n$), indexed by $w \in \{0,1\}^n$
+	\item $\{ C_w \}_{w \in \{0,1\}^n}$ is a \emph{family} of POVMs $C_w = \{C_w^m\}_{m \in \mathcal{M}}$ acting on $\C^d$ with outcomes in $\mathcal{M}$ (i.e. $\sum_{m \in \mathcal{M}} C^m_w = \Id$ for all $w \in \{0,1\}^n$)
 	\item $V: \{0,1\}^n \times \mathcal{Q} \times \mathcal{A} \times \mathcal{M} \to \{0,1\}$ is a verification predicate.
 \end{enumerate} 
 An extended non-local game is played between a referee (also called an \textbf{extended verifier}) and $r$ players, just like in an non-local game, except the referee now gets to measure a quantum state as part of the verification process. Before the game starts, the players distribute a shared state $\rho_{\sC \sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$ and the referee gets register $\sC$ which is isomorphic to $\C^d$. In the game, the referee:
 \begin{enumerate}
 	\item Generates a private random string $w \in \{0,1\}^n$
-	\item Performs POVM $M_w$ on register $\sC$ to obtain measurement outcome $m$
-	\item The referee samples the question tuple $(q_1,\ldots,q_r)$ from the distribution $\mu_w$, and sends $q_i$ to player $i$. 
+	\item Performs POVM $C_w$ on register $\sC$ to obtain measurement outcome $m$
+	\item The referee samples the question tuple $\vec{q} = (q_1,\ldots,q_r)$ from the distribution $\mu_w$, and sends $q_i$ to player $i$. 
 \end{enumerate}
-Player $i$ performs a local measurement on register $\sP_i$ of $\rho$ and returns answer $a_i$ to the referee. The referee acepts if and only if $V(w,q_1,\ldots,q_r,a_1,\ldots,a_r,m) = 1$. 
+Player $i$ performs a local measurement on register $\sP_i$ of $\rho$ and returns answer $a_i$ to the referee. Let $\vec{a} = (a_1,\ldots,a_r)$. The referee acepts if and only if $V(w,\vec{q},\vec{a},m) = 1$. 
 
-An extended verifier can thus be described by three circuits: the first is a quantum circuit for the measurement to be performed on $\sC$\tnote{should this be $\sC$? It would be good to clarify what is part of the definition of the game, such as the $\sC$ (its dimension), and what is not, but is part of the definition of a strategy, such as $\sP_i$}, the second is a classical circuit that computes questions to the players, as a function of the input and the measurement outcome, and the third is a classical circuit that computes the referee's decision as a function of the measurement outcome, the questions, and the players' answers. 
+Note that a non-local game is a special case of an ENL game where $d = n = 0$, there is only a single question distribution $\mu$, the family of POVMs $\{C_w\}$ is trivial, and the register $\sC$ is empty.
+%An extended verifier can thus be described by three circuits: the first is a quantum circuit for the measurement to be performed on $\sC$\tnote{should this be $\sC$? It would be good to clarify what is part of the definition of the game, such as the $\sC$ (its dimension), and what is not, but is part of the definition of a strategy, such as $\sP_i$}, the second is a classical circuit that computes questions to the players, as a function of the input and the measurement outcome, and the third is a classical circuit that computes the referee's decision as a function of the measurement outcome, the questions, and the players' answers. 
 
 
-\hnote{TODO: Make the presentation of definitions of nonlocal games and ENL games consistent}
-
-\paragraph{Strategies}
+\subsubsection{Strategies}
 
 A strategy $\mathcal{S}$ for an $r$-player ENL game $G$ consists of a pair $(\rho,\{M_i\})$ where
 \begin{enumerate}
@@ -115,8 +110,19 @@ A strategy $\mathcal{S}$ for an $r$-player ENL game $G$ consists of a pair $(\rh
 	%For each player $i$, for each question $q \in \mathcal{Q}_i$, a POVM $\{ M_q^a \}_{a \in \mathcal{A}_i}$ acting on $\sP_i$. That is, these operators satisfy $\sum_{a \in \mathcal{A}_i} M_q^a = \Id$.
 \end{enumerate}
 
+\paragraph{Value of games}
 
-We now define notions of closeness of strategies. 
+Let $G = (\mathcal{Q},\mathcal{A},\mathcal{M},\{\mu_w\},\{C_w\},V)$ be an ENL game, and let $\mathcal{S}  = (\rho,\{M_i\})$ be a strategy for $G$. Then the \textbf{value} of $\mathcal{S}$ in $G$ is denoted by $\omega_{\mathcal{S}}(G)$ and defined to be
+\[
+	\omega_{\mathcal{S}}(G) = \E_w \, \E_{\vec{q} \sim \mu_w} \sum_{m,\vec{a}} V(w,\vec{q},\vec{a},m) \, \Tr_\rho  \left ( C_w^m \otimes M_1(q_1,a_1) \otimes \cdots \otimes M_r(q_r,a_r) \right).
+\]	
+The \textbf{value} of $G$ is denoted by $\omega^*(G)$ and defined be
+\[
+	\omega^*(G) = \sup_{\mathcal{S}} \omega_{\mathcal{S}}(G)
+\]
+where the supremum is over all strategies $\mathcal{S}$ for $G$.
+
+\paragraph{Closeness of strategies} We now define notions of closeness of strategies. 
 
 \begin{definition}[State-dependent closeness of POVMs]
 	Let $\rho \in \Dens(\sA)$ be a state and let $M = \{M^a\}_a,N = \{N^a\}_a$ be two POVMs that have the same set of possible outcomes. Then define 
@@ -149,19 +155,50 @@ We now define notions of closeness of strategies.
 
 \begin{lemma}
 \label{lem:close_strategies}
-	Let $G$ be an ENL game, and let $\mathcal{S}$ be a strategy that is $\eps$-isometric to $\mathcal{S}'$. Let $\omega_{\mathcal{S}}(G)$ and $\omega_{\mathcal{S}'}(G)$ denote the success probabilities of $\mathcal{S}$ and $\mathcal{S}'$ respectively in $G$. Then we have that
+	Let $G$ be an $r$-player ENL game, and let $\mathcal{S},\mathcal{S}'$ be strategies such that $\mathcal{S}$ is $\eps$-isometric to $\mathcal{S}'$. Then we have that
 	\[
-		\Abs{ \omega_{\mathcal{S}}(G) - \omega_{\mathcal{S}'}(G) } \leq O(\eps^c)
+		\Abs{ \omega_{\mathcal{S}}(G) - \omega_{\mathcal{S}'}(G) } \leq r\eps.
 	\]
-	for some universal constant $c > 0$.
 \end{lemma}
 \begin{proof}
-	\hnote{Insert proof here.} 
+	Let $\wt{\mathcal{S}}$ be the strategy such that $\mathcal{S}$ is perfectly isometric to $\wt{\mathcal{S}}$ and $\wt{\mathcal{S}}$ is $\eps$-close to $\mathcal{S}'$. It is straightforward to verify that $\omega_{\mathcal{S}}(G) = \omega_{\wt{\mathcal{S}}}(G)$. Now let $\mathcal{S}'' = (\rho'',\{M_i''\})$ denote the same strategy as $\mathcal{S}'$ except $\rho'' = \wt{\rho}$. Then
+	\begin{align*}
+		\abs{ \omega_{\mathcal{S}''}(G) - \omega_{\mathcal{S}'}(G) } &\leq \E_w \, \E_{\vec{q} \sim \mu_w} \Abs{ \Tr \Paren{ (\rho' - \wt{\rho}) \, \Paren{\sum_{m,\vec{a}} V(w,\vec{q},\vec{a},m) \, C_w^m \otimes M_1(q_1,a_1)' \otimes \cdots \otimes M_r(q_r,a_r)'}}} \\
+		&\leq \E_w \, \E_{\vec{q} \sim \mu_w} \Norm{ \rho' - \wt{\rho'}}_1 \\
+		&\leq \eps
+	\end{align*}
+	where in the second inequality used the fact that $\Norm{\sum_{m,\vec{a}} V(w,\vec{q},\vec{a},m) \, C_w^m \otimes M_1(q_1,a_1)' \otimes \cdots \otimes M_r(q_r,a_r)' }_\infty \leq 1$ and $|\Tr(AB)| \leq \Norm{A}_1 \Norm{B}_\infty$. Finally, we can bound
+	\begin{align*}
+		&\abs{ \omega_{\mathcal{S}''}(G) - \omega_{\wt{\mathcal{S}}}(G) } \\
+		&\leq \E_w \, \E_{\vec{q} \sim \mu_w} \Tr_{\wt{\rho}} \Paren{ \sum_{m,\vec{a}} \Abs{C_w^m \otimes M_1(q_1,a_1)'' \otimes \cdots \otimes M_r(q_r,a_r)'' - C_w^m \otimes \wt{M}_1(q_1,a_1) \otimes \cdots \otimes \wt{M}_r(q_r,a_r))}} \\
+		&= \E_w \, \E_{\vec{q} \sim \mu_w} \Tr_{\wt{\rho}} \Paren{\sum_{\vec{a}} \Abs{M_1(q_1,a_1)'' \otimes \cdots \otimes M_r(q_r,a_r)'' - \wt{M}_1(q_1,a_1) \otimes \cdots \otimes \wt{M}_r(q_r,a_r))}}
+	\end{align*}
+	where in the second line, we use $|A|$ to denote the operator absolute value function. We can define $r$ hybrids $H_1,\ldots,H_r$ where
+	\begin{align*}
+		H_1 &= M_1(q_1,a_1)'' \otimes \cdots \otimes M_r(q_r,a_r)'' \\
+		H_2 &= \wt{M}_1(q_1,a_1) \otimes M_2(q_1,a_2)'' \otimes \cdots \otimes M_r(q_r,a_r)'' \\
+		&\vdots \\
+		H_r &= \wt{M}_1(q_1,a_1) \otimes \cdots \otimes \wt{M}_r(q_r,a_r)).
+	\end{align*}
+	In other words, in going from hybrid $H_i$ to $H_{i+1}$, we switch the $i$'th tensor component from the corresponding operator in $\mathcal{S}''$ to the corresponding operator in $\wt{\mathcal{S}}$. We can then write
+	\begin{align*}
+		&\Tr_{\wt{\rho}} \Paren{\sum_{\vec{a}} \Abs{M_1(q_1,a_1)' \otimes \cdots \otimes M_r(q_r,a_r)' - \wt{M}_1(q_1,a_1) \otimes \cdots \otimes \wt{M}_r(q_r,a_r))}}  \leq \sum_{i=1}^{r-1} \Tr_{\wt{\rho}} \Paren{\sum_{\vec{a}} \Abs{H_i - H_{i+1}}}.
+	\end{align*}
+	Then,
+	\begin{align*}
+	\Tr_{\wt{\rho}} \Paren{\sum_{\vec{a}} \Abs{H_i - H_{i+1}}} &= \Tr_{\wt{\rho}} \Paren{\sum_{a_i} \Abs{M_i(q_i,a_i)'' - \wt{M}_i(q_i,a_i)}} \\
+	&= \Tr_{\wt{\rho}} \Paren{\sum_{a_i} \sqrt{\Abs{M_i(q_i,a_i)'' - \wt{M}_i(q_i,a_i)}^2} } \\
+	&\leq \sqrt{\sum_{a_i} \Tr_{\wt{\rho}}  \Abs{M_i(q_i,a_i)'' - \wt{M}_i(q_i,a_i)}^2} \\
+	&= d_{\wt{\rho}}(M_i'',\wt{M}_i) \\
+	&\leq \eps.
+	\end{align*}
+	Putting everything together we get the desired conclusion.
 \end{proof}
 
-\begin{definition}
-Given the description of a family of circuits $V$ for the verifier in an ENL, we let $\omega^*(V)$ denote the maximum acceptance probability for a strategy of the provers in the game. 
-\end{definition}
+%\begin{definition}
+%Given the description of a family of circuits $V$ for the verifier in an ENL, we let $\omega^*(V)$ denote the maximum acceptance probability for a strategy of the provers in the game. 
+%\end{definition}
+
 
 
 \subsection{Turing machines}
@@ -202,4 +239,21 @@ Analogously to the circuit $TMSIM$ that simulates a Turing Machine, we require t
 \begin{lemma}\label{lem:cktsim}
 For every integer $n$ there is a classical (resp. quantum) circuit $CKTSIM$ of size $\poly(n)$ that operates on $2n$ bits and is such that for any input $(C,x)$ where $x\in\{0,1\}^n$ and $C$ is the description of a classical (resp. quantum) circuit operating on at most $n$ bits returns $C(x)$. 
 \end{lemma}
+
+\subsection{Complexity theory}
+
+\begin{definition}[Nondeterministic iterated exponential time]
+	Let $R$ be a positive integer. Then we define
+	\[
+		\NEXPR = \NTIME[\exp^R_2(n)]
+	\]
+\end{definition}
+with $n$ being the input size. 
+
+We now define a canonically complete language for $\NEXPR$. Define $\mathcal{L}_R$ to be the set of all instances $\langle M, 1^n \rangle$ such that $M$, when interpreted as a nondeterministic Turing Machine, accepts after $\exp^R_2(n)$ steps on a blank tape as input.
+
+\begin{definition}[$\MIPstar$]
+	A language $L$ is in $\MIPstar(m,r)_{f(n)}$ if there is a $m$-player, $r$-round quantum interactive proof for $L$ with completeness-soundness gap $f(n)$, where $n$ is the input size. We write $\MIPstar(m,r) = \MIPstar(m,r)_{1/\poly(n)}$.
+\end{definition}
+
 

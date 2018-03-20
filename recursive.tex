@@ -70,9 +70,9 @@ We defer the proof of Proposition~\ref{prop:uevc_soundness} until Section~\ref{s
 Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an instance of $\mathcal{L}_R$. There exists a constant $c > 0$ such that the $\kappa(R)$-prover extended verifier specified by the circuit $UEVC_{n,R}$ on input $(G_{UEVC},V_{NV},M)$ has value 
 \begin{align*}
 		&= 1  \quad & \text{if } \langle M,1^n \rangle\in \mathcal{L}_R \\
-		&\leq 1 - \exp^{R-1}_2(-cn) \quad &\text{if } \langle M,1^n \rangle\notin \mathcal{L}_R
+		&\leq 1 - \exp^{R-1}_2(-cn) \quad &\text{if } \langle M,1^n \rangle\notin \mathcal{L}_R.
 \end{align*}
-where recall $\exp^0_a(-b) = 1/b$ by definition for $b \geq 0$.
+%where recall $\exp^0_a(-b) = 1/b$ by definition for $b \geq 0$.
 \end{corollary}
 \begin{proof}
 	For all $m$, the value $\omega_{m,1}$ when the circuit $UEVC_{m,1}$ is run on input $(G_{UEVC},V_{NV},M)$ is $1$ if $\langle M,1^m \rangle$ is in $\mathcal{L}_1$ and is at most $1 - \delta$ otherwise for some universal constant $\delta > 0$.
