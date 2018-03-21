@@ -1,3 +1,19 @@
 \section{Introduction}
 
+Ever since the work of Cleve et al.~\cite{cleve2004consequences}, the complexity of computing the value of games with entangled players (known as \emph{entangled games}) has been a central topic of study in quantum complexity theory. Several results in the past several years have provided evidence that this problem is much harder than its classical counterpart. In a breakthrough result, Slofstra showed that there is no algorithm that can decide whether the entangled value of a game is equal to $1$~\cite{slofstra2017set}. Ji showed that estimating the entangled value of a game up to inverse polynomial precision is as hard as solving problems in $\NEXP$ (i.e. nondeterministic exponential time)~\cite{ji2016compression}. In contrast, computing the \emph{classical} value of a game, even approximately, is $\NP$-complete\footnote{More formally, we mean the \emph{decision} version of the problem is $\NP$-complete.}. Since it is known that $\NP$ is a strict subset of $\NEXP$, this shows that the complexity of games is drastically different in the setting of entangled players. 
 
+It is an important open problem to determine upper bounds on the complexity of approximating the entangled value of a game. A particularly interesting special case of this problem is that of \emph{constant} factor approximation, where given the description of a game $G$, estimate its entangled value $\omega^*(G)$ up to an additive constant $\eps$ that does not depend on $G$. There are two natural conjectures regarding the complexity of this problem. One is that this computational task is $\NEXP$-hard. The other is that this problem is undecidable. There are many other alternative possibilities to these two, but in our view these are the two most reasonable ones. 
+%For all we know, the problem of deciding whether the entangled value of a game is $1$ or at most $1/2$ could be undecidable! This question is closely related to deep problems in operator algebras, such as the Connes' Embedding Conjecture~\cite{}. 
+
+The aforementioned results of Slofstra and Ji present evidence in favor of the second conjecture (i.e. uncomputability of the entangled value of games). In this paper we present additional evidence for this. We show a time lower bound on approximating the entangled value of games, where the lower bound scales inversely with the quality of approximation. More precisely, our main result is as follows:
+
+\begin{theorem}
+\label{thm:main}
+	%Let $R$ be a positive integer. 
+	Let $\eps: \N \to (0,1)$ be a monotontically non-increasing function. Any deterministic Turing machine $M$ that when given a description of a game $G$ decides whether 
+\[
+	\omega^*(G) = 1	\qquad \text{or} \qquad \omega^*(G) \leq 1 - \eps(|G|) %\exp(- \underbrace{\exp( \cdots \exp(|G|))}_{R-1})
+\]
+requires at least $\exp^{(R)}(|G|) := \underbrace{\exp(\exp( \cdots \exp(|G|)))}_{R+1}$ time, where $R$ is the maximum integer such that $\exp^{(R)}(n) = O(1/\eps(n))$ for infinitely many $n \in \N$. Here, $|G|$ refers to the size of the game $G$. \hnote{Make sure number of exponentials is correct.}
+\end{theorem}
+Roughly speaking, the time complexity of approximating the entangled value of a game $G$ up to accuracy $\eps$ is at least $2^{1/\eps}$. In fact, we prove a stronger result and show that computing the entangled value up to $\eps$ requires \emph{nondeterministic time} $2^{1/\eps}$. 
