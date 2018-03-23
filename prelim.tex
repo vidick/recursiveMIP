@@ -175,7 +175,7 @@ For notational convenience we omit the all zeroes state $\ketbra{0}{0}_{\sV \sM}
 
 \section{Special types of quantum interactive protocols}
 
-In this section we will define a few special types of three-turn quantum interactive protocols that are central to our results. 
+In this section we define a few special types of three-turn quantum interactive protocols that are central to our results. 
 
 %\subsubsection{Non-local games} 
 
@@ -192,7 +192,7 @@ An $r$-player non-local game is a type of three-turn quantum interactive protoco
 
 \subsection{Simulated Communication Games}
 
-Here we will define a variant of three-turn protocols, called \textbf{simulated communication games} (or \textbf{SimCom games} for short), where the verifier and provers do not explicitly exchange message registers. Instead, they will use quantum teleportation to communicate. Furthermore, whereas in teleportation the sender transmits classical teleportation keys to the receiver, in SimCom games no such transmission takes place. Instead, the communicating parties will \emph{guess} what the correct teleportation keys are, and we will measure the acceptance probability of the verifier \emph{conditioned} on the event that every party correctly guesses the teleportation keys. This explains why we call the communication \emph{simulated}. 
+Here we  define a variant of three-turn protocols, called \textbf{simulated communication games} (or \textbf{SimCom games} for short), where the verifier and provers do not explicitly exchange message registers. Instead, they use quantum teleportation to communicate. Furthermore, whereas in teleportation the sender transmits classical teleportation keys to the receiver, in SimCom games no such transmission takes place. Instead, the communicating parties \emph{guess} what the correct teleportation keys are; if their guess is incorrect, the protocol accepts. If the guess is correct, then acceptance or rejection is determined by an output bit of the verifier. This explains why we call the communication \emph{simulated}; the parties can effectively transmit messages to each other when we post-select on the correct teleportation keys.
 
 The benefit of using SimCom games is that the actions of the verifier and the provers are disjoint: they act on separate registers. This will be very useful for us in our recursive compression result. There will be a quantitative loss in transforming normal quantum interactive protocols to SimCom games, but this loss will small provided that the original message lengths were small. 
 
@@ -202,7 +202,7 @@ is still specified by two circuits $(C_Q,C_V)$ acting on registers $\sC \sV \sM$
 
 However, instead of letting the provers act on $\sM \sP$ as before, the protocol behaves as follows: there are five additional registers $\sE_{1} \sE_{1}' \sE_{2} \sE_{2}' \sK$. The $\sE_j$ and $\sE_j'$ registers are each isomorphic to $\sM$. The $\sK$ register is isomorphic to two copies of $\sM$. The $\sE_1 \sE_1' \sE_2 \sE_2'$ registers are initialized in the state $\ket{\Phi}_{\sE_{1} \sE_{1}'} \otimes \ket{\Phi}_{\sE_{2} \sE_{2}'}$, where $\ket{\Phi}_{\sE_j \sE_j'}$ denotes the maximally entangled state between $\sE_j$ and $\sE_j'$. The $\sK$ register is initialized to all zeroes.
 
-The maximally entangled state $\ket{\Phi}_{\sE_1 \sE_1'}$ will be used to teleport the verifier's outgoing message to the provers; after the circuit $C_Q$, there will be a teleportation circuit $TP$ acting on $\sV \sM \sE_1$, which performs a Bell measurement on $\sM \sE_1$ and stores the measurement outcome in $\sV$. The provers then act on $\sE_1' \sE_2' \sP \sK$, where the $i$-th prover acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_i$. 
+The maximally entangled state $\ket{\Phi}_{\sE_1 \sE_1'}$ is used to teleport the verifier's outgoing message to the provers; after the circuit $C_Q$, there is a teleportation circuit $TP$ acting on $\sV \sM \sE_1$, which performs a Bell measurement on $\sM \sE_1$ and stores the measurement outcome in $\sV$. The provers then act on $\sE_1' \sE_2' \sP \sK$, where the $i$-th prover acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_i$. 
 
 Then, a SWAP gate is applied between $\sE_2$ and $\sM$. Finally, the circuit $C_A$ is applied to $\sC \sV \sM$. In addition to the output qubit $\sV_{out}$, we identify additional sub-registers of $\sV$, denoted by $\sV_{tp1},\sV_{tp2}$. These two registers are each isomorphic to two copies of $\sM$.
 
@@ -245,14 +245,14 @@ Finally, the \textbf{value of $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ an
 	\]
 \end{lemma}
 \begin{proof}
-	Let $V'$ behave as follows. The circuit $C_Q'$ is exactly the same as $C_Q$ (which we assume to act as the identity on the registers $\sV_{tp1} \sV_{tp2}$. The circuit $C_A'$ will first initialize $\sV_{tp2}$ to be a uniformly random string, and then apply the Pauli correction operation on the $\sM$ register, assuming that the teleportation keys are given by $\sV_{tp2}$. Then it will run the circuit $C_A$. 
+	Let $V'$ behave as follows. The circuit $C_Q'$ is exactly the same as $C_Q$ (which we assume to act as the identity on the registers $\sV_{tp1} \sV_{tp2}$. The circuit $C_A'$ first initializes $\sV_{tp2}$ to be a uniformly random string, and then apply the Pauli correction operation on the $\sM$ register, assuming that the teleportation keys are given by $\sV_{tp2}$. Then it runs the circuit $C_A$. 
 	
 	We now argue that for every strategy $\strat$ for $\Protocol_V$, there is a strategy $\strat'$ for $\mathscr{Z}_{V'}$ such that
 	\begin{equation}
 	\label{eq:simcom1}
 		\omega^{SC}_{\strat'}(V') = 1 - \frac{1 - \omega^*_\strat(V)}{\dim \sM^4}.
 	\end{equation}
-	The strategy $\strat' = (\rho',\{P_i'\})$ is essentially the same as $\strat$: the states $\rho,\rho'$ are equal. The $i$-th prover $P_i'$ will apply $P_i$ on $\sE_{1,i}' \sP_i$ (treating $\sE_{1,i}'$ as $\sM_i$). Then, it will perform a Bell measurement on $\sE_{1,i}'$ and $\sE_{2,i}'$, saving the result of the Bell measurement in $\sK_i$. In other words, the $i$-th prover uses $\sE_{1,i}'$ as its incoming message; it does not apply any Pauli corrections. Its message back to the verifier is teleported into the register $\sE_{2,i}'$. The probability that the keys from the first teleportation is equal to all zeroes is $(\dim \sM)^{-2}$. The probability the keys from the second teleportation is equal to the verifier's guess in $\sV_{tp2}$ is also $(\dim \sM)^{-2}$. This establishes~\eqref{eq:simcom1}.
+	The strategy $\strat' = (\rho',\{P_i'\})$ is essentially the same as $\strat$: the states $\rho,\rho'$ are equal. The $i$-th prover $P_i'$ applies $P_i$ on $\sE_{1,i}' \sP_i$ (treating $\sE_{1,i}'$ as $\sM_i$). Then, it performs a Bell measurement on $\sE_{1,i}'$ and $\sE_{2,i}'$, saving the result of the Bell measurement in $\sK_i$. In other words, the $i$-th prover uses $\sE_{1,i}'$ as its incoming message; it does not apply any Pauli corrections. Its message back to the verifier is teleported into the register $\sE_{2,i}'$. The probability that the keys from the first teleportation is equal to all zeroes is $(\dim \sM)^{-2}$. The probability the keys from the second teleportation is equal to the verifier's guess in $\sV_{tp2}$ is also $(\dim \sM)^{-2}$. This establishes~\eqref{eq:simcom1}.
 	
 	This implies that $\omega^{SC}(V') \geq 1 - \frac{1 - \omega^*(V)}{\dim \sM^4}$. Now we argue for all strategies $\strat'$ for $\mathscr{Z}_{V'}$, there exists a strategy $\strat$ for $\Protocol_V$ such that Equation~\eqref{eq:simcom1} holds. Let $\strat' = (\rho',\{ P_i' \})$. Define $\strat = (\rho,\{P_i\})$ where
 	\begin{enumerate}
