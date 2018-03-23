@@ -39,16 +39,16 @@ There exists an $\delta > 0$ such that the following holds. Let $M$ be a nondete
 \subsection{Circuits}
 \label{sec:circuits}
 
-\paragraph{Universal Extended Verifier Circuit, $UEVC_{n,r}$} This is a family of circuits for an $\kappa(r)$-prover extended verifier of size $\poly(n)$. The universal extended verifier takes an input $(G,V,M)$. It expects $G$ to be the description of a GTM for some circuit family, $V$ to be a Verifier Turing Machine that executes a $2$-prover game, and $M$ to be a non-deterministic Turing machine. % $M$ to be the description of 
+\paragraph{Universal Extended Verifier Circuit, $UEVC_{n,r}$} This is a family of circuits for an $\kappa(r)$-prover extended verifier of size $\poly(n)$. The universal extended verifier takes an input $(G,V,M)$. It expects $G$ to be the description of a GTM for some circuit family, $V$ to be a Verifier Turing Machine that executes a $k$-prover game for some $k \leq \kappa(r)$, and $M$ to be a non-deterministic Turing machine. % $M$ to be the description of 
 We let $N = 2^n$.
 \begin{itemize}
-\item If $r=1$ the verifier plays the $2$-prover game that is executed by VTM $V$ on input $(1^n,w,M)$, where $w$ is a random string.
+\item If $r=1$ the verifier plays the $k$-prover game that is executed by VTM $V$ on input $(1^n,w,M)$, where $w$ is a random string.
 
 \item If $r>0$ the verifier executes the $\kappa(r)$-prover extended game that corresponds to checking the history state for the $r$-prover extended verifier whose circuit is $CKT(G,1^N,r-1)$, with input to that circuit being $(G,V,M)$. Note that $UEVC_{n,r}$ cannot compute the entirety of $CKT(G,1^N,r-1)$ in $\poly(n)$ time. But it is enough for $UEVC_{n,r}$ to use the procedure $G(N,r-1,t)$ for a random value of $1\leq t\leq N$.
 \end{itemize}
 
 \begin{restatable}{proposition}{soundness}
-	Let $G_{UEVC}$ be the GTM for the circuit family $\{UEVC_{n,r}\}$, let $V$ be a VTM for a $2$-prover game, and let $M$ be a nondeterministic Turing machine. For any integer $n$ and $r$ let $\omega_{n,r} = \omega^*(UEVC_{n,r})$, when the input to $UEVC_{n,r}$ is $(G_{UEVC},V_{NV},M)$. 
+	Let $G_{UEVC}$ be the GTM for the circuit family $\{UEVC_{n,r}\}$, let $V_{NV}$ be the Natarajan-Vidick VTM, and let $M$ be a nondeterministic Turing machine. For any integer $n$ and $r$ let $\omega_{n,r} = \omega^*(UEVC_{n,r})$, when the input to $UEVC_{n,r}$ is $(G_{UEVC},V_{NV},M)$. 
 	
 	Then for any integer $n$, $N=2^n$, and $r$,
 	\begin{itemize}
@@ -162,6 +162,7 @@ and $\sM_{i}$, and writes a single bit of output in the first qubit of register 
 The way these circuits are interpreted as a verifier in an ENL is as follows. First, the circuit $C_M$ is executed on the input $x$ and the contents of the quantum register $\sC$, that is assumed to contain the provers' first quantum message. The outcome $s$ of the measurement is then passed along to circuit $C_Q$, that also has access to the input $x$ and the workspace $\sV_{work}$ and computes questions $q_i$ in registers $\sM_{i}$ for $i\in\{1,\ldots,\kappa(r)\}$. Prover $i$ is sent register $\sM_i$, on which it writes its answer $a_i$. Finally, circuit $C_A$ has access to the input $x$, the workspace $\sV_{work}$, the measurement outcome $s$, and the answers $a_i$ in registers $\sM_i$, and it computes the referee's decision in the protocol, and stores the decision bit in the first qubit of $\sV_{work}$. (We assume that the workspace $\sV_{work}$ stores a copy of the questions $\{q_i\}$ as well as the random strings that are used for each of the three circuits). 
 
 We wish to specify these three circuits in a way that makes it clear that the associated GTM $G_{UEVC}$, which on input $(n,r,t)$ computes the $t$-th gate of $UEVC_{n,r}$, can be executed in time polynomial in its input length, and in particular polylogarithmic in $n$. To make this possible we introduce an intermediate notion of \emph{Verifier Turing Machine}. 
+
 
 \subsection{ Verifier Turing Machines}
 \label{sec:vtm}

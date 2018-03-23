@@ -61,144 +61,207 @@ For a quantum state $\rho \in \Dens(\sA)$ and psd operators $M,N \in \Lin(\sA)$,
 
 \subsection{Quantum interactive protocols} 
 
-We define general quantum interactive protocols between a quantum verifier $V$ and provers $P_1,P_2,\ldots,P_r$. For simplicity, we will restrict our attention to protocols with a single prover $P$. Extending the discussion to multiple provers is straightforward. 
+We define quantum interactive protocols between a quantum verifier $V$ and provers $P_1,P_2,\ldots,P_r$. In this paper we will focus exclusively on \emph{three-turn protocols}, in which the order of interaction is: the provers send a message to the verifier, the verifier sends a message to the prover, the prover sends a message back, and finally the verifier performs a computation to accept or reject. 
 
-We model a single-prover protocol as follows: our Hilbert space consists of three registers: $\sV, \sM, \sP$. The verifier $V$ acts on registers $\sV$ (the verifier's local memory) and $\sM$ (the message register). The prover $P$ acts on $\sM$ and $\sP$ (the prover's local memory). The $\sV$ register initially starts off in the $\ket{0}$ state, but the $\sM$ and $\sP$ registers are arbitrary. The verifier applies a polynomial-size circuit $V_1$ to $\sV \sM$. The prover then applies some unitary $W_1$ (which in general will not be representable by a polynomial size circuit) to $\sM \sP$. The verifier applies $V_2$ to $\sV \sM$, and so on. This continues for polynomially-many steps until the verifier applies a final circuit $V_k$, and the first output qubit of $\sV$ is measured to determine whether the verifier accepts or rejects.
+%For simplicity, we will restrict our attention to protocols with a single prover $P$. Extending the discussion to multiple provers is straightforward. 
 
+For simplicity we will first restrict our attention to protocols with a single prover $P$. Our Hilbert space consists of three registers: $\sC, \sV, \sM, \sP$. The verifier $V$ acts on registers $\sC$ (the register containing the prover's initial message), $\sV$ (the verifier's local memory) and $\sM$ (the message register). The prover $P$ acts on $\sM$ and $\sP$ (the prover's local memory). The $\sV$ and $\sM$ registers initially start off in the $\ket{0}$ state, but the $\sC$ and $\sP$ registers are arbitrary (and in general, entangled). The verifier applies a circuit $C_Q$ to $\sC \sV \sM$ ($Q$ stands for ``questions''). The prover then applies some unitary $P$ to $\sM \sP$. The verifier then applies $C_A$ to $\sC \sV \sM$ ($A$ stands for ``answers''). The first output qubit of $\sV$ is measured in the standard basis to determine whether the verifier accepts or rejects.
 
-We can assume without loss of generality that every operation in this protocol is a reflection. The gates applied by the verifier $V$ are either the Hadamard gate ($H$) or the Toffoli gate ($T$) which are reflections. The prover's unitaries $W_1, W_2,\ldots$ can be made reflections by introducing an ancilla qubit that indicates whether the unitary is to be run forward or backward. In other words, every unitary $W$ can be embedded in a reflection as $\wt{W} = \ketbra{1}{0} \otimes W + \ketbra{0}{1} \otimes W^\dagger$. 
+We can assume without loss of generality that every operation in this protocol is a reflection (Hermitian unitaries that square to identity). The verifier circuits $C_Q,C_A$ consist of Hadamard gates ($H$) and Toffoli gate ($T$), which are reflections. The prover's unitary $P$ can be made a reflection by introducing an ancilla qubit that indicates whether the unitary is to be run forward or backward. In other words, every unitary $P$ can be embedded in a reflection as $\wt{P} = \ketbra{1}{0} \otimes P + \ketbra{0}{1} \otimes P^\dagger$. 
 
-We can now describe the execution of this interactive protocol as a sequence of gates $G_1,G_2,\ldots,G_\tau$ corresponding to the sequence of Hadamard and Toffoli gates of the verifier circuits interleaved with the prover's unitaries $W_i$. In other words, the gate sequence $\{G_t\}$ consists entirely of Hadamard and Toffoli gates except for the prover's unitaries. %Note that $\tau = \poly(n)$ since the interactive protocol runs in polynomial time.
+The extension to $r$ provers is straightforward: the registers $\sM$ and $\sP$ are divided into $r$ parts: $\sM_1,\ldots,\sM_r$ and $\sP_1,\ldots,\sP_r$. The $i$-th prover's unitary $P_i$ acts on $\sM_i \sP_i$. 
 
-\subsection{Games and strategies}
+Pictorially, the protocol looks like Figure \ref{fig:qip}.
 
-\paragraph{Non-local games} An $r$-player \textbf{non-local game} $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mu,V)$ where $\mathcal{Q} = \mathcal{Q}_1 \times \cdots \times \mathcal{Q}_r$ and $\mathcal{A} = \mathcal{A}_1 \times \cdots \times \mathcal{A}_r$ are $r$-partite alphabets, $\mu$ is a distribution over $\mathcal{Q}$, and $V: \mathcal{Q} \times \mathcal{A} \to \{0,1\}$ is a verification predicate. 
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=4in]{graphics/qip3.pdf}
+\end{center}
+\caption{Three-turn quantum interactive protocol.}
+\label{fig:qip}
+\end{figure}
 
-A non-local game is played in the following manner. Before the game starts, the players distribute a shared state $\rho_{\sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$. In the game, the referee uses private randomness to sample a tuple of \emph{questions} $\vec{q} = (q_1,\ldots,q_r)$ from $\mu$, and sends $q_i$ to player $i$, who then performs local measurements on register $\sP_i$ of $\rho$ and returns the measurement outcome $a_i \in \mathcal{A}_i$ (called an \emph{answer}) to the referee. The referee accepts if and only if $V(\vec{q},\vec{a}) = 1$, where $\vec{a} = (a_1,\ldots,a_r)$.
-
-
-\paragraph{Extended non-local (ENL) games} An $r$-player \textbf{extended non-local (ENL) game} $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mathcal{M},\{\mu_w\},\{C_w\},V)$ where there exist integers $d, n \geq 0$ such that
-\begin{enumerate}
-	\item $\mathcal{Q}$ and $\mathcal{A}$ are $r$-partite question and answer alphabets, respectively
-	\item $\mathcal{M}$ is a finite alphabet of \emph{measurement outcomes}
-	\item $\{\mu_w\}_{w \in \{0,1\}^n}$ is a \emph{family} of distributions over $\mathcal{Q}$, indexed by $w \in \{0,1\}^n$
-	\item $\{ C_w \}_{w \in \{0,1\}^n}$ is a \emph{family} of POVMs $C_w = \{C_w^m\}_{m \in \mathcal{M}}$ acting on $\C^d$ with outcomes in $\mathcal{M}$ (i.e. $\sum_{m \in \mathcal{M}} C^m_w = \Id$ for all $w \in \{0,1\}^n$)
-	\item $V: \{0,1\}^n \times \mathcal{Q} \times \mathcal{A} \times \mathcal{M} \to \{0,1\}$ is a verification predicate.
-\end{enumerate} 
-An extended non-local game is played between a referee (also called an \textbf{extended verifier}) and $r$ players, just like in an non-local game, except the referee now gets to measure a quantum state as part of the verification process. Before the game starts, the players distribute a shared state $\rho_{\sC \sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$ and the referee gets register $\sC$ which is isomorphic to $\C^d$. In the game, the referee:
-\begin{enumerate}
-	\item Generates a private random string $w \in \{0,1\}^n$
-	\item Performs POVM $C_w$ on register $\sC$ to obtain measurement outcome $m$
-	\item The referee samples the question tuple $\vec{q} = (q_1,\ldots,q_r)$ from the distribution $\mu_w$, and sends $q_i$ to player $i$. 
-\end{enumerate}
-Player $i$ performs a local measurement on register $\sP_i$ of $\rho$ and returns answer $a_i$ to the referee. Let $\vec{a} = (a_1,\ldots,a_r)$. The referee acepts if and only if $V(w,\vec{q},\vec{a},m) = 1$. 
-
-Note that a non-local game is a special case of an ENL game where $d = n = 0$, there is only a single question distribution $\mu$, the family of POVMs $\{C_w\}$ is trivial, and the register $\sC$ is empty.
-%An extended verifier can thus be described by three circuits: the first is a quantum circuit for the measurement to be performed on $\sC$\tnote{should this be $\sC$? It would be good to clarify what is part of the definition of the game, such as the $\sC$ (its dimension), and what is not, but is part of the definition of a strategy, such as $\sP_i$}, the second is a classical circuit that computes questions to the players, as a function of the input and the measurement outcome, and the third is a classical circuit that computes the referee's decision as a function of the measurement outcome, the questions, and the players' answers. 
-
+A verifier $V = (C_Q,C_A)$ will implicitly define $3$-turn quantum interactive protocol for some number of provers. We will let $\Protocol_V$ denote this protocol.
 
 \subsubsection{Strategies}
 
-A strategy $\mathcal{S}$ for an $r$-player ENL game $G$ consists of a pair $(\rho,\{M_i\})$ where
+Let $V = (C_Q,C_A)$ be a verifier for an $r$-prover protocol $\Protocol_V$. A \textbf{strategy} $\strat$ for $\Protocol_V$ consists of a pair $(\rho,\{P_i\})$ where
 \begin{enumerate}
-	\item $\rho$ is a state on $(r+1)$ registers denoted $\sC$, $\sP_1,\ldots, \sP_r$.
-	\item For each $i\in\{1,\ldots,r\}$, $M_i$ is a map from $\mathcal{Q}_i \times \mathcal{A}_i$ to the set of positive semidefinite operators acting on $\sP_i$, satisfying the constraint that for all $q \in \mathcal{Q}_i$,
-	\[
-		\sum_{a \in \mathcal{A}_i} M_i(q,a) = \Id_{\sP_i}\;.
-	\]
-	For each $q \in \mathcal{Q}_i$, we write $M_i(q) = \{M_i(q,a)\}_a$ to denote the associated POVM on $\sP_i$.
-	%For each player $i$, for each question $q \in \mathcal{Q}_i$, a POVM $\{ M_q^a \}_{a \in \mathcal{A}_i}$ acting on $\sP_i$. That is, these operators satisfy $\sum_{a \in \mathcal{A}_i} M_q^a = \Id$.
+	\item $\rho$ is an entangled state on $r+1$ (finite dimensional) registers $\sC, \sP_1, \ldots, \sP_r$
+	\item For each $i$, $P_i$ is a reflection acting on the $\sM_i \sP_i$ registers.
 \end{enumerate}
+Note that given $V$, the size of register $\sC$ is fixed (because it is specified by the verifier circuit $V$) in any strategy $\strat$ for $\Protocol_V$. However, the size of the registers $\paren{ \sP_i}$ can be arbitrary.
 
-\paragraph{Value of games}
-
-Let $G = (\mathcal{Q},\mathcal{A},\mathcal{M},\{\mu_w\},\{C_w\},V)$ be an ENL game, and let $\mathcal{S}  = (\rho,\{M_i\})$ be a strategy for $G$. Then the \textbf{value} of $\mathcal{S}$ in $G$ is denoted by $\omega_{\mathcal{S}}(G)$ and defined to be
+The \textbf{value of $\strat$ in $\Protocol_V$} is denoted by $\omega^*_\strat(V)$ and is defined as
 \[
-	\omega_{\mathcal{S}}(G) = \E_w \, \E_{\vec{q} \sim \mu_w} \sum_{m,\vec{a}} V(w,\vec{q},\vec{a},m) \, \Tr_\rho  \left ( C_w^m \otimes M_1(q_1,a_1) \otimes \cdots \otimes M_r(q_r,a_r) \right).
-\]	
-The \textbf{value} of $G$ is denoted by $\omega^*(G)$ and defined be
-\[
-	\omega^*(G) = \sup_{\mathcal{S}} \omega_{\mathcal{S}}(G)
+	\omega^*_{\strat}(V) := \Tr \Paren{ \Pi_{out} \, \paren{ C_A P C_Q} \, \rho \otimes \ketbra{0}{0}_{\sV \sM} \, \paren{C_A P C_Q}^\dagger}
 \]
-where the supremum is over all strategies $\mathcal{S}$ for $G$.
+where $\Pi_{out} = \ketbra{1}{1}_{\sV_{out}}$ is the projector onto the $\ket{1}$ state of the output qubit of the $\sV$ register, $\ketbra{0}{0}_{\sV \sM}$ is the all zeroes state in the $\sV \sM$ registers, and $P = P_1 \otimes \cdots \otimes P_r$. 
 
-\paragraph{Closeness of strategies} We now define notions of closeness of strategies. 
 
-\begin{definition}[State-dependent closeness of POVMs]
-	Let $\rho \in \Dens(\sA)$ be a state and let $M = \{M^a\}_a,N = \{N^a\}_a$ be two POVMs that have the same set of possible outcomes. Then define 
-	\begin{align}
-		d_\rho \Paren{ M, N } := \Brac{ \sum_a \Norm{ M^a - N^a }_\rho^2 }^{1/2}.
-	\end{align}
-\end{definition}
+The \textbf{value of a protocol $\Protocol_V$} is denoted by $\omega^*(V)$ and is defined as 
+\[
+	\omega^*(V) := \sup_{\strat} \omega^*_\strat(V)
+\]
+where the supremum is over all (finite dimensional) strategies $\strat$ for $\Protocol_V$. 
 
+%We can now describe the execution of this interactive protocol as a sequence of gates $G_1,G_2,\ldots,G_\tau$ corresponding to the sequence of Hadamard and Toffoli gates of the verifier circuits interleaved with the prover's unitaries $W_i$. In other words, the gate sequence $\{G_t\}$ consists entirely of Hadamard and Toffoli gates except for the prover's unitaries. %Note that $\tau = \poly(n)$ since the interactive protocol runs in polynomial time.
+
+
+\subsubsection{Closeness of strategies} 
+
+We now define notions of closeness of strategies. 
+%
+%\begin{definition}[State-dependent closeness of POVMs]
+%	Let $\rho \in \Dens(\sA)$ be a state and let $M = \{M^a\}_a,N = \{N^a\}_a$ be two POVMs that have the same set of possible outcomes. Then define 
+%	\begin{align}
+%		d_\rho \Paren{ M, N } := \Brac{ \sum_a \Norm{ M^a - N^a }_\rho^2 }^{1/2}.
+%	\end{align}
+%\end{definition}
 
 \begin{definition}[Closeness of strategies]
-	Let $\mathcal{S} = (\rho,\{M_i\}), \mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL game $G$. Then $\mathcal{S}$ is \textbf{$\eps$-close} to $\mathcal{S}'$ if and only if
+	Let $V = (C_Q,C_A)$ be a verifier and let $\strat = (\rho,\{P_i\}), \strat' = (\rho',\paren{P_i'})$ be strategies for the $r$-prover protocol $\Protocol_V$. Then $\strat$ is \textbf{$\eps$-close} to $\strat'$ if and only if
 	\begin{enumerate}
 		\item $ \norm{ \rho - \rho'}_{tr} \leq \eps$
-		\item For all $i\in\{1,\ldots,r\}$, for all $q \in \mathcal{Q}_i$,
+		\item $\Norm{ P \sigma P^\dagger - P' \sigma P'^\dagger }_{tr} \leq \eps$		
+		%For all $i\in\{1,\ldots,r\}$, %for all $q \in \mathcal{Q}_i$,
 		%\tnote{why this? the first condition says that having the second for $\rho$ or $\rho'$ is enough}
-		\[
-		d_\rho(M_i(q),M_i'(q)) \leq \eps.
-		\]
+		
+		%d_\rho(M_i(q),M_i'(q)) \leq \eps.
+		%\Norm{ P - P' }^2_{\wt{\rho}} \leq \eps
+		%\]
 	\end{enumerate}
+where $\sigma := C_Q \rho \otimes \ketbra{0}{0}_{\sV \sM} C_Q^\dagger$, $P = P_1 \otimes \cdots \otimes P_r$ and $P' = P_1' \otimes \cdots \otimes P_r'$.
+
 \end{definition}
 
 \begin{definition}[Isometric strategies]
-	Let $\mathcal{S} = (\rho,\{M_i\})$ and $\mathcal{S}' = (\rho',\{M_i'\})$ be strategies for an $r$-player ENL game $G = (\mathcal{Q},\mathcal{A},\mu,V)$, where $\rho \in \Dens(\sC \sP_1 \cdots \sP_r)$ and $\rho' \in \Dens(\sC \sP_1' \cdots \sP_r')$. Then $\mathcal{S}$ is \textbf{$\eps$-isometric} to $\mathcal{S}'$ if and only if there exist isometries: $I_i : \sP_i \to \sP_i'$ for each $i\in\{1,\ldots,r\}$ such that the strategy $\wt{\mathcal{S}} = (\wt{\rho}, \set{ \wt{M}_i })$ is $\eps$-close to $\mathcal{S}'$, where $\wt{\mathcal{S}}$ is defined by
+	Let $\strat = (\rho,\{P_i\})$ and $\strat' = (\rho',\{P_i'\})$ be strategies for an $r$-prover protocol $\Protocol_V$ corresponding to some verifier $V = (C_Q,C_A)$. Suppose $\rho \in \Dens(\sC \sP_1 \cdots \sP_r)$ and $\rho' \in \Dens(\sC \sP_1' \cdots \sP_r')$. Then $\strat$ is \textbf{$\eps$-isometric} to $\strat'$ if and only if there exist isometries: $I_i : \sP_i \to \sP_i'$ for each $i\in\{1,\ldots,r\}$ such that the strategy $\wt{\strat} = (\wt{\rho}, \set{ \wt{P}_i })$ is $\eps$-close to $\strat'$, where $\wt{\strat}$ is defined by
 	\begin{enumerate}
-		\item $\wt{\rho} = (I_\sC \otimes I_1 \otimes \cdots \otimes I_r) \rho (I_\sC \otimes I_1 \otimes \cdots \otimes I_r)^\dagger$
-		\item For all $i$, for all $(q,a) \in \mathcal{Q}_i \times \mathcal{A}_i$, $\wt{M}_i(q,a) = I_i \, M_i(q,a)\, I_i^\dagger$.
+		\item $\wt{\rho} = (I_1 \otimes \cdots \otimes I_r) \rho (I_1 \otimes \cdots \otimes I_r)^\dagger$
+		\item For all $i$, $\wt{P}_i = I_i P_i I_i^\dagger$.
 	\end{enumerate}
 \end{definition}
 
 
 \begin{lemma}
 \label{lem:close_strategies}
-	Let $G$ be an $r$-player ENL game, and let $\mathcal{S},\mathcal{S}'$ be strategies such that $\mathcal{S}$ is $\eps$-isometric to $\mathcal{S}'$. Then we have that
+	Let $V = (C_Q,C_A)$ be a verifier and let $\strat_1 = (\rho_1,\{P^{(1)}_i\}),\strat_2= (\rho_2,\{P^{(2)}_i\})$ be strategies for $\Protocol_V$ such that $\strat_1$ is $\eps$-isometric to $\strat_2$. Then we have that
 	\[
-		\Abs{ \omega_{\mathcal{S}}(G) - \omega_{\mathcal{S}'}(G) } \leq r\eps.
+		\Abs{ \omega_{\strat_1}(V) - \omega_{\strat_2}(V) } \leq 2\eps.
 	\]
 \end{lemma}
 \begin{proof}
-	Let $\wt{\mathcal{S}}$ be the strategy such that $\mathcal{S}$ is perfectly isometric to $\wt{\mathcal{S}}$ and $\wt{\mathcal{S}}$ is $\eps$-close to $\mathcal{S}'$. It is straightforward to verify that $\omega_{\mathcal{S}}(G) = \omega_{\wt{\mathcal{S}}}(G)$. Now let $\mathcal{S}'' = (\rho'',\{M_i''\})$ denote the same strategy as $\mathcal{S}'$ except $\rho'' = \wt{\rho}$. Then
+For notational convenience we omit the all zeroes state $\ketbra{0}{0}_{\sV \sM}$ in the calculations below. Let $\strat_3= (\rho_3,\{P^{(3)}_i\})$ be the strategy such that $\strat_1$ is perfectly isometric to $\strat_3$ and $\strat_3$ is $\eps$-close to $\strat_2$. It is straightforward to verify that $\omega_{\strat_1}(V) = \omega_{\strat_3}(V)$. 
+	
+	Let $\strat_4 = (\rho_4,\set{ P^{(4)}_i})$ be such that $\rho_4 = \rho_2$ but $\set{P^{(4)}_i} = \set{P^{(3)}_i}$. Then
 	\begin{align*}
-		\abs{ \omega_{\mathcal{S}''}(G) - \omega_{\mathcal{S}'}(G) } &\leq \E_w \, \E_{\vec{q} \sim \mu_w} \Abs{ \Tr \Paren{ (\rho' - \wt{\rho}) \, \Paren{\sum_{m,\vec{a}} V(w,\vec{q},\vec{a},m) \, C_w^m \otimes M_1(q_1,a_1)' \otimes \cdots \otimes M_r(q_r,a_r)'}}} \\
-		&\leq \E_w \, \E_{\vec{q} \sim \mu_w} \Norm{ \rho' - \wt{\rho'}}_1 \\
-		&\leq \eps
+		\abs{ \omega^*_{\strat_3}(V) - \omega^*_{\strat_4}(V)} &\leq \Abs{ \Tr\Paren{ (C_A P^{(3)} C_Q)^\dagger \Pi_{out} (C_A P^{(3)} C_Q) \paren{\rho_3 - \rho_2}} } \\
+		&\leq \norm{ \rho_3 - \rho_2}_{tr} \\
+		&\leq \eps.
 	\end{align*}
-	where in the second inequality used the fact that $\Norm{\sum_{m,\vec{a}} V(w,\vec{q},\vec{a},m) \, C_w^m \otimes M_1(q_1,a_1)' \otimes \cdots \otimes M_r(q_r,a_r)' }_\infty \leq 1$ and $|\Tr(AB)| \leq \Norm{A}_1 \Norm{B}_\infty$. Finally, we can bound
+	where $P^{(3)} = \bigotimes P^{(3)}_i$. The second inequality follows from matrix H\"{o}lder ($\Tr(AB) \leq \|A\|_\infty \|B\|_{tr}$) and the last inequality follows from the fact that $\strat_3$ is $\eps$-close to $\strat_2$.
+	Next, we have
 	\begin{align*}
-		&\abs{ \omega_{\mathcal{S}''}(G) - \omega_{\wt{\mathcal{S}}}(G) } \\
-		&\leq \E_w \, \E_{\vec{q} \sim \mu_w} \Tr_{\wt{\rho}} \Paren{ \sum_{m,\vec{a}} \Abs{C_w^m \otimes M_1(q_1,a_1)'' \otimes \cdots \otimes M_r(q_r,a_r)'' - C_w^m \otimes \wt{M}_1(q_1,a_1) \otimes \cdots \otimes \wt{M}_r(q_r,a_r))}} \\
-		&= \E_w \, \E_{\vec{q} \sim \mu_w} \Tr_{\wt{\rho}} \Paren{\sum_{\vec{a}} \Abs{M_1(q_1,a_1)'' \otimes \cdots \otimes M_r(q_r,a_r)'' - \wt{M}_1(q_1,a_1) \otimes \cdots \otimes \wt{M}_r(q_r,a_r))}}
-	\end{align*}
-	where in the second line, we use $|A|$ to denote the operator absolute value function. We can define $r$ hybrids $H_1,\ldots,H_r$ where
-	\begin{align*}
-		H_1 &= M_1(q_1,a_1)'' \otimes \cdots \otimes M_r(q_r,a_r)'' \\
-		H_2 &= \wt{M}_1(q_1,a_1) \otimes M_2(q_1,a_2)'' \otimes \cdots \otimes M_r(q_r,a_r)'' \\
-		&\vdots \\
-		H_r &= \wt{M}_1(q_1,a_1) \otimes \cdots \otimes \wt{M}_r(q_r,a_r)).
-	\end{align*}
-	In other words, in going from hybrid $H_i$ to $H_{i+1}$, we switch the $i$'th tensor component from the corresponding operator in $\mathcal{S}''$ to the corresponding operator in $\wt{\mathcal{S}}$. We can then write
-	\begin{align*}
-		&\Tr_{\wt{\rho}} \Paren{\sum_{\vec{a}} \Abs{M_1(q_1,a_1)' \otimes \cdots \otimes M_r(q_r,a_r)' - \wt{M}_1(q_1,a_1) \otimes \cdots \otimes \wt{M}_r(q_r,a_r))}}  \leq \sum_{i=1}^{r-1} \Tr_{\wt{\rho}} \Paren{\sum_{\vec{a}} \Abs{H_i - H_{i+1}}}.
-	\end{align*}
-	Then,
-	\begin{align*}
-	\Tr_{\wt{\rho}} \Paren{\sum_{\vec{a}} \Abs{H_i - H_{i+1}}} &= \Tr_{\wt{\rho}} \Paren{\sum_{a_i} \Abs{M_i(q_i,a_i)'' - \wt{M}_i(q_i,a_i)}} \\
-	&= \Tr_{\wt{\rho}} \Paren{\sum_{a_i} \sqrt{\Abs{M_i(q_i,a_i)'' - \wt{M}_i(q_i,a_i)}^2} } \\
-	&\leq \sqrt{\sum_{a_i} \Tr_{\wt{\rho}}  \Abs{M_i(q_i,a_i)'' - \wt{M}_i(q_i,a_i)}^2} \\
-	&= d_{\wt{\rho}}(M_i'',\wt{M}_i) \\
-	&\leq \eps.
-	\end{align*}
-	Putting everything together we get the desired conclusion.
+		\abs{ \omega^*_{\strat_2}(V) - \omega^*_{\strat_4}(V)} &\leq \Abs{ \Tr\Paren{ \Pi_{out} \Paren{ (C_A P^{(2)} C_Q)\rho_2 (C_A P^{(2)} C_Q)^\dagger  - (C_A P^{(3)} C_Q) \rho_2 (C_A P^{(3)} C_Q)^\dagger  } }} \\
+		&\leq \norm{ (P^{(2)} C_Q) \rho_2 (P^{(2)} C_Q)^\dagger - (P^{(3)} C_Q) \rho_2 (P^{(3)} C_Q)^\dagger}_{tr} \\
+		&\leq \eps.
+	\end{align*}	
+	The first inequality follows from matrix H\"{o}lder and the second inequality follows again from the fact that $\strat_3$ is $\eps$-close to $\strat_2$. Putting everything together we obtain the desired conclusion.
+
 \end{proof}
 
-%\begin{definition}
-%Given the description of a family of circuits $V$ for the verifier in an ENL, we let $\omega^*(V)$ denote the maximum acceptance probability for a strategy of the provers in the game. 
-%\end{definition}
 
+
+\section{Special types of quantum interactive protocols}
+
+In this section we will define a few special types of three-turn quantum interactive protocols that are central to our results. 
+
+%\subsubsection{Non-local games} 
+
+%
+%\subsection{Games and strategies}
+%
+\subsection{Non-local games} 
+An $r$-player \textbf{non-local game} $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mu,V)$ where $\mathcal{Q} = \mathcal{Q}_1 \times \cdots \times \mathcal{Q}_r$ and $\mathcal{A} = \mathcal{A}_1 \times \cdots \times \mathcal{A}_r$ are $r$-partite alphabets, $\mu$ is a distribution over $\mathcal{Q}$, and $V: \mathcal{Q} \times \mathcal{A} \to \{0,1\}$ is a verification predicate. 
+
+%A non-local game is played in the following manner. Before the game starts, the players distribute a shared state $\rho_{\sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$. In the game, the referee uses private randomness to sample a tuple of \emph{questions} $\vec{q} = (q_1,\ldots,q_r)$ from $\mu$, and sends $q_i$ to player $i$, who then performs local measurements on register $\sP_i$ of $\rho$ and returns the measurement outcome $a_i \in \mathcal{A}_i$ (called an \emph{answer}) to the referee. The referee accepts if and only if $V(\vec{q},\vec{a}) = 1$, where $\vec{a} = (a_1,\ldots,a_r)$.
+
+An $r$-player non-local game is a type of three-turn quantum interactive protocol where the circuit $C_Q$ samples questions $\vec{q} = (q_1,\ldots,q_r)$ from the distribution $\mu$, and saves a copy of $q_i$ in the register $\sM_i$. After the provers' unitaries $P = P_1 \otimes \cdots \otimes P_r$, the circuit $C_A$ reads the $\sM$ registers in the standard basis to obtain the answers $\vec{a} = (a_1,\ldots,a_r)$, and then computes the predicate $V(\vec{q},\vec{a})$ to decide whether to accept or reject.
+
+
+\subsection{Simulated Communication Games}
+
+Here we will define a variant of three-turn protocols, called \textbf{simulated communication games} (or \textbf{SimCom games} for short), where the verifier and provers do not explicitly exchange message registers. Instead, they will use quantum teleportation to communicate. Furthermore, whereas in teleportation the sender transmits classical teleportation keys to the receiver, in SimCom games no such transmission takes place. Instead, the communicating parties will \emph{guess} what the correct teleportation keys are, and we will measure the acceptance probability of the verifier \emph{conditioned} on the event that every party correctly guesses the teleportation keys. This explains why we call the communication \emph{simulated}. 
+
+The benefit of using SimCom games is that the actions of the verifier and the provers are disjoint: they act on separate registers. This will be very useful for us in our recursive compression result. There will be a quantitative loss in transforming normal quantum interactive protocols to SimCom games, but this loss will small provided that the original message lengths were small. 
+
+More precisely, an $r$-prover SimCom game is specified by a verifier $V$, which 
+%an $r$-partite question alphabet $\cQ = \cQ_1 \times \cdots \times \cQ_r$, and an $r$-partite answer alphabet $\cA = \cA_1 \times \cdots \times \cA_r$. 
+is still specified by two circuits $(C_Q,C_V)$ acting on registers $\sC \sV \sM$. %The $\sM$ register is isomorphic to whichever is the larger of $\cQ$ or $\cA$.\footnote{Here, we abuse notation and treat $\cQ$ (resp. $\cA$) as a Hilbert space of dimension $|\cQ|$ (resp. $|\cA|$).}
+
+However, instead of letting the provers act on $\sM \sP$ as before, the protocol behaves as follows: there are five additional registers $\sE_{1} \sE_{1}' \sE_{2} \sE_{2}' \sK$. The $\sE_j$ and $\sE_j'$ registers are each isomorphic to $\sM$. The $\sK$ register is isomorphic to two copies of $\sM$. The $\sE_1 \sE_1' \sE_2 \sE_2'$ registers are initialized in the state $\ket{\Phi}_{\sE_{1} \sE_{1}'} \otimes \ket{\Phi}_{\sE_{2} \sE_{2}'}$, where $\ket{\Phi}_{\sE_j \sE_j'}$ denotes the maximally entangled state between $\sE_j$ and $\sE_j'$. The $\sK$ register is initialized to all zeroes.
+
+The maximally entangled state $\ket{\Phi}_{\sE_1 \sE_1'}$ will be used to teleport the verifier's outgoing message to the provers; after the circuit $C_Q$, there will be a teleportation circuit $TP$ acting on $\sV \sM \sE_1$, which performs a Bell measurement on $\sM \sE_1$ and stores the measurement outcome in $\sV$. The provers then act on $\sE_1' \sE_2' \sP \sK$, where the $i$-th prover acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_i$. 
+
+Then, a SWAP gate is applied between $\sE_2$ and $\sM$. Finally, the circuit $C_A$ is applied to $\sC \sV \sM$. In addition to the output qubit $\sV_{out}$, we identify additional sub-registers of $\sV$, denoted by $\sV_{tp1},\sV_{tp2}$. These two registers are each isomorphic to two copies of $\sM$.
+
+%The first register $\sV_{tp1}$ is isomorphic to two copies of $\cM$. The second register $\sV_{tp2}$ is isomorphic to two copies of $\cA$. 
+
+See Figure \ref{fig:simcom} for a pictorial representation of a SimCom game.
+
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=5in]{graphics/simcom.pdf}
+\end{center}
+\caption{A simulated communication game.}
+\label{fig:simcom}
+\end{figure}
+
+Let $V = (C_Q,C_A)$ be a verifier and let $\mathscr{Z}_V$ denote the SimCom game corresponding to $V$. We say that $V$ accepts in $\mathscr{Z}_V$ if measuring the $\sV_{out} \sV_{tp1} \sV_{tp2} \sK$ registers yields outcome $(b,t_1,t_2,k)$ where $b = 1$, $t_1$ is all zero,
+%\footnote{Here, the registers $\sV_{tp1}$ and $\sV_{tp2}$ are indexed by the alphabets $\cQ^2$ and $\cA^2$ respectively. We assume that there is a canonical ``zero'' element of these alphabets.} 
+and $t_2 = k$. 
+
+Given a strategy $\strat = (\rho,\{P_i\})$, the \textbf{value of $\strat$ in $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ and is defined to be
+\[
+	\omega^{SC}_\strat(V) := \Tr \Paren{ \wt{\Pi}_{out} \, \paren{ C_A P C_Q} \, \sigma\paren{C_A P C_Q}^\dagger}
+\]
+where
+\begin{align*}
+\sigma &= \rho \otimes \ketbra{0}{0}_{\sV \sM \sK} \otimes \ketbra{\Phi}{\Phi}_{\sE_1 \sE_1'} \otimes \ketbra{\Phi}{\Phi}_{\sE_2 \sE_2'} \\
+	\wt{\Pi}_{out} &= \ketbra{1}{1}_{\sV_{out}} \otimes \Pi_{tp} + (\Id - \Pi_{tp}) \\
+	\Pi_{tp} &= \ketbra{0}{0}_{\sV_{tp1}} \otimes \Paren{ \sum_{m} \ketbra{mm}{mm}_{\sV_{tp2} \sK}}.
+\end{align*}
+The state $\sigma$ is simply $\rho$ along with the proper initialization for the protocol. The projector $\Pi_{tp}$ projects onto the state where $\sV_{tp1}$ is the zero state, and $\sV_{tp2}$ and $\sK$ are equal in the standard basis.
+
+Finally, the \textbf{value of $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ and is defined to be the supremum of $\omega^{SC}_\strat(V)$ over all strategies $\strat$.
+
+\begin{lemma}
+\label{lem:convert_to_simcom}
+	Let $V = (C_Q,C_A)$ be a verifier for a (standard) three-turn protocol $\Protocol_V$. There exists a verifier $V' = (C_Q',C_A')$ for a SimCom game $\mathscr{Z}_{V'}$ such that
+	\[
+		\omega^{SC}(V') = 1 - \frac{1 - \omega^*(V)}{\dim \sM^4}.
+	\]
+\end{lemma}
+\begin{proof}
+	Let $V'$ behave as follows. The circuit $C_Q'$ is exactly the same as $C_Q$ (which we assume to act as the identity on the registers $\sV_{tp1} \sV_{tp2}$. The circuit $C_A'$ will first initialize $\sV_{tp2}$ to be a uniformly random string, and then apply the Pauli correction operation on the $\sM$ register, assuming that the teleportation keys are given by $\sV_{tp2}$. Then it will run the circuit $C_A$. 
+	
+	We now argue that for every strategy $\strat$ for $\Protocol_V$, there is a strategy $\strat'$ for $\mathscr{Z}_{V'}$ such that
+	\begin{equation}
+	\label{eq:simcom1}
+		\omega^{SC}_{\strat'}(V') = 1 - \frac{1 - \omega^*_\strat(V)}{\dim \sM^4}.
+	\end{equation}
+	The strategy $\strat' = (\rho',\{P_i'\})$ is essentially the same as $\strat$: the states $\rho,\rho'$ are equal. The $i$-th prover $P_i'$ will apply $P_i$ on $\sE_{1,i}' \sP_i$ (treating $\sE_{1,i}'$ as $\sM_i$). Then, it will perform a Bell measurement on $\sE_{1,i}'$ and $\sE_{2,i}'$, saving the result of the Bell measurement in $\sK_i$. In other words, the $i$-th prover uses $\sE_{1,i}'$ as its incoming message; it does not apply any Pauli corrections. Its message back to the verifier is teleported into the register $\sE_{2,i}'$. The probability that the keys from the first teleportation is equal to all zeroes is $(\dim \sM)^{-2}$. The probability the keys from the second teleportation is equal to the verifier's guess in $\sV_{tp2}$ is also $(\dim \sM)^{-2}$. This establishes~\eqref{eq:simcom1}.
+	
+	This implies that $\omega^{SC}(V') \geq 1 - \frac{1 - \omega^*(V)}{\dim \sM^4}$. Now we argue for all strategies $\strat'$ for $\mathscr{Z}_{V'}$, there exists a strategy $\strat$ for $\Protocol_V$ such that Equation~\eqref{eq:simcom1} holds. Let $\strat' = (\rho',\{ P_i' \})$. Define $\strat = (\rho,\{P_i\})$ where
+	\begin{enumerate}
+		\item $\rho = \rho' \otimes \ketbra{\Phi}{\Phi}_{\sE_1 \sE_1'} \otimes \ketbra{\Phi}{\Phi}_{\sE_2 \sE_2'} \otimes \ketbra{0}{0}_{\sK}$. 
+		
+		\item The $i$-th prover $P_i$ receives registers $\sM_i \sP_i \sE_{1,i}' \sE_{2,i}' \sK_i$ in this strategy. It does the following: it teleports the register $\sM_i$ into $\sE_{1,i}'$, applying Pauli corrections as needed. Then, it applies $P_i'$ to registers $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_i$. Then, it applies the Pauli correction operation on $\sE_{2,i}'$, using $\sK_i$ as the correction keys. Then, it swaps the $\sE_{2,i}'$ register with the $\sM_i$ register. 
+	\end{enumerate}
+	It is straightforward to verify that~\eqref{eq:simcom1} holds. \hnote{Double check this.} This implies that $\omega^{SC}(V') \leq 1 - \frac{1 - \omega^*(V)}{\dim \sM^4}$, this proving the lemma.
+\end{proof}
 
 
 \subsection{Turing machines}

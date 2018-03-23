@@ -14,6 +14,6 @@ The aforementioned results of Slofstra and Ji present evidence in favor of the s
 \[
 	\omega^*(G) = 1	\qquad \text{or} \qquad \omega^*(G) \leq 1 - \eps(|G|) %\exp(- \underbrace{\exp( \cdots \exp(|G|))}_{R-1})
 \]
-requires at least $\exp^{(R)}(|G|) := \underbrace{\exp(\exp( \cdots \exp(|G|)))}_{R+1}$ time, where $R$ is the maximum integer such that $\exp^{(R)}(n) = O(1/\eps(n))$ for infinitely many $n \in \N$. Here, $|G|$ refers to the size of the game $G$. \hnote{Make sure number of exponentials is correct.}
+requires at least $\exp^{(R)}(|G|) := \underbrace{\exp(\exp( \cdots \exp(|G|)))}_{R+1}$ time, where $R$ is any integer such that $\exp^{(R)}(n) = O(1/\eps(n))$ for infinitely many $n \in \N$. Here, $|G|$ refers to the size of the game $G$. \hnote{Make sure number of exponentials is correct.}
 \end{theorem}
 Roughly speaking, the time complexity of approximating the entangled value of a game $G$ up to accuracy $\eps$ is at least $2^{1/\eps}$. In fact, we prove a stronger result and show that computing the entangled value up to $\eps$ requires \emph{nondeterministic time} $2^{1/\eps}$. 
