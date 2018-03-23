@@ -63,57 +63,70 @@ Let $\mS$ be an honest Pauli Check strategy. Then the strategy is accepted with 
 Any strategy $\mathcal{S}$ that passes the Pauli Check with probability at least $1 - \eps$ is $\delta$-isometric to an honest Pauli Check strategy for some $\delta = \poly[N;\eps]$.
 \end{lemma}
 
-The lemma is proved using a sequence of claims that analyze each of the tests that constitute the Pauli check. We start with the EPR test. 
+The lemma is proved using a sequence of claims that analyze each of the tests that constitute the Pauli check. We start with the propagation check. 
+
+\begin{claim}\label{claim:pauli-prop}
+Let $\mathcal{S}$ be a strategy that passes the propagation check with probability at least $1 - \eps_1$. Then $\mathcal{S}$ is $\delta_1$-isometric to a strategy $\mathcal{S}_1$ such that the shared state takes the form
+\[ \ket{\psi}_{\reg{C}_p \reg{PR}} \,=\, \frac{1}{2N+1} \sum_{t,t'=0}^{2N} \ket{t,t'}_{\reg{C}_p} W''_{t'} CW_t \ket{ \psi_0}_{\reg{PR}}\;, \]
+for some observables $CW_t$ and $W''_{t'}$. Moreover, when B is sent a Pauli question $CW_t$ or $W''_t$ then he measures the corresponding answer to determine the answer to that question (independently of the accompanying EPR question). 
+\end{claim}
+
+\begin{proof}
+Follows from Lemma~\ref{lem:prop_check_0}.
+\end{proof}
+
+
+Next we analyze the consequences of the Pauli test. 
 
 \begin{claim}\label{claim:pauli-epr}
-Let $\mathcal{S}$ be a strategy that passes the EPR test with probability at least $1 - \eps_1$. Then $\mathcal{S}$ is $\delta_1$-isometric to a strategy $\mathcal{S}_1$ satisfying the following properties:
+Let $\mathcal{S}_1$ be a strategy satisfying the conclusion of Claim~\ref{claim:pauli-prop}. Suppose further that $\mS_1$ passes the EPR test with probability at least $1 - \eps_2$. Then $\mathcal{S}_1$ is $\delta_2$-isometric to a strategy $\mathcal{S}_2$, for some $\delta_2 = \poly[N;\eps_2]$, such that the following hold:
 \begin{enumerate}
-\item On a question of the form $(W_i,W'_j)$ where $W_i$ is a Pauli question and $W'_j$ an EPR question, B determines its answer using two commuting observables $W_i$ and $W'_j$. 
-\item The sub-strategy of $\mathcal{S}_1$ that consists of the shared entangled state, conditioned on $t=0$ in $\sC_p$, and the $W_i$, $i\in\{1,\ldots,2N\}$, is the honest $2N$-qubit EPR strategy, for some $\delta_1 = \poly[N;\eps_1]$, where the $2N$ shared EPR pairs are on registers $\sA'$ and $\sB'$ and the ancilla registers are $\sA$ and $\sB$. 
-\item The observables $W'_j$, $j\in\{1,\ldots,2N\}$, act on $\sB$ only. 
-\end{enumerate}
+\item B always determines its answer to a question using two commuting binary observables, one associated with the EPR question and depending only on it, and the other associated with the EPR question and depending only on it.  
+\item The sub-strategy of $\mathcal{S}_2$ that consists of the shared entangled state, conditioned on $t=0$ in $\sC_p$, and the players' observables associated to Pauli questions, is the honest $2N$-qubit EPR strategy. In particular, the state $\ket{\psi_0}_{\reg{PR}}$ has the form 
+\[ \ket{\psi_0}_{\reg{PR}} \,=\, \ket{\Phi}_{\reg{A}'\reg{B}'} \ket{\varphi_0}_{\reg{ABZR}}\;,\]
+where registers $\reg{A}\reg{A}'$ are in the possession of player A, and registers $\reg{B}\reg{B}'$ in the possession of player B. 
+\item At $t=0$, the observable associated to player B's answer to a Pauli question not of the form $CW_t$ acts trivially on $\reg{B}'$. The observable associated with $CW_t$ acts trivially on all qubits in $\reg{B}'$ but the $t$-th qubit.
+\end{enumerate}  
 \end{claim}
 
 \begin{proof}
-First we observe that for any $W'_j$ that is sent as the EPR question to player $B$, player A and player B are required to successfully play a copy of the $2N$-qubit EPR test, where questions to player A do not depend on $W'_j$. Using Theorem~\ref{thm:epr-test}, this implies that the observable associated with player B's answer to the Pauli question does not depend on the EPR question, and establises item 2. in the claim. 
-
-To show item 1. we similarly observe that the verifier's measurement of the second clock register is independent of the EPR question sent to player B. Using the consistency check performed between the verifier's measurement outcome and player B's answer to the Pauli question, we deduce that the observable associated with the Pauli question does not depend on the EPR question. 
-
-The third item follows from the previous two, as by definition any observable for player B associated to a Pauli question approximately commutes with any observable for player B associated to an EPR question. 
-
+First we observe that for any EPR question to player $B$, player A and player B are required to successfully play a copy of the $2N$-qubit EPR test, where questions to player A do not depend on the Pauli question to B. Using Theorem~\ref{thm:epr-test}, this implies that the observable associated with player B's answer to the Pauli question does not depend on the EPR question. Since the converse property follows from Claim~\ref{claim:pauli-prop}, this shows the first item. The second item follows directly from Theorem~\ref{thm:epr-test}. The last item follows from the first, since an observable commutes with all Pauli observables on a qubit if and only if it acts trivially on that qubit.   
 \end{proof}
 
-\begin{claim}\label{claim:pauli-propagation}
-Let $\mathcal{S}_1$ be a strategy satisfying the conclusion of Claim~\ref{claim:pauli-epr}. Suppose further that $\mS_1$ passes the propagation test with probability at least $1-\eps_2$. Then $\mathcal{S}_1$ is $\delta_2$-isometric to an honest Propagation Check strategy $\mathcal{S}_2$ with the following properties:
-\begin{enumerate}
-\item The clock register is the register $\sC_p$. 
-\item The initial state for the computation takes the form 
-\begin{equation}\label{eq:pauli-prop-1}
-\ket{\Phi}_{\sA'_A\sB'_B} \ket{\theta}_{\sA\sB\sZ\sR}\;,
-\end{equation}
-where $\ket{\Phi}_{\sA'_A\sB'_B}$ is the $2N$-qubit maximally entangled state associated with the honest EPR strategy, $\sZ$ denotes a set of registers held by the provers, and $\sR$ a purifying register.
-\end{enumerate}
-\end{claim}
-
-\begin{proof}
-The fact that $\mS_1$ is isometric to an honest Propagation Check strategy follows from the assumption that  $\mS_1$ passes the propagation test with probability $1-\eps_2$, and the soundness statement in Lemma~\ref{lem:prop_check} \tnote{the Lemma should be adapted a little for this to work out.}. The form of the initial state follows from the assumption that $\mS_1$ is an honest EPR strategy, so we may choose the isometry for the Propagation check so that the provers' shared state has the form~\eqref{eq:pauli-prop-1}. 
-\end{proof}
+%\begin{claim}\label{claim:pauli-propagation}
+%Let $\mathcal{S}_1$ be a strategy satisfying the conclusion of Claim~\ref{claim:pauli-epr}. Suppose further that $\mS_1$ passes the propagation test with probability at least $1-\eps_2$. Then $\mathcal{S}_1$ is $\delta_2$-isometric to an honest Propagation Check strategy $\mathcal{S}_2$ with the following properties:
+%\begin{enumerate}
+%\item The clock register is the register $\sC_p$. 
+%\item The initial state for the computation takes the form 
+%\begin{equation}\label{eq:pauli-prop-1}
+%\ket{\Phi}_{\sA'_A\sB'_B} \ket{\theta}_{\sA\sB\sZ\sR}\;,
+%\end{equation}
+%where $\ket{\Phi}_{\sA'_A\sB'_B}$ is the $2N$-qubit maximally entangled state associated with the honest EPR strategy, $\sZ$ denotes a set of registers held by the provers, and $\sR$ a purifying register.
+%\end{enumerate}
+%\end{claim}
+%
+%\begin{proof}
+%The fact that $\mS_1$ is isometric to an honest Propagation Check strategy follows from the assumption that  $\mS_1$ passes the propagation test with probability $1-\eps_2$, and the soundness statement in Lemma~\ref{lem:prop_check} \tnote{the Lemma should be adapted a little for this to work out.}. The form of the initial state follows from the assumption that $\mS_1$ is an honest EPR strategy, so we may choose the isometry for the Propagation check so that the provers' shared state has the form~\eqref{eq:pauli-prop-1}. 
+%\end{proof}
 
 
 \begin{claim}\label{claim:pauli-ctl}
-Let $\mathcal{S}_2$ be a strategy satisfying the conclusion of Claim~\ref{claim:pauli-propagation}. Suppose further that $\mS_2$ passes the CTL check test with probability at least $1-\eps_3$. Then $\mS_2$ is $\delta_3$-close to a strategy in which the observable associated with a Pauli question $CW_i$, for $i\in\{1,\ldots,2N\}$, is the same observable as a $CTL-W_i$, for $W_i$ the obserable applied on Pauli question $W)i$, and where the control is the $t$-th qubit in $\sB'$. 
+Let $\mathcal{S}_2$ be a strategy satisfying the conclusion of Claim~\ref{claim:pauli-epr}. Suppose further that $\mS_2$ passes the CTL check with probability at least $1-\eps_3$. Then $\mS_2$ is $\delta_3$-close to a strategy in which the observable associated with a Pauli question $CW_t$, for $t\in\{1,\ldots,2N\}$, is the same observable as a CTL$-W_t$ obsersable, for $W_t$ the observable applied on Pauli question $W_t$, and where the control is the $t$-th qubit in $\sB'$. 
 \end{claim}
 
 \begin{proof}
-Consider first the case where the verifier's outcome is $t'=0$. In this case, by assumption on $\mS_2$, the shared state is 
-$$ \frac{1}{\sqrt{2}}\big(\ket{t,0}_{\reg{C}_p} \ket{\Phi}_{\reg{A}'\reg{B}'}  \ket{\theta_t} + (-1)^c  \ket{t,0}_{\reg{C}_p} \Id_{\reg{A}'} \otimes (CW_t)_{\reg{B}\reg{B}'} \ket{\Phi}_{\reg{A}'\reg{B}'} \ket{\theta_t}\big)\;.$$
-In case player A reports the outcome $0$ for her EPR question $X_t$, the verifier's check implies that $CW_t$ acts as identity on $\reg{B}\reg{B}'$. In case player A reports the outcome $1$, the check implies that $CW_t$ acts as $W_t$. Thus the two observables are close, when their action on $\ket{\theta_t}$ is considered. 
+Suppose the verifier obtains an outcome $c\neq 2$. By assumption on $\mS_2$, the shared state is 
+\[ \frac{1}{\sqrt{2(2N+1)}}\sum_{t'} \ket{t'}_{\reg{C}_{p,2}}\otimes \big(\ket{t}_{\reg{C}_{p,1}} G'_{t'} G_{t-1} \ket{\Phi}_{\reg{A}'\reg{B}'}  \ket{\varphi_0} + (-1)^c  \ket{t}_{\reg{C}_{p,1}} \Id_{\reg{A}'} \otimes G_{t'} (CW_t)_{\reg{B}\reg{B}'} G_{t-1}\ket{\Phi}_{\reg{A}'\reg{B}'} \ket{\varphi_0}\big)\;,\]
+where $G_{t'} = W_{t'}\cdots W_1$ and $G_{t-1} =  CW_{t-1}\cdots CW_1$. 
+In case player A reports the outcome $0$ for her EPR question $X_t$, the verifier's check implies that $CW_t$ acts as identity on $\reg{B}\reg{B}'$. In case player A reports the outcome $1$, the check implies that $CW_t$ acts as $G_{t'}^\dagger W_t G_{t'}$. Since this should hold for any $t'$, the claim holds. 
 \end{proof}
 
 \begin{claim}\label{claim:pauli-relation}
-Let $\mathcal{S}_3$ be a strategy satisfying the conclusion of Claim~\ref{claim:pauli-ctl}. Suppose further that $\mS_3$ passes the Pauli relation check with probability at least $1-\eps_4$. Then the observables associated with player B's Pauli questions of the form $W_i$ satisfy the conditions of Lemma~\ref{lem:gh}, up to some error $\delta_4 = \poly[N;\eps_3+\delta_3]$ and when the state is the state $\ket{\theta}$. 
+Let $\mathcal{S}_3$ be a strategy satisfying the conclusion of Claim~\ref{claim:pauli-ctl}. Suppose further that $\mS_3$ passes the Pauli relation check with probability at least $1-\eps_4$. Then the observables associated with player B's Pauli questions of the form $W_i$ satisfy the conditions of Lemma~\ref{lem:gh}, up to some error $\delta_4 = \poly[N;\eps_3+\delta_3]$ and when the state is the state $\ket{\varphi_0}$. 
 \end{claim}
 
 \begin{proof}
-\tnote{todo}
+Conditions~\eqref{eq:x-com} and~\eqref{eq:z-com} in the lemma follow from the two parts of the test. By assumption, conditioned on the verifier obtaining $t=2N$ and $t'=0$, the shared state is 
+\[\ket{\psi} \,=\, \ket{2N,0}_{\reg{C}_p} \frac{1}{2^N}\sum_{a,b} \ket{a}_{\reg{A}'} \ket{b}_{\reg{B}'} X(a)Z(b)\ket{\psi_0}\;,\]
+where we used the form of the $CW_t$ observables that follows from Claim~\ref{claim:pauli-ctl}. The conclusion of the claim follows. 
 \end{proof}

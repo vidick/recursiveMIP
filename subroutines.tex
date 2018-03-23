@@ -28,8 +28,6 @@ For a given register $\sR$, we write $\supp(\sR)$ to denote the set of qubits in
 
 
 
-
-
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
@@ -50,6 +48,51 @@ If $t'$ is not specified it is understood that $t'=t+1$.
 \caption{Template for each of the subroutines of $V_{UEVC}$}
 \label{fig:check_structure}
 \end{figure}
+
+
+
+\subsection{Propagation Check}
+
+\begin{center}
+\begin{mdframed}
+    Input: $(T,\reg{C},\{g_1,\ldots,g_T\}$, where $T$ is an integer, $\reg{C}$ the label for a clock register,  $g_1,\ldots,g_T$ question symbols. 
+	\begin{enumerate}
+		\item (\textsc{ClockMeasurement}) Select a uniformly random integer $t\in\{1,\ldots,T\}$. Write on the measurement specification tape a description for the circuit $C_M$ that implements the following measurement on clock register $\reg{C}$: 
+\[
+	\{ 	\Pi^0 = \ketbra{+_t}{+_t}, 
+	\Pi^1 = \ketbra{-_t}{-_t}, 
+	\Pi^2 = \Id - \Pi^0 - \Pi^1 \}\;.
+\]	
+Let $s\in \{0,1,2\}$ denote the result of the measurement.
+	\item (\textsc{GenQuestions}) Set $q_P = g_t$.
+		\item (\textsc{CheckAnswers}) If $s = 2$, then accept. Otherwise, accept if and only if $a_P = s$. 
+	\end{enumerate}    
+\end{mdframed}
+
+\end{center}
+\begin{figure}[H]
+\caption{Propagation Check}
+\label{fig:prop_check_0}
+\end{figure}
+
+
+
+
+\paragraph{Honest Propagation Check strategy} An honest Propagation Check strategy is one in which the shared state is a history state of the computation $G_T\cdots G_1$, where $G_i$ is the binary observable measured by the prover on question $g_i$. In other words, it has the following form:
+\[
+	\frac{1}{\sqrt{T}} \sum_{t = 0}^{T} \ket{t}_{\reg{C}} \otimes G_t\cdots G_1 \ket{\psi_0}_{\sP}\;,
+\]
+for some state $\ket{\psi_0}_{\sP}$.
+
+\begin{lemma}	
+\label{lem:prop_check_0}
+\leavevmode
+\begin{enumerate}
+\item (\textbf{Completeness}) An honest Propagation strategy passes the $\textsc{Propagation Check}$ subprotocol with probability $1$. 
+\item (\textbf{Soundness}) Any strategy that passes the $\textsc{Propagation Check}$ subprotocol with probability at least $1 - \eps$ is $\delta$-close to an honest Propagation Check strategy, for some $\delta = \poly[N;\eps]$.
+\end{enumerate}
+\end{lemma}
+
 
 
 
@@ -79,17 +122,26 @@ In the subroutine, the verifier performs one of several tests, chosen uniformly 
     \]
     
 	\begin{enumerate}
- \item \emph{(EPR test)} Measure the first register of $\reg{C}_{p}$ in the computational basis to obtain an outcome $t\in\{0,\ldots,2N\}$. Select $t'\in\{1,\ldots,2N\}$ uniformly at random. Measure the second register of $\reg{C}_{p}$ using a basis containing $\{\ket{+_{0,t'}},\ket{-_{0,t'}}$. Accept if neither of these two outcomes is obtained. Generate questions $(q_A,q_B)$ as in the $2N$-qubit EPR test with A and B. Send $q_A$ to Alice, and $(q_B,W_t)$ to B. Accept if and only if (either $t\neq 0$ or the answers to the EPR questions are valid) and B's answer to the Pauli question has the same sign as the outcome of the verifier's clock measurement.\\
-\tnote{Intended goal: Checks that whenever A or B is sent an EPR question, it applies the corresponding Pauli observable, independently of any other question asked. A consequence of this test and the form of questions to player B is that we can write the observables it applies as a product of an observable for the EPR question, and an observable for the Pauli question, where each observable only depends on the corresponding question (and not on the pair of questions).}
 
-\item \emph{(Propagation check)} Let $t\in\{0,\ldots,2N\}$ be chosen uniformly at random. Measure register $\reg{C}_{p}$ using the three-outcome POVM
-$$\Set{ \Pi^0 =  \proj{+_t} \otimes \proj{0},\; \Pi^1 =  \proj{-_t} \otimes \proj{0},\;\Pi^2 = \Id - \Pi^0-\Pi^1 }.$$
-If the outcome is $c=2$, accept. Otherwise, send $B$ the Pauli question $CW_{t}$, where $W=X$ is $t$ is even and $W=Z$ if $t$ is odd. Accept if and only if the answer reported by B equals $(-1)^c$, where $c\in\{0,1\}$ is the outcome obtained by the verifier.
+\item \emph{(Propagation check)} Let $\reg{C}_{p,1}$ and $\reg{C}_{p,2}$ denote the two registers of $\reg{C}_p$. Execute each of the following with equal probability:
+\begin{enumerate}
+\item Execute $\prop(2N,\reg{C}_{p,1},\{CW_1,\ldots,CW_{2N}\})$.
+\item Execute $\prop(2N,\reg{C}_{p,2},\{W''_1,\ldots,W''_{2N}\})$.
+\end{enumerate}
 
-\item \emph{(CTL check)} Measure the second register of $\reg{C}_{p}$ in the computational basis to obtain an outcome $t'\in\{0,\ldots,n\}$, and the first register in a basis containing $\{\ket{+_t},\ket{-_t}\}$ to obtain an outcome $(c,t)$ where $c\in\{\pm 1\}$. If $t'=0$, send player A the EPR question $X_{t}$, and send player $B$ the Pauli question $W_t$. Accept if and only if, either A's answer is $0$ and $c=1$, or A's answer is $1$ and $c$ matches B's answer to the Pauli question. %If $t'>0$, accept if $t\neq t'$. Send player A the EPR question $X_t$ and accept if the answer is not $1$. Send player B the Pauli question $W'_t$ and accept if and only if the outcome matches $c$.
+ \item \emph{(EPR test)} Measure the first register of $\reg{C}_{p}$ in the computational basis to obtain an outcome $t\in\{0,\ldots,2N\}$. 
+%Select $t'\in\{1,\ldots,2N\}$ uniformly at random. Measure the second register of $\reg{C}_{p}$ using a basis containing $\{\ket{+_{0,t'}},\ket{-_{0,t'}}\}$. Accept if neither of these two outcomes is obtained. 
+Generate questions $(q_A,q_B)$ as in the $2N$-qubit EPR test with A and B. Send $q_A$ to Alice, and $q_B$ to B. Accept if $t\neq 0$ or if the Pauli question to B is of the form $CW_t$. Otherwise, accept if and only if the answers to the EPR questions are valid.
+%\tnote{Intended goal: Checks that whenever A or B is sent an EPR question, it applies the corresponding Pauli observable, independently of any other question asked. A consequence of this test and the form of questions to player B is that we can write the observables it applies as a product of an observable for the EPR question, and an observable for the Pauli question, where each observable only depends on the corresponding question (and not on the pair of questions).}
 
-\item{\emph{(Pauli relation check)}} Measure the first register of $\reg{C}_p$  in the computational basis to obtain an outcome $t\in\{0,\ldots,2N\}$. Accept if $t\neq 2N$. Send A the EPR question $X_u$, and B the EPR question $Z_u$ and the Pauli question $W_u$. If $u$ is even, accept if and only if the product of the three answers is $1$. If $u$ is odd, accept if and only if the product of A's answer and B's answer to the Pauli question is $1$. 
-	\end{enumerate}    
+\item \emph{(CTL check)} Measure the first register of $\reg{C}_{p}$ in a basis containing $\{\ket{+_t},\ket{-_t}\}$ to obtain an outcome $c$ where $c\in\{0,1,2\}$. If $c=2$ then accept. Send player A the EPR question $X_{t}$, and send player $B$ the Pauli question $W_t$. Accept if and only if, either A's answer is $0$ and $c=1$, or A's answer is $1$ and $c$ matches B's answer to the Pauli question. %If $t'>0$, accept if $t\neq t'$. Send player A the EPR question $X_t$ and accept if the answer is not $1$. Send player B the Pauli question $W'_t$ and accept if and only if the outcome matches $c$.
+
+\item{\emph{(Pauli relation check)}} Measure both  registers of $\reg{C}_p$  in the computational basis to obtain outcomes $t,t'\in\{0,\ldots,2N\}$. Accept if $(t,t')\neq (2N,0)$. Select $u\in\{1,\ldots,N\}$ uniformly at random. Send A the EPR question $X_u$, and B the EPR question $Z_u$. Do either of the following with equal probability:
+\begin{enumerate}
+\item Send B the Pauli question $W_{2u}$. Accept if and only if the product of the players' three answers is $1$.
+\item Send B the Pauli question $W_{2u-1}$. Accept if and only if A's answer to the EPR question matches B's answer to the Pauli question. 
+\end{enumerate}  
+\end{enumerate}  
 \end{mdframed}
 \end{center}
 \begin{figure}[H]
@@ -127,45 +179,19 @@ $P \in \mathcal{R}_r$, define inductively
 \begin{align}
 	\ket{\psi_{0,t+1,P}} =  CW_t \ket{\psi_{0,t}} \;,
 \end{align}
-and for $t' > 0$ define 
+and for $t' \geq 0$ define 
 \begin{align}
-	\ket{\psi_{t',t,P}} =  W_{t'} \ket{\psi_{0,t}} \;,
+	\ket{\psi_{t'+1,t,P}} =  W_{t'} \ket{\psi_{t',t}} \;,
 \end{align}
 where if $t$ or $t'$ is even (resp. odd), $CW_t$ or $W_{t'}$ is a controlled-$X$ or $X$ (resp. controlled-$Z$ or $Z$) gate whose control qubit is the $\sB_P'$ part of the $t$-th EPR pair of $\ket{\Phi}_{\sA_P' \sB_P'}$, and whose target qubit is the $\lceil t/2\rceil$-th qubit of $\sB_P$. 
 
-%The players share a state of the form~\eqref{eq:honest-psi}, where $\ket{\psi}_{\reg{BR}}$ is arbitrary and $\{X_i,Z_j:\, i,j\in\{1,\ldots,N\}\}$ are observables on $\mathcal{H}_\reg{B}$ that satisfy the Pauli relations. For $a,b\in \{0,1\}^N$ and $t\in\{0,\ldots,n\}$ let $X(a_{\leq t}) = X_t^{a_t}\cdots X_1^{a_1}$ and $Z(b_{\leq t}) = Z_t^{b_t}\cdots Z_1^{b_1}$. We also write $X(a)$ and $Z(b)$ for $X(a_{\leq N})$ and $Z(b_{\leq N})$ respectively. 
 
 This finishes the specification of the state $\rho$. The next part of the specification is the measurement operators of the strategy. \hnote{Fill in here...}
 
-%Player A applies the honest strategy for the EPR test, using the $2N$-qubit register $\reg{A}'$. On EPR questions Player B applies the  honest strategy for the EPR test, using the $2N$-qubit register $\reg{B}'$. On Pauli questions, player B uses the family of observables $X(a),Z(b)$ on $\reg{B}$ to determine his $3$-bit answer. On a CTL-Pauli question of the form $CX_i$ (resp $CZ_j$), the observable is controlled on the $i$-th qubit (resp. $N+j$-th qubit) of register $\reg{B}'$. 
+
 
 \paragraph{Guarantees}
 
-
-%The following lemma states completeness of the check. 
-
-%
-%\begin{lemma}[Completeness of the Pauli check]
-%Let $\ket{\psi}_{\reg{BR}} \in \cH_\reg{B} \otimes \cH_\reg{R}$ be a state, such that $\reg{B}$ is an $N$-qubit quantum register. Let $X(a)$ and $Z(b)$, for $a,b\in\{0,1\}^N$, be Pauli operators on $\reg{B}$. Let $\reg{A}'$, $\reg{B}'$ be $2N$-qubit registers, and 
-%\begin{equation}\label{eq:honest-psi}\ket{\Psi}_{\reg{C}_{p} \reg{A'B'BR}} \,=\, \frac{1}{\sqrt{2(N+1)}} \sum_{\substack{d\in\{0,1\} \\ t\in\{0,\ldots,N\}}} \ket{d,t}_{\reg{C}_{p}}  \frac{1}{2^N} \sum_{a,b \in \{0,1\}^N} \ket{a,b}_{\reg{A}'} \ket{a,b}_{\reg{B}'} \big(X(d\cdot a_{\leq t}) Z(b_{\leq t})\otimes \Id_R\big)\ket{\psi}_\reg{BR}\;.
-%\end{equation}
-%Then there exists a strategy for players A and B sharing state $\ket{\Psi}_{\reg{C}_{p} \reg{A'B'BR}}$ that succeeds with probability $1$ in the Pauli check.  
-%\end{lemma}
-%
-%The next lemma states soundness of the check.
-%
-%\begin{lemma}[Soundness of the Pauli check (OLD)]
-%\label{lem:pauli_check_soundness}
-%Suppose players A and B sharing state $\ket{\psi}_{\reg{C}_p\reg{A'B'BR}}$ succeed with probability at least $1-\eps$ in \textsc{Pauli Check}. Here $\reg{C}_p$ is part of the register sent to the verifier, $\reg{A'}$ and $\reg{B'B}$ are held by $A$ and $B$ respectively, and $\reg{R}$ is arbitrary. 
-%
-%Then there exists a $\delta = \poly[N;\eps]$ and local isometries $V_A: \cH_A \to \cH_A \otimes \cH_{A'}$, $V_B:\cH_{B}\to  (\C^2)^{\otimes N} \otimes \cH_{B'} \otimes \cH_{B''}$ such that   for all Pauli questions $(W_1(w_1),W_2(w_2),W_3(w_3))$ and all triples of answers $(a_1,a_2,a_3)$, if $W^{abc}$ is the associated POVM for player B then 
-%$$ \sum_{a,b,c\in\{\pm1\}}\big\| \Id_{\reg{CAR}}\otimes  V_B W^{abc} \ket{\psi}_{\reg{CABR}} -  \Id_{\reg{CAR}}\otimes\sigma_{W_1}(w_1)^{a_1} \sigma_{W_2}(w_2)^{a_2}\sigma_{W_3}(w_3)^{a_3}V_B \ket{\psi}_{\reg{CABR}} \big\|^2 \,=\,O(\delta)\;.$$
-%Moreover, \tnote{Do we need this part? Seems like the only thing we want is the Pauli operators, we don't care about the form of the state?}
-%\begin{equation}\label{eq:hist-epr-state}
-%V_A \otimes V_B \otimes \Id_{CR} \ket{\psi}_\reg{CABR} \approx_\delta \frac{1}{\sqrt{2(N+1)}} \sum_{d\in\{0,1\},t\in\{0,\ldots,N\}} \ket{d,t}_{C}  \frac{1}{2^N} \sum_{a,b \in \{0,1\}^N} \ket{a,b}_{A'} \ket{a,b}_{B'} \big(\Id_A \otimes X(d\cdot a_{\leq t}) Z(b_{\leq t})\otimes \Id_R\big)\ket{\psi}_\reg{ABR}\;.
-%\end{equation}
-%
-%\end{lemma}
 
 \begin{lemma}[Completeness and soundness of the Pauli Check]
 \label{lem:pauli_check}
@@ -199,8 +225,10 @@ The relations~\eqref{eq:x-com} and~\eqref{eq:z-com} are sufficient to verify tha
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%		PROPAGATION CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Propagation check}
+\subsection{Gate check}
 \label{sec:prop_check}
+
+\tnote{I renamed this gate check because I wanted a more general ``propagation check''. But I did not edit the section}
 
 \vspace{10pt}
 \begin{center}
@@ -233,7 +261,7 @@ Let $(p,s) \in \{0,1\} \times \{0,1,2\}$ denote the result of the six-outcome me
 
 \end{center}
 \begin{figure}[H]
-\caption{Propagation Check}
+\caption{Gate Check}
 \label{fig:prop_check}
 \end{figure}
 
