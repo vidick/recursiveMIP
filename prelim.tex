@@ -177,11 +177,6 @@ For notational convenience we omit the all zeroes state $\ketbra{0}{0}_{\sV \sM}
 
 In this section we define a few special types of three-turn quantum interactive protocols that are central to our results. 
 
-%\subsubsection{Non-local games} 
-
-%
-%\subsection{Games and strategies}
-%
 \subsection{Non-local games} 
 An $r$-player \textbf{non-local game} $G$ is a tuple $(\mathcal{Q},\mathcal{A},\mu,V)$ where $\mathcal{Q} = \mathcal{Q}_1 \times \cdots \times \mathcal{Q}_r$ and $\mathcal{A} = \mathcal{A}_1 \times \cdots \times \mathcal{A}_r$ are $r$-partite alphabets, $\mu$ is a distribution over $\mathcal{Q}$, and $V: \mathcal{Q} \times \mathcal{A} \to \{0,1\}$ is a verification predicate. 
 
@@ -262,6 +257,56 @@ Finally, the \textbf{value of $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ an
 	\end{enumerate}
 	It is straightforward to verify that~\eqref{eq:simcom1} holds. \hnote{Double check this.} This implies that $\omega^{SC}(V') \leq 1 - \frac{1 - \omega^*(V)}{\dim \sM^4}$, this proving the lemma.
 \end{proof}
+
+
+\subsubsection{Three-turn protocols with classical communication}
+
+Here we discuss three-turn protocols with classical messages. What we mean by this is that, in generating the message for the prover in the circuit $C_Q$, the verifier will save a copy of the message in the computational basis in its workspace register $\sV$. The circuit $C_A$, when viewed as a unitary, is classically controlled on the message register $\sM$. In other words, 
+\[
+	C_Q = \sum_{a} \ketbra{a}{a} \otimes C_Q^a 
+\]
+where $a$ runs over the computational basis states of $\sM$ and $C_Q^a$ is a unitary on $\sC \sV$. Furthermore, we will assume such protocols are equipped with a question and answer alphabet $\cQ = \cQ_1 \times \cdots \times \cQ_r$ and $\cA = \cA_1 \times \cdots \times \cA_r$, where the $i$-th prover receives questions from $\cQ_i$ and answers from $\cA_i$. We call these protocols \textbf{classical message protocols}, and their associated verifiers \textbf{classical message verifiers}.
+
+Nonlocal games are an example of such protocols. We will also generally consider simcom games with classical communication. 
+
+Strategies for such protocols can be expressed in a different way. As defined above, a strategy for a three-turn quantum interactive protocol consists of a shared state $\rho$ and a collection of reflections $\{ P_i \}$, one for each prover. We call these strategies \textbf{unitary strategies}, because the provers' actions are unitaries.
+
+When the communication is classical, we can instead think of a \textbf{measurement strategy} $\cM$ which consists of a shared state $\rho$ along with a collection of POVMs $\{M_i\}$, where each $M_i$ is a map from $\cQ \times \cA$ to positive semidefinite matrices acting on $\sP_i$ satisfying $\sum_{a \in \cA_i} M_i(q_i,a_i) = \Id_{\sP_i}$ for all $i$ and $q_i$. 
+%We call such a strategy a \textbf{measurement strategy}, to distinguish it from a unitary strategy. 
+
+A measurement strategy $\cM = (\rho,\{M_i\})$ has a canonical unitary strategy associated with it.
+Let $\rho$ be on registers $\sC \sP_1 \cdots \sP_r$. Define $\strat_\cM = (\rho_U,\{P_i\})$ where $\rho_U = \rho \otimes \Paren{ \bigotimes_i \ketbra{0}{0}_{\sM_i'}}$ where $\sM_i'$ is an ancilla register isomorphic to $\sM_i$ given to the $i$-th prover (in addition to register $\sP_i$), and $P_i$ is defined as follows:
+\[
+	P_i = SWAP_{\sM_i \leftrightarrow \sM_i'} \cdot U_i
+\]
+with
+\[
+	U_i = \sum_{q_i} \ketbra{q_i}{q_i}_{\sM} \otimes \sum_{a_i} M_i(q_i,a_i)_{\sP_i} \otimes \ketbra{a_i}{0}_{\sM_i'}.
+\]
+The unitary $U_i$ is nothing but the Stinespring dilation of the channel that measures $\sP_i$ using the POVM $M_i(q_i)$. It saves the measurement outcome in the register $\sM_i'$. The unitary $P_i$ then swaps the $\sM_i$ and $\sM_i'$ registers after first applying $U_i$. \footnote{Technically speaking, we need to make $P_i$ a reflection by adding an additional ancilla qubit, but to keep the presentation simple we omit this detail for now.} 
+
+The value of a protocol $\Protocol_V$ with respect to a measurement strategy $\cM$, denoted by $\omega^*_{\cM}(V)$, is defined to be $\omega^*_{\strat_\cM}(V)$. We also define the value of a simcom protocol $\mathscr{Z}_V$ with respect to $\cM$ to be the same as the value of a $\mathscr{Z}_V$ with respect to $\strat_\cM$. 
+
+We now argue that in a classical message protocol, every unitary strategy $\strat$ has an associated measurement strategy $\cM_\strat$ whose value is equal to the one under the unitary strategy.
+
+\begin{lemma}
+\label{lem:unitary_measurement_strat}
+Let $V = (C_Q,C_A)$ be a classical message verifier. Then for all unitary strategies $\strat = (\rho,\{ P_i \})$ there exists a measurement strategies $\cM_\strat = (\rho_\cM,\{M_i\})$ such that
+	\[
+		\omega^*_{\strat}(V) = \omega^*_{\cM_\strat}(V).
+	\]
+	and
+	\[
+		\omega^{SC}_{\strat}(V) = \omega^{SC}_{\cM_\strat}(V).
+	\]	
+\end{lemma}
+\begin{proof}
+\hnote{Insert proof here.}
+\end{proof}
+
+This lemma shows that for classical message protocols we can deal with measurement strategies. Throughout this paper, since we deal solely with classical message protocols, we will only deal with measurement strategies.
+
+Notions of close and isometric measurement strategies are derived from close and isometric unitaries strategies: two measurement strategies $\cM$ and $\cM'$ are $\eps$-close if $\strat_{\cM}$ and $\strat_{\cM'}$ are $\eps$-close. A measurement strategy $\cM$ is $\eps$-isometric to $\cM'$ if $\strat_{\cM}$ is $\eps$-isometric to $\strat_{\cM'}$.  \hnote{May need to fix or spell out more explicitly...}
 
 
 \subsection{Turing machines}
