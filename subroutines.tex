@@ -403,7 +403,7 @@ Thus we have
     To hide which subroutine is being run, the verifier will send a random EPR question along with the ``real'' Pauli question. Let $E$ be a uniformly random EPR question. Only the answer corresponding to the Pauli question will be considered.\\
 	\begin{enumerate}
 		\item (\textsc{ClockMeasurement}) Write into the measurement specification tape the circuit $C_M$ that measures $\sC_p \sC_{mip}$ in the computational basis, with the outcome being $(t_p,t_{mip})$.
-		\item (\textsc{GenQuestions}) If $(t_p,t_{mip})$ is not $(0,0)$, then continue to the \textsc{CheckAnswers} phase. Otherwise, pick a random qubit $j \in \supp(\sV_{r-1} \setminus \{\sC_{r-1} \})$. 
+		\item (\textsc{GenQuestions}) If $(t_p,t_{mip})$ is not $(0,0)$, then continue to the \textsc{CheckAnswers} phase. Otherwise, pick a random qubit $j \in \supp(\sV_{r-1} \setminus \{\sC_{r-1} \})$. Set $q_V = (E,Z_j)$.
 		\begin{itemize}
 			\item If $j \in \supp(\sM_{r-1,i})$, set $q_{P,i} = (E,Z_j)$.
 			\item If $j \notin \supp(\sM_{r-1,i})$, set $q_V = (E,Z_j)$.

@@ -71,13 +71,13 @@ We can assume without loss of generality that every operation in this protocol i
 
 The extension to $r$ provers is straightforward: the registers $\sM$ and $\sP$ are divided into $r$ parts: $\sM_1,\ldots,\sM_r$ and $\sP_1,\ldots,\sP_r$. The $i$-th prover's unitary $P_i$ acts on $\sM_i \sP_i$. 
 
-Pictorially, the protocol looks like Figure \ref{fig:qip}.
+Figure \ref{fig:qip} depicts this protocol as a circuit:
 
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=4in]{graphics/qip3.pdf}
 \end{center}
-\caption{Three-turn quantum interactive protocol.}
+\caption{Three-turn quantum interactive protocol circuit.}
 \label{fig:qip}
 \end{figure}
 
@@ -193,7 +193,7 @@ The benefit of using simcom games is that the actions of the verifier and the pr
 
 More precisely, an $r$-prover simcom game involves a verifier $V$, which 
 %an $r$-partite question alphabet $\cQ = \cQ_1 \times \cdots \times \cQ_r$, and an $r$-partite answer alphabet $\cA = \cA_1 \times \cdots \times \cA_r$. 
-is still specified by two circuits $(C_Q,C_V)$ acting on registers $\sC \sV \sM$, and $r$ provers. The circuits $C_Q, C_A$ act on registers $\sC \sV \sM$ as before. However, the execution of the game is different from that of Figure \ref{fig:qip}. There are a number of extra registers: $\sK_1,\sK_2,\sK_2'$ are registers that are each isomorphic to two copies of $\sM$ (i.e. their dimensions are $(\dim \sM)^2$). These registers are initialized in the all zeroes state. $\sE_1,\sE_1',\sE_2,\sE_2'$ are registers that are each isomorphic to $\sM$. They are initialized in the state  $\ket{\Phi}_{\sE_{1} \sE_{1}'} \otimes \ket{\Phi}_{\sE_{2} \sE_{2}'}$, where $\ket{\Phi}_{\sE_j \sE_j'}$ denotes the maximally entangled state between $\sE_j$ and $\sE_j'$.
+is still specified by two circuits $(C_Q,C_V)$ acting on registers $\sC \sV \sM$, and $r$ provers. The circuits $C_Q, C_A$ act on registers $\sC \sV \sM$ as before. However, the execution of the game is different from that of Figure \ref{fig:qip}. There are a number of extra registers: $\sK_1,\sK_2,\sK_2'$ are registers that are each isomorphic to two copies of $\sM$ (i.e. their dimensions are $(\dim \sM)^2$). The $\sK_1 \sK_2$ registers are initialized in the all zeroes state. The $\sK_2'$ register can start off in an arbitrary state. $\sE_1,\sE_1',\sE_2,\sE_2'$ are registers that are each isomorphic to $\sM$. They are initialized in the state  $\ket{\Phi}_{\sE_{1} \sE_{1}'} \otimes \ket{\Phi}_{\sE_{2} \sE_{2}'}$, where $\ket{\Phi}_{\sE_j \sE_j'}$ denotes the maximally entangled state between $\sE_j$ and $\sE_j'$. The allocation of registers is as follows: the verifier holds registers $\sK_1 \sK_2 \sC \sV \sM \sE_1 \sE_2$, and the $i$-th prover holds registers $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
 
 \medskip
 \noindent The sequence of unitaries run in the simcom game is as follows:
@@ -219,13 +219,13 @@ is still specified by two circuits $(C_Q,C_V)$ acting on registers $\sC \sV \sM$
 
 %The first register $\sV_{tp1}$ is isomorphic to two copies of $\cM$. The second register $\sV_{tp2}$ is isomorphic to two copies of $\cA$. 
 
-See Figure \ref{fig:simcom} for a pictorial representation of a simcom game.
+\noindent See Figure \ref{fig:simcom} for the circuit representation of a simcom game.
 
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=4.5in]{graphics/simcom.pdf}
 \end{center}
-\caption{A simulated communication game.}
+\caption{Simulated communication game circuit.}
 \label{fig:simcom}
 \end{figure}
 
