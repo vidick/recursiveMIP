@@ -224,7 +224,7 @@ The relations~\eqref{eq:x-com} and~\eqref{eq:z-com} are sufficient to verify tha
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%		PROPAGATION CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%		GATE CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Gate check}
 \label{sec:prop_check}
 
@@ -269,7 +269,7 @@ The procedures  \textsc{Toffoli Check} and \textsc{Hadamard Check} are taken fro
 
 A Toffoli or doubled Hadamard gate $g$ returned by the GTM $G$ always comes together with labels for a set of qubits on which the gate acts on. These qubits refer to qubits on which the $(r-1)$-level verifier $UEVC_{N,r-1}$ acts on. In the protocol executed by the $r$-level verifier $UEVC_{n,r}$, the qubits are distributed among the provers. In the description of the tests, we refer to the ``prover holding qubit $u$'' to specify the appropriate prover. For example, if $u$ is a qubit in $\reg{V}_{r-1,in}$ then the prover is $PV$; if it is a qubit in $\reg{M}_{r-1,j}$ then the prover is $PP_j$, etc. 
 
-In the Hadamard and Toffoli Checks, the verifier will send to each prover a pair of questions: an EPR question and a Pauli question (as done in the Pauli Check subroutine). This is because the prover should not be able to distinguish between whether it is performing the Pauli Check or the Propagation Check (or any other check). Thus the ``true'' question in these tests is the Pauli question, but they will be augmented with a random EPR check question. Only the provers' answers to the Pauli questions are taken into consideration.
+In the Hadamard and Toffoli Checks, the verifier will send to each prover a pair of questions: an EPR question and a Pauli question (as done in the Pauli Check subroutine). This is because the prover should not be able to distinguish between whether it is performing the Pauli Check or the Gate Check (or any other check). Thus the ``true'' question in these tests is the Pauli question, but they will be augmented with a random EPR check question. Only the provers' answers to the Pauli questions are taken into consideration.
 
 \vspace{10pt}
 \begin{center}
@@ -321,7 +321,10 @@ Any prover who was not explicitly sent a question is sent a null question, denot
 \paragraph{Question types} There are two types of questions in this test: pairs of EPR and Pauli operations (the types of questions that are asked to the non-ancilla provers in the Pauli Check subroutine), and a prover reflection question $\star$.
 
 
-\paragraph{Honest Propagation Check strategy} For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. An honest Pauli strategy $\mathcal{S}$ is an honest Propagation Check strategy if the shared state $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$, when projected onto the space where the $\sC_p$ register is all zeroes, is a history state of the computation $g_1g_2\cdots g_{\tau(N)}$. In other words, it has the following form:
+\paragraph{Honest Gate Check strategy} 
+\hnote{An honest gate check strategy is to actually leave the luggage on the jetway when they ask you to, instead of sneakily taking it on the plane with you... ahem....}
+
+For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. An honest Pauli strategy $\mathcal{S}$ is an honest Gate Check strategy if the shared state $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$, when projected onto the space where the $\sC_p$ register is all zeroes, is a history state of the computation $g_1g_2\cdots g_{\tau(N)}$. In other words, it has the following form:
 \[
 	\left( \ketbra{0}{0}_{\sC_p} \right) \, \ket{\psi}_{\sC_p \sC_{mip} \sP \sR} = \alpha_N \ket{0}_{\sC_p} \otimes \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}
 \]
@@ -336,8 +339,8 @@ For all $i$, the $\sB_{PP_i}$ register also has the name $\sM_{r-1,i}$. From thi
 \label{lem:prop_check}
 \leavevmode
 \begin{enumerate}
-\item (\textbf{Completeness}) An honest Propagation strategy passes the $\textsc{Propagation Check}$ subprotocol with probability $1$. 
-\item (\textbf{Soundness}) All honest Pauli strategies $\mathcal{S}$ that pass the $\textsc{Propagation Check}$ subprotocol with probability at least $1 - \eps$ are $\delta$-close to an honest Propagation Check strategy for some $\delta = \poly[N;\eps]$.
+\item (\textbf{Completeness}) An honest Gate Check strategy passes the $\textsc{Gate Check}$ subprotocol with probability $1$. 
+\item (\textbf{Soundness}) All honest Pauli strategies $\mathcal{S}$ that pass the $\textsc{Gate Check}$ subprotocol with probability at least $1 - \eps$ are $\delta$-close to an honest Gate Check strategy for some $\delta = \poly[N;\eps]$.
 \end{enumerate}
 \end{lemma}
 \begin{proof}
@@ -349,9 +352,9 @@ For all $i$, the $\sB_{PP_i}$ register also has the name $\sM_{r-1,i}$. From thi
 	\[
 		\rho_0 = \frac{\Pi \rho \Pi}{\Tr_\rho(\Pi)} = \frac{\Pi \ketbra{\psi}{\psi} \Pi}{\bra{\psi} \Pi \ket{\psi}}.
 	\]
-	The probability that the \textsc{Propagation Check} subroutine rejects when the shared state is $\rho_0$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
+	The probability that the \textsc{Gate Check} subroutine rejects when the shared state is $\rho_0$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
 	
-	Suppose now that the shared state in the \textsc{Propagation Check} is $\rho_0$. We now give an expression for the rejection probability. For any $t \in \{0,1,\ldots,\tau(N)\}$, let $r_t$ denote the rejection probability conditioned on the verifier choosing $t$. If $g_t$ corresponds to a doubled Hadamard gate or a Toffoli gate, by Lemma~\ref{lem:ver_gate_check} the rejection probability is 
+	Suppose now that the shared state in the \textsc{Gate Check} is $\rho_0$. We now give an expression for the rejection probability. For any $t \in \{0,1,\ldots,\tau(N)\}$, let $r_t$ denote the rejection probability conditioned on the verifier choosing $t$. If $g_t$ corresponds to a doubled Hadamard gate or a Toffoli gate, by Lemma~\ref{lem:ver_gate_check} the rejection probability is 
 	\[
 		r_t = \frac{1}{4} \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
 	\]
@@ -379,7 +382,7 @@ Thus we have
 	
 	Now notice that $H_{prop}$ resembles the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$~\cite{kitaev2002classical}. Thus any state $\ket{\theta}$ in the kernel of $H_{prop}$ must be a history state $\ket{\theta}_{\sC_{mip} \sP \sR} = \frac{1}{\sqrt{\tau(N)+1}} \sum_t \ket{t}_{\sC_{mip}} \otimes \ket{\theta_t}_{\sP \sR}$ where $\ket{\theta_t} = g_t \ket{\theta_{t-1}}$.
 	
-	We can thus construct a new honest Pauli strategy $\mathcal{S}'$ where the prover operators are the same as in $\mathcal{S}$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ (i.e. is a history state for the computation $g_1 g_2 \cdots g_{\tau(N)}$) and otherwise has the form~\eqref{eq:honest-psi}.\footnote{Such a state $\ket{\psi'}$ can be constructed by starting with $\ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ and ``propagating'' the Pauli operators as needed by the Pauli Check.} We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so $\mathcal{S}'$ is $\poly[N;\eps]$-close to $\mathcal{S}$, and furthermore $\mathcal{S}'$ is an honest Propagation Check strategy. This concludes the proof. %\hnote{We will need to write what it means for two strategies to be close.}
+	We can thus construct a new honest Pauli strategy $\mathcal{S}'$ where the prover operators are the same as in $\mathcal{S}$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ (i.e. is a history state for the computation $g_1 g_2 \cdots g_{\tau(N)}$) and otherwise has the form~\eqref{eq:honest-psi}.\footnote{Such a state $\ket{\psi'}$ can be constructed by starting with $\ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ and ``propagating'' the Pauli operators as needed by the Pauli Check.} We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so $\mathcal{S}'$ is $\poly[N;\eps]$-close to $\mathcal{S}$, and furthermore $\mathcal{S}'$ is an honest Gate Check strategy. This concludes the proof. %\hnote{We will need to write what it means for two strategies to be close.}
 %	The propagation term has spectral gap $1/\poly(N)$ and its zero eigenspace is exactly the space of history states of the aforementioned computation.
 	
 	%This, combined with Lemma~\ref{lem:closeness_to_groundspace}, implies that $\rho_0$ is $\poly[N;\eps]$-close to a history state of the computation $g_1g_2\cdots g_{\tau(N)}$.%\tnote{should the last implication refer to a theorem?}
@@ -422,10 +425,10 @@ Thus we have
 \label{fig:input_check}
 \end{figure}
 
-\paragraph{The high level} First, we will assume that the strategy is an honest \textsc{Propagation Check} strategy (and thus an honest Pauli strategy), meaning that the provers will share a history state of the protocol between the $(r-1)$-th level verifier $UEVC_{N,r-1}$ and a number of provers. The \textsc{Input Check} subroutine will check that in the first snapshot of the history state, the prover $PV$ (which is supposed to play the role of $UEVC_{N,r-1}$) has the $\sV_{r-1,in}$ register initialized to the input $(G,V,M)$, and $\sV_{r-1,work} $ set to zeroes. Furthermore, the subroutine will check that the $PP_i$ prover has the message register $\sM_{r-1,i}$ set to all zeroes.
+\paragraph{The high level} First, we will assume that the strategy is an honest \textsc{Gate Check} strategy (and thus an honest Pauli strategy), meaning that the provers will share a history state of the protocol between the $(r-1)$-th level verifier $UEVC_{N,r-1}$ and a number of provers. The \textsc{Input Check} subroutine will check that in the first snapshot of the history state, the prover $PV$ (which is supposed to play the role of $UEVC_{N,r-1}$) has the $\sV_{r-1,in}$ register initialized to the input $(G,V,M)$, and $\sV_{r-1,work} $ set to zeroes. Furthermore, the subroutine will check that the $PP_i$ prover has the message register $\sM_{r-1,i}$ set to all zeroes.
 
 \paragraph{Honest Input Check strategy}
-An honest Propagation Check strategy $\mathcal{S}$ with shared state
+An honest Gate Check strategy $\mathcal{S}$ with shared state
 \[
 	\ket{\psi}_{\sC_{mip} \sC_p \sP \sR} = \frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sC_p \sP \sR}
 \]
@@ -441,13 +444,13 @@ is an honest Input Check strategy if the initial state $\ket{\psi_0}_{\sP \sR}$ 
 \leavevmode
 \begin{enumerate}
 	\item (\textbf{Completeness}) An honest Input Check strategy passes the $\textsc{Input Check}$ subprotocol with probability $1$. 
-	\item (\textbf{Soundness}) All honest Propagation Check strategies $\mathcal{S}$ that pass the $\textsc{Input Check}$ subprotocol with probability at least $1 - \eps$ are $\poly[N;\eps]$-close to the honest Input Check strategy.
+	\item (\textbf{Soundness}) All honest Gate Check strategies $\mathcal{S}$ that pass the $\textsc{Input Check}$ subprotocol with probability at least $1 - \eps$ are $\poly[N;\eps]$-close to the honest Input Check strategy.
 \end{enumerate}
 \end{lemma}
 \begin{proof}
 The completeness statement of the Theorem is straightforward. We now argue about the soundness statement.
 
-Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state. Let $\rho = \ketbra{\psi}{\psi}$. Since the strategy $\mathcal{S}$ is an honest Propagation Check strategy (and therefore an honest Pauli Check strategy), we have that
+Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state. Let $\rho = \ketbra{\psi}{\psi}$. Since the strategy $\mathcal{S}$ is an honest Gate Check strategy (and therefore an honest Pauli Check strategy), we have that
 \begin{enumerate}
 	\item $\Tr_\rho \left ( \ketbra{0}{0}_{\sC_p} \right) \geq 1/\poly(N)$
 	\item $	\left( \ketbra{0}{0}_{\sC_p} \right) \, \ket{\psi}_{\sC_p \sC_{mip} \sP \sR} = \alpha_N \sum_{t = 0}^{\tau(N)} \ket{0}_{\sC_p} \otimes \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}$ for some $\alpha_N = 1/\poly(N)$.
@@ -475,7 +478,7 @@ Suppose now that the shared state in \textsc{Input Check} is $\rho_{00}$. Let $\
 	\]
 	for some state $\ket{\theta}_{\sY}$.
 	
-	Thus we can construct a new honest Propagation strategy $\mathcal{S}'$ where the prover operators are the same as in $\mathcal{S}$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0,0}_{\sC} \otimes \ket{G,V,M,0}_{\sX} \otimes \ket{\theta}_{\sY}$, and otherwise has the form of an honest Propagation strategy. We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so therefore $\mathcal{S}'$ is $\poly[N;\eps]$-close to $\mathcal{S}$, and furthermore $\mathcal{S}'$ is an honest Input Check strategy. This concludes the proof.
+	Thus we can construct a new honest Gate strategy $\mathcal{S}'$ where the prover operators are the same as in $\mathcal{S}$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0,0}_{\sC} \otimes \ket{G,V,M,0}_{\sX} \otimes \ket{\theta}_{\sY}$, and otherwise has the form of an honest Gate strategy. We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so therefore $\mathcal{S}'$ is $\poly[N;\eps]$-close to $\mathcal{S}$, and furthermore $\mathcal{S}'$ is an honest Input Check strategy. This concludes the proof.
 	
 %	$\Big( \rho_{00} \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ is $\poly(N) \eps'$-close to $\ketbra{G,V,M,0}{G,V,M,0}$. This finishes the proof.
 
