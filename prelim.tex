@@ -19,7 +19,7 @@ for $R > 1$, and when $R=1$ define $\exp^1_a(b) = a^b$. Equivalently,
 	\exp^R_a(b) &= \underbrace{a^{a^{\cdot^{\cdot^{a^b}}}}}_{R} \qquad \mbox{if } b \geq 0 \\
 	\exp^R_a(b) &= \underbrace{a^{-a^{\cdot^{\cdot^{a^{|b|}}}}}}_{R} \qquad \mbox{if } b < 0
 \end{align*}
-Furthermore, for convenience we will define $\exp^0_a(b) = b$.% and $\exp^0_a(-b) = 1/b$ when $b \geq 0$.
+Furthermore, for convenience we define $\exp^0_a(b) = b$.% and $\exp^0_a(-b) = 1/b$ when $b \geq 0$.
 
 \subsection{Quantum information theory}
 
@@ -59,7 +59,7 @@ For a quantum state $\rho \in \Dens(\sA)$ and positive semidefinite operators $M
 
 We define quantum interactive protocols between a quantum verifier $V$ and provers $P_1,P_2,\ldots,P_k$. In this paper we focus exclusively on \emph{three-turn protocols}, in which the order of interaction is as follows. First the provers send a message to the verifier; second the verifier sends a message to the provers; third the provers send a message back; finally, the verifier performs a computation and returns a decision bit,  ``accept'' or ``reject''. 
 
-%For simplicity, we will restrict our attention to protocols with a single prover $P$. Extending the discussion to multiple provers is straightforward. 
+
 
 For simplicity we first restrict our attention to protocols with a single prover $P$. There are four registers involved: $\sC, \sV, \sM, \sP$. The verifier $V$ acts on registers $\sC$ (the register containing the prover's initial message), $\sV$ (the verifier's local memory) and $\sM$ (the message register). The prover $P$ acts on $\sM$ and $\sP$ (the prover's local memory). The $\sV$ and $\sM$ registers initially start off in the $\ket{0}$ state, but the state of the $\sC$ and $\sP$ registers is arbitrary. The verifier applies a circuit $C_Q$ to $\sC \sV \sM$ ($Q$ stands for ``questions''). The prover then applies some unitary $P$ to $\sM \sP$. The verifier then applies $C_A$ to $\sC \sV \sM$ ($A$ stands for ``answers''). The first output qubit of $\sV$ is measured in the standard basis to determine whether the verifier accepts or rejects.
 
@@ -77,7 +77,7 @@ Figure \ref{fig:qip} depicts this protocol as a circuit:
 \label{fig:qip}
 \end{figure}
 
-A verifier $V = (C_Q,C_A)$ will\tnote{will ---  when? There are 25 wills in this draft. Let's cut it to 1/10-th of this --- rounded down.} implicitly define $3$-turn quantum interactive protocol for some number of provers. We let $\Protocol_V$ denote this protocol.
+A verifier $V = (C_Q,C_A)$ implicitly define $3$-turn quantum interactive protocol for some number of provers. We let $\Protocol_V$ denote this protocol.
 
 
 
@@ -206,17 +206,17 @@ Any $k$-tape Turing machine $M$ that runs in time $T$ can be simulated by a $k$-
 	For all $T$, for every $k$-tape oblivious Turing machine $M$, there exists a quantum circuit $TMSIM(M,T)$ of size $\poly(T)$ where
 	\begin{enumerate}
 		\item $TMSIM(M,T)$ acts on registers $\sM \sA_1 \ldots \sA_k$
-		\item The output of the $\{\sA_j\}$ registers of $TMSIM(M,T)$, when run on input $\ket{0}_{\sM} \otimes \ket{x}_{\sA_1 \cdots \sA_k}$, will be equal to the contents of $M$'s tapes on input $x$ after $T$ steps.
+		\item The output of the $\{\sA_j\}$ registers of $TMSIM(M,T)$, when run on input $\ket{0}_{\sM} \otimes \ket{x}_{\sA_1 \cdots \sA_k}$, is equal to the contents of $M$'s tapes on input $x$ after $T$ steps.
 	\end{enumerate}
-	Furthermore, there exists a Turing machine $\text{TMSIM-DESC}$ that on input $(M,T,t)$ (where $t$ is written in binary), it will output the $t$'th gate of $TMSIM(M,T)$ in $\poly\log(T)$ time. 
+	Furthermore, there exists a Turing machine $\text{TMSIM-DESC}$ that on input $(M,T,t)$ (where $t$ is written in binary), outputs the $t$'th gate of $TMSIM(M,T)$ in $\poly\log(T)$ time. 
 \end{lemma}
 
 \begin{proof}
-	The architecture of the circuit $TMSIM(M,T)$ is the following: the registers $\sM$ will store the state of the Turing machine $M$, and $\{\sA_j\}$ represent the work tapes of $M$. Since $M$ is oblivious, the head movement patterns of $M$ are pre-determined. Without loss of generality, each tape head will alternate between sweeping left for $T$ steps and then right for $T$ steps, and the heads will be moved in sequence (i.e., the first tape's head will move first, then the second tape's head will move, and so on). 
+	The architecture of the circuit $TMSIM(M,T)$ is the following: the registers $\sM$ store the state of the Turing machine $M$, and $\{\sA_j\}$ represent the work tapes of $M$. Since $M$ is oblivious, the head movement patterns of $M$ are pre-determined. Without loss of generality, each tape head alternates between sweeping left for $T$ steps and then right for $T$ steps, and the heads move in sequence (i.e., the first tape's head moves first, then the second tape's head moves, and so on). 
 	
-	Each $\sA_j$ register is $O(T)$ qubits wide, representing the $T$ cells of tape $j$ that $M$ could possibly access. Each movement of the heads of $M$ will correspond to a layer in the circuit; the computation of the head transition function of $M$ will be computed in the $\sM$ registers, which connected via two-qubit gates to the corresponding locations in the $\sA_j$ registers. 
+	Each $\sA_j$ register is $O(T)$ qubits, representing the $T$ cells of tape $j$ that $M$ could possibly access. Each movement of the heads of $M$ corresponds to a layer in the circuit; the computation of the head transition function of $M$ is computed in the $\sM$ registers, which connected via two-qubit gates to the corresponding locations in the $\sA_j$ registers. 
 	
-	Since the computation of the transition function is some constant that only depends on the description size of $M$, the number of gates in each layer is a constant. Thus the total gate complexity of this circuit is $O(T)$. Notice that the gate sequence of each layer is the same, except the gates that cross between $\sM$ and the $\{\sA_j\}$ registers will be different depending on which cells of the tapes are supposed to be read at that layer. 
+	Since the computation of the transition function is some constant that only depends on the description size of $M$, the number of gates in each layer is a constant. Thus the total gate complexity of this circuit is $O(T)$. Notice that the gate sequence of each layer is the same, except the gates that cross between $\sM$ and the $\{\sA_j\}$ registers are different depending on which cells of the tapes are supposed to be read at that layer. 
 	
 	Thus it is clear that it only takes $\poly\log T$ time to compute any desired gate of the circuit $TMSIM(M,T)$.
 \end{proof}
@@ -274,7 +274,7 @@ Formally, a VTM $\cV$ is a deterministic Turing machine that takes as input $(1^
 	\item Communication tapes. There are two tapes of this kind: the measurement outcome tape and the prover answer tape. 
 	\item Output tapes. There are three tapes of this kind: the measurement specification tape, the prover question tape, and the referee decision tape. 
 \end{enumerate}
-There are a few properties that are inherent to a VTM $\cV$: First, there is a function $r_{\cV,n}$ that depends on the parameter $n$. On input $(1^n,w,\lambda)$, the prover question and answer tapes will be divided into $r_{\cV,n}$ components; $r_{\cV,n}$ denotes the number of provers the VTM will write messages for. \hnote{Need to update}
+There are a few properties that are inherent to a VTM $\cV$: First, there is a function $r_{\cV,n}$ that depends on the parameter $n$. On input $(1^n,w,\lambda)$, the prover question and answer tapes will be divided into $r_{\cV,n}$ components; $r_{\cV,n}$ denotes the number of provers the VTM write messages for. \hnote{Need to update}
 
 Second, when executed on input $(1^n,w,V)$ the VTM $\cV$ runs in exactly $3p(n)$ time steps, where $p(n)$ is a fixed polynomial that is a property of the VTM. Moreover, the $3p(n)$ time steps can be divided into three phases of equal length with the following properties: 
 \begin{enumerate}
@@ -283,7 +283,7 @@ Second, when executed on input $(1^n,w,V)$ the VTM $\cV$ runs in exactly $3p(n)$
 \item \textsc{CheckAnswers} phase (timesteps $2p(n) + 1$ through $3p(n)$). During this phase the VTM only accesses the input tape (read only), the work tape, the measurement outcome tape (read only), the prover answer tape (read only), and the referee decision tape (write only). Assuming that at the beginning of the phase the measurement outcome tape contains a valid measurement outcome, and the prover answer tape contains a valid $r_{\cV,n}$-tuple of answers, at the end of the phase the referee decision tape contains a single bit. 
 \end{enumerate}
 
-\paragraph{From VTMs to verifiers} We now specify how a VTM $\cV$ specifies a family of circuits $\{ (C_Q^{(n)},C_A^{(n)}) \}$ for the verifier. Fix the parameter $n$. The circuits will act on three registers $\sC, \sV, \sM$ of $3p(n)$ qubits each\tnote{let's not use the notion of a register being ``$3p(n)$ qubits wide''. It's ugly. And a register has no depth, so width is the only parameter, it doesn't need a name}. The $\sV$ register is divided into two subregisters $\sV_{in}$ and $\sV_{work}$ (each are $3p(n)/2$ qubits wide). 
+\paragraph{From VTMs to verifiers} We now specify how a VTM $\cV$ specifies a family of circuits $\{ (C_Q^{(n)},C_A^{(n)}) \}$ for the verifier. Fix the parameter $n$. The circuits act on three registers $\sC, \sV, \sM$ of $3p(n)$ qubits each. The $\sV$ register is divided into two subregisters $\sV_{in}$ and $\sV_{work}$ (each are $3p(n)/2$ qubits). 
 
 %Recall that a verifier in a three-turn quantum interactive protocol is specified by two circuits $C_Q$ and $C_A$, which act on registers $\sC \sV \sM$. A VTM $V$ can be used to specify circuits $C_Q$ and $C_A$ as described in Figure \ref{fig:vtm_circuits}. The $\sV$ register is divided into two subregisters $\sV_{in}$ and $\sV_{work}$.
 
@@ -292,8 +292,7 @@ Second, when executed on input $(1^n,w,V)$ the VTM $\cV$ runs in exactly $3p(n)$
 	The circuit $C_Q^{(n)}$:
 	  \begin{enumerate}
         \item (\textbf{ClockMeasurement phase}) Use a quantum circuit to compute a random string $w \in \{0,1\}^n$ in the work register $\sV_{work}$. 
-Simulate $\cV$ on input $(1^n,w,\lambda)$ for $p(n)$ steps using TMSIM, where $\lambda$ is the contents of $\sV_{in}$. Let $s$ denote the contents of the measurement specification tape of $V_R$\tnote{is this $\sV$?}.   Execute CKTSIM on input $s$ and the $\sV_{work}, \sC$ registers.\tnote{Refer to ``the register $\sV$'', not ``the $\sV$ register''. Same for ``the $V$ verifier'', should be ``the verifier $V$'', etc.}%, writing the classical output $s$ into $\sV_{work}$.
-%registers $\sV_{m}$ (circuit description) and $\sC$, writing the classical output in register $\sV_{mo}$.
+Simulate $\cV$ on input $(1^n,w,\lambda)$ for $p(n)$ steps using TMSIM, where $\lambda$ is the contents of $\sV_{in}$. Let $s$ denote the contents of the measurement specification tape of $\cV$.   Execute CKTSIM on input $s$ and the registers $\sV_{work}, \sC$.
         \item (\textbf{GenQuestions phase}) Simulate $\cV$ for $p(n)$ additional steps. Copy the contents of the prover question tape of $\cV$ into registers $\sM_{i}$, $i\in\{1,\ldots,r_{\cV,n}\}$.
     \end{enumerate}
     
@@ -304,7 +303,7 @@ Simulate $\cV$ on input $(1^n,w,\lambda)$ for $p(n)$ steps using TMSIM, where $\
         \end{enumerate}    
         
         \medskip
-       	We will use $C_Q^{(n)}(\lambda)$ to denote the circuit $C_Q^{(n)}$ where $\lambda$ is initialized in the register $\sV_{in}$\tnote{above you write something very similar as ``$\lambda$ is the contents of'', instead of ``$\lambda$ is initialized in''. Are they the same? I prefer the former}.
+       	We use $C_Q^{(n)}(\lambda)$ to denote the circuit $C_Q^{(n)}$ where $\lambda$ is the contents of register $\sV_{in}$.
 \end{mdframed}
 \begin{figure}[H]
 \caption{The circuits $C_Q$ and $C_A$ specified by a VTM $\cV$.}
@@ -328,16 +327,16 @@ Here we use the fact that the phases of $\cV$ are run for exactly $p(n)$ steps.
 
 In this section we introduce a variant of three-turn protocols, called \textbf{simulated communication games} (or \textbf{simcom games} for short), where the verifier and provers do not explicitly exchange message registers. Instead, they use quantum teleportation to communicate. Furthermore, whereas in teleportation the sender transmits classical teleportation keys to the receiver, in simcom games no such transmission takes place. Instead, the communicating parties \emph{guess} what the correct teleportation keys are; if their guess is incorrect, the protocol accepts. If the guess is correct, then acceptance or rejection is determined by an output bit of the verifier. This explains why we call the communication \emph{simulated}; the parties can effectively transmit messages to each other when we post-select on the correct teleportation keys.
 
-\tnote{cut this:?}
-The benefit of using simcom games is that the actions of the verifier and the provers are disjoint: they act on separate registers. This will be very useful for us in our recursive compression result. There will be a quantitative loss in transforming normal quantum interactive protocols to simcom games, but this loss will small provided that the original message lengths were small. 
+%\tnote{cut this:?}
+%The benefit of using simcom games is that the actions of the verifier and the provers are disjoint: they act on separate registers. This will be very useful for us in our recursive compression result. There will be a quantitative loss in transforming normal quantum interactive protocols to simcom games, but this loss will small provided that the original message lengths were small. 
 
 More precisely, an $k$-prover simcom game is specified by a verifier $V = (C_Q,C_A)$ and an $k$-partite question alphabet $\cQ = \cQ_1 \times \cdots \times \cQ_k$, and an $k$-partite answer alphabet $\cA = \cA_1 \times \cdots \times \cA_k$. The circuits $C_Q, C_A$ act on registers $\sC \sV \sM$ as before. However, the execution of the game is different from that of Figure \ref{fig:qip}. The dimension of $\sM$ is equal to $\max\{ |\cQ|, |\cA| \}$. There are a number of extra registers:
 \begin{enumerate}
 	\item $\sO$ is a qubit register that is initialized in the zero state.
 	\item $\sK_1$ is a register whose dimension is equal to $|\cQ|^2$. It is initialized in the all zeroes state.
 	\item $\sK_2,\sK_2'$ are registers whose dimensions are equal to $|\cA|^2$. $\sK_2$ is initialized in the all zeroes state.
-	\item $\sE_1,\sE_1'$ are registers whose dimensions are equal to $|\cQ|$. They are initialized $\ket{\Phi}_{\sE_{1} \sE_{1}'}$ which is the maximally entangled state between $\sE_1$ and $\sE_1'$.
-	\item $\sE_2,\sE_2'$ are registers whose dimensions are equal to $|\cA|$. They are initialized $\ket{\Phi}_{\sE_{2} \sE_{2}'}$.	
+	\item $\sE_1,\sE_1'$ are registers whose dimensions are equal to $|\cQ|$. They are initialized in the state $\ket{\Phi}_{\sE_{1} \sE_{1}'}$ which is the maximally entangled state between $\sE_1$ and $\sE_1'$.
+	\item $\sE_2,\sE_2'$ are registers whose dimensions are equal to $|\cA|$. They are initialized in the state $\ket{\Phi}_{\sE_{2} \sE_{2}'}$.	
 %	that are each isomorphic to $\sM$. They are initialized in the state  $\ket{\Phi}_{\sE_{1} \sE_{1}'} \otimes \ket{\Phi}_{\sE_{2} \sE_{2}'}$, where $\ket{\Phi}_{\sE_j \sE_j'}$ denotes the maximally entangled state between $\sE_j$ and $\sE_j'$. 
 \end{enumerate}
 The allocation of registers is as follows: the verifier holds registers $\sO \sK_1 \sK_2 \sC \sV \sM \sE_1 \sE_2$, and the $i$-th prover holds registers $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
@@ -352,7 +351,7 @@ The allocation of registers is as follows: the verifier holds registers $\sO \sK
 	\item A SWAP gate is applied between $\sE_2$ and $\sM$.
 	\item Controlled on $\sK_2$, Pauli corrections (such as one would do in a teleportation protocol) is applied to the $\sM$ register.
 	\item The circuit $C_A$ is applied to $\sC \sV \sM$.
-	\item The $\sO$ register is set to $1$ if and only if the $\sK_1$ register is all zero. \tnote{is this the only reason for $\sO$? Given later you consider measuring complete registers, $\sK_2\sK_2'$, why not do the same for $\sK_1$, is $\sO$ used for another reason?}
+	\item The $\sO$ register is set to $1$ if and only if the $\sK_1$ register is all zero. \tnote{is this the only reason for $\sO$? Given later you consider measuring complete registers, $\sK_2\sK_2'$, why not do the same for $\sK_1$, is $\sO$ used for another reason?}\hnote{The $\sK_2 \sK_2'$ registers are constant sized, so we can (and have to) ask the provers to measure all of them. However, the $\sK_1$ register is $\poly(n)$ sized, but we can only ask $PV$ to measure a constant number of Pauli measurements.}
 \end{enumerate}
 
 \noindent See Figure \ref{fig:simcom} for the circuit representation of a simcom game.
@@ -372,21 +371,21 @@ Let $V = (C_Q,C_A)$ be a verifier and let $\mathscr{Z}_V$ denote the simcom game
 	\item $o = 1$, $k_2 = k_2'$, and $b = 1$.
 \end{enumerate}
 
-\paragraph{Strategies for simcom games} Strategies $\strat$ for simcom games are the similar to normal three-turn protocol strategies; they consist of a state $\rho$ and a collection of reflections $\{ P_i \}$. The shared state $\rho$ is on registers $\sC, \sP_1,\ldots,\sP_k$. The reflections $P_i$ act on registers $\sE_1' \sE_2' \sP_i \sK_{2,i}'$. Given a strategy $\strat = (\rho,\{P_i\})$, the \textbf{value of $\strat$ in $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ and is defined to be
-\[
-	\omega^{SC}_\strat(V) = \Tr \Paren{ \wt{\Pi}_{out} \, U \sigma U^\dagger}
-\]
-where \tnote{I think it'd be easier to say in words that this is the probability of obtaining a certain outcome, when making a certain measurement on certain registers of the circuit in the picture. You made a nice picture, much easier to parse than the below, which is not really needed}
-\begin{enumerate}
-	\item $U =  (F) \, (C_A) \,  (\text{C-Pauli}) \, (SWAP_{\sM \leftrightarrow \sE_2}) \, (H^{\otimes m}) \, (P)\, (\mathrm{Bell})\, (C_Q)$, where $F$ is the gate that applies a CNOT to $\sO$ if $\sK_1$ is all zero, $\mathrm{Bell}$ is the Bell measurement circuit that saves the measurement outcome in register $\sK_1$ and $\text{C-Pauli}$ is the Pauli correction circuit that is controlled on $\sK_2$
-	\item $\sigma = \rho \otimes \ketbra{0}{0}_{\sV \sM \sK_1 \sK_2 \sK_2'} \otimes \ketbra{\Phi}{\Phi}_{\sE_1 \sE_1'} \otimes \ketbra{\Phi}{\Phi}_{\sE_2 \sE_2'}$
-	\item  $\wt{\Pi}_{out} = \ketbra{1}{1}_{\sV_{out}} \otimes \Pi_{tp} + (\Id - \Pi_{tp})$
-	\item $\Pi_{tp} = \ketbra{1}{1}_{\sO} \otimes \Paren{ \sum_{k} \ketbra{kk}{kk}_{\sK_2 \sK_2'}}$.
-\end{enumerate}
-The unitary $U$ is the sequence of unitaries in the simcom game. The state $\sigma$ is simply $\rho$ along with the proper initialization for the protocol. The projector $\Pi_{tp}$ projects onto the state where $\sO$ is in the state $\ket{1}$, and $\sK_2$ and $\sK_2'$ are equal when measured in the standard basis.
+\paragraph{Strategies for simcom games} Strategies $\strat$ for simcom games are the similar to normal three-turn protocol strategies; they consist of a state $\rho$ and a collection of reflections $\{ P_i \}$. The shared state $\rho$ is on registers $\sC, \sP_1,\ldots,\sP_k$. The reflections $P_i$ act on registers $\sE_1' \sE_2' \sP_i \sK_{2,i}'$. Given a strategy $\strat = (\rho,\{P_i\})$, the \textbf{value of $\strat$ in $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ and is defined to be the probability that $V$ accepts in $\mathscr{Z}_V$. The \textbf{value of $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ and is defined to be the supremum of $\omega^{SC}_\strat(V)$ over all strategies $\strat$.
+%\[
+%	\omega^{SC}_\strat(V) = \Tr \Paren{ \wt{\Pi}_{out} \, U \sigma U^\dagger}
+%\]
+%where \tnote{I think it'd be easier to say in words that this is the probability of obtaining a certain outcome, when making a certain measurement on certain registers of the circuit in the picture. You made a nice picture, much easier to parse than the below, which is not really needed}
+%\begin{enumerate}
+%	\item $U =  (F) \, (C_A) \,  (\text{C-Pauli}) \, (SWAP_{\sM \leftrightarrow \sE_2}) \, (H^{\otimes m}) \, (P)\, (\mathrm{Bell})\, (C_Q)$, where $F$ is the gate that applies a CNOT to $\sO$ if $\sK_1$ is all zero, $\mathrm{Bell}$ is the Bell measurement circuit that saves the measurement outcome in register $\sK_1$ and $\text{C-Pauli}$ is the Pauli correction circuit that is controlled on $\sK_2$
+%	\item $\sigma = \rho \otimes \ketbra{0}{0}_{\sV \sM \sK_1 \sK_2 \sK_2'} \otimes \ketbra{\Phi}{\Phi}_{\sE_1 \sE_1'} \otimes \ketbra{\Phi}{\Phi}_{\sE_2 \sE_2'}$
+%	\item  $\wt{\Pi}_{out} = \ketbra{1}{1}_{\sV_{out}} \otimes \Pi_{tp} + (\Id - \Pi_{tp})$
+%	\item $\Pi_{tp} = \ketbra{1}{1}_{\sO} \otimes \Paren{ \sum_{k} \ketbra{kk}{kk}_{\sK_2 \sK_2'}}$.
+%\end{enumerate}
+%The unitary $U$ is the sequence of unitaries in the simcom game. The state $\sigma$ is simply $\rho$ along with the proper initialization for the protocol. The projector $\Pi_{tp}$ projects onto the state where $\sO$ is in the state $\ket{1}$, and $\sK_2$ and $\sK_2'$ are equal when measured in the standard basis.
 
-Finally, the \textbf{value of $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ and is defined to be the supremum of $\omega^{SC}_\strat(V)$ over all strategies $\strat$.
-
+\medskip
+\vspace{10pt}
 
 Although simcom games appear to be much more complicated than normal three-turn quantum interactive protocols, we emphasize that the verifiers for simcom games are exactly the same as in three-turn protocols; the only difference is in how the protocol is executed and how the value is defined. In the next lemma, we relate the value of a simcom game $\mathscr{Z}_V$ and the value of the three-turn protocol $\Protocol_V$ defined by $V$.
 
@@ -418,13 +417,13 @@ Although simcom games appear to be much more complicated than normal three-turn 
 \tnote{Is this section needed? It doesn't seem to be saying much?}
 \hnote{Probably could be shortened but we should make a note that we will only consider measurement strategies in this paper.}
 
-Here we discuss three-turn protocols with classical messages. What we mean by this is that, in generating the message for the prover in the circuit $C_Q$, the verifier will save a copy of the message in the computational basis in its workspace register $\sV$. The circuit $C_A$, when viewed as a unitary, is classically controlled on the message register $\sM$. In other words, 
+Here we discuss three-turn protocols with classical messages. What we mean by this is that, in generating the message for the prover in the circuit $C_Q$, the verifier saves a copy of the message in the computational basis in its workspace register $\sV$. The circuit $C_A$, when viewed as a unitary, is classically controlled on the message register $\sM$. In other words, 
 \[
 	C_Q = \sum_{a} \ketbra{a}{a} \otimes C_Q^a 
 \]
-where $a$ runs over the computational basis states of $\sM$ and $C_Q^a$ is a unitary on $\sC \sV$. Furthermore, we will assume such protocols are equipped with a question and answer alphabet $\cQ = \cQ_1 \times \cdots \times \cQ_k$ and $\cA = \cA_1 \times \cdots \times \cA_k$, where the $i$-th prover receives questions from $\cQ_i$ and answers from $\cA_i$. We call these protocols \textbf{classical message protocols}, and their associated verifiers \textbf{classical message verifiers}.
+where $a$ runs over the computational basis states of $\sM$ and $C_Q^a$ is a unitary on $\sC \sV$. Furthermore, we assume such protocols are equipped with a question and answer alphabet $\cQ = \cQ_1 \times \cdots \times \cQ_k$ and $\cA = \cA_1 \times \cdots \times \cA_k$, where the $i$-th prover receives questions from $\cQ_i$ and answers from $\cA_i$. We call these protocols \textbf{classical message protocols}, and their associated verifiers \textbf{classical message verifiers}.
 
-Nonlocal games are an example of such protocols. We will also generally consider simcom games with classical communication. 
+Nonlocal games are an example of such protocols. We also generally consider simcom games with classical communication. 
 
 Strategies for such protocols can be expressed in a different way. As defined above, a strategy for a three-turn quantum interactive protocol consists of a shared state $\rho$ and a collection of reflections $\{ P_i \}$, one for each prover. We call these strategies \textbf{unitary strategies}, because the provers' actions are unitaries.
 

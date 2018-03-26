@@ -1,15 +1,15 @@
 %!TEX root = main.tex
 
-\section{The VTM $V_{UPC}$}
+\section{The VTM $\cV_{UPC}$}
 \label{sec:vtm_upc}
 
-We now specify the VTM $V_{UPC}$, which interacts with $\kappa_R$ provers. The VTM is specified in high level pseudocode in Figure~\ref{fig:vtm}. It receives input $(1^n,w,\lambda)$, where $\lambda$ is interpreted as a tuple $(G,V_{final},M,r)$ where $G$ is a Gate Turing Machine, $V_{final}$ is another VTM, $M$ is a nondeterministic Turing machine \tnote{Couldn't we fold $M$ into $V_{final}$? Maybe one dedicated final object is enough? It'd make the presentation a little lighter}, and $r$ is an integer written in binary. The input string $w$ is used to determine all random choices made by $V_{UPC}$.
+We now specify the VTM $\cV_{UPC}$, which interacts with $\kappa_R$ provers. The VTM is specified in high level pseudocode in Figure~\ref{fig:vtm}. It receives input $(1^n,w,\lambda)$, where $\lambda$ is interpreted as a tuple $(G,r)$ where $G$ is a Gate Turing Machine and $r$ is an integer written in binary. The input string $w$ is used to determine all random choices made by $\cV_{UPC}$.
 
 \begin{center}
 \begin{mdframed}
-    Input: $(1^n,w,G,V_{final},M,r)$
+    Input: $(1^n,w,G,r)$
     \begin{itemize}
-    	\item If $r = 1$, run the VTM specified by $V_{final}$ on input $(1^n,w,M)$.
+    	\item If $r = 1$, run the VTM specified by $\cV_{NV}$ on input $(1^n,w)$.
 	
 		\item If $r > 1$, run each of the following subroutines with probability $1/4$: \textbf{Stabilizer check}, \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check}.
 %			do the following. Using the string $w$, execute one of the following subroutines: \emph{Stabilizer check}, \emph{Propagation check}, \emph{Input check}, and \emph{Output check}, described in Figures~\ref{fig:pauli_check},~\ref{fig:prop_check},~\ref{fig:input_check}, and Figure~\ref{fig:output_check} respectively.
@@ -17,21 +17,21 @@ We now specify the VTM $V_{UPC}$, which interacts with $\kappa_R$ provers. The V
 \end{mdframed}
 
 \begin{figure}[H]
-\caption{The VTM $V_{UPC}$}
+\caption{The VTM $\cV_{UPC}$}
 \label{fig:vtm}
 \end{figure}
 \end{center}
 
-Fix integers $n, r$, and fix $\lambda = (G_{UPC},V_{NV},M,r)$. Recall from Section~\ref{sec:vtm} that a VTM $V_{UPC}$ specifies verifier circuits $C_Q^{(n)}(\lambda)$ and $C_A^{(n)}$. In a slight abuse of notation, we use $V_{UPC}^{(n,r)}$ to denote $(C_Q^{(n)}(\lambda),C_A^{(n)})$. Let $\Protocol_{n,r}$ denote the protocol that is executed by this verifier. 
+Fix integers $n, r$, and fix $\lambda = (G_{UPC},r)$. Recall from Section~\ref{sec:vtm} that a VTM $\cV_{UPC}$ specifies verifier circuits $C_Q^{(n)} = C_Q(n,\cV_{UPC},\lambda)$ and $C_A^{(n)} = C_A(n,\cV_{UPC})$. In a slight abuse of notation, we use $\cV_{UPC}^{(n,r)}$ to denote $(C_Q^{(n)},C_A^{(n)})$. Let $\Protocol_{n,r}$ denote the protocol that is executed by this verifier. 
 
-We will show that provers succeeding in the protocol $\Protocol_{n,r}$ with high enough probability must, up to local isometries, share a history state of the simcom game $\mathscr{Z}_{N,r-1}$ whose verifier is $V_{UPC}^{(N,r-1)}$ where $N = 2^n$. This in turn allows us to relate the value of $\Protocol_{n,r}$ to the simcom value of $\mathscr{Z}_{N,r-1}$. This is the main idea behind the proof of Proposition~\ref{prop:UPC_soundness}.
+We will show that provers succeeding in the protocol $\Protocol_{n,r}$ with high enough probability must, up to local isometries, share a history state of the simcom game $\mathscr{Z}_{N,r-1}$ whose verifier is $\cV_{UPC}^{(N,r-1)}$ where $N = 2^n$. This in turn allows us to relate the value of $\Protocol_{n,r}$ to the simcom value of $\mathscr{Z}_{N,r-1}$. This is the main idea behind the proof of Proposition~\ref{prop:UPC_soundness}.
 
 
-The argument proceeds in two stages. In the first stage, we analyze a VTM $V_H$ that is a modification of $V_{UPC}$: 
+The argument proceeds in two stages. In the first stage, we analyze a VTM $\cV_H$ that is a modification of $\cV_{UPC}$: 
 
 \begin{center}
 \begin{mdframed}
-    Input: $(1^n,w,G,V_{final},M,r)$
+    Input: $(1^n,w,G,r)$
     \begin{itemize}
     	\item Run each of the following subroutines with probability $1/3$: \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check}.
 %			do the following. Using the string $w$, execute one of the following subroutines: \emph{Stabilizer check}, \emph{Propagation check}, \emph{Input check}, and \emph{Output check}, described in Figures~\ref{fig:pauli_check},~\ref{fig:prop_check},~\ref{fig:input_check}, and Figure~\ref{fig:output_check} respectively.
@@ -39,27 +39,27 @@ The argument proceeds in two stages. In the first stage, we analyze a VTM $V_H$ 
 \end{mdframed}
 
 \begin{figure}[H]
-\caption{The VTM $V_H$}
+\caption{The VTM $\cV_H$}
 \label{fig:vtm_h}
 \end{figure}
 \end{center}
 
-Observe that $V_H$ is the same as $V_{UPC}$ except it does not run the VTM $V_{final}$ when $r = 1$, and furthermore it runs a different set of subroutines: \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check}. We present and analyze these subroutines first; we will restrict ourselves to \textbf{honest Pauli strategies}, in which there is a specific prover\tnote{explain this is an extra prover?} (called the \textbf{honest Pauli prover}) that is only asked to perform Pauli measurements, and its measurement operators are indeed the honest ones.
+Observe that $\cV_H$ is the same as $\cV_{UPC}$ except it does not run the VTM $\cV_{NV}$ when $r = 1$, and furthermore it runs a different set of subroutines: \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check}. We present and analyze these subroutines first; we will restrict ourselves to \textbf{honest Pauli strategies}, in which there is a specific prover\tnote{explain this is an extra prover?} (called the \textbf{honest Pauli prover}) that is only asked to perform Pauli measurements, and its measurement operators are indeed the honest ones.
 
-We will show that honest Pauli strategies passing the protocol $\Protocol^H_{n,r}$ corresponding to $V_H$ with high enough probability must involve\tnote{what does it mean, ``involve''} a history state for $\mathscr{Z}_{N,r-1}$.
+We will show that honest Pauli strategies passing the protocol $\Protocol^H_{n,r}$ corresponding to $\cV_H$ with high enough probability must use a shared state that is, up to local isometries, close to a history state for $\mathscr{Z}_{N,r-1}$.
 
-The second stage of the argument will then show that the \textbf{Stabilizer check} subroutine of $V_{UPC}$ will essentially force a set of $7$ provers\tnote{Here, are these re-used provers or $7$ extra provers?} to encode an honest Pauli prover using an error correcting code. The subroutines \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check} will be the same as those in $V_H$ except that the messages sent to the honest Pauli prover will now be distributed to these $7$ provers. The value of a strategy in $\Protocol_{n,r}$ will then be related to the value of the corresponding honest Pauli strategy in $\Protocol^H_{n,r}$.
+The second stage of the argument will then show that the \textbf{Stabilizer check} subroutine of $\cV_{UPC}$ will essentially force a set of $7$ provers\tnote{Here, are these re-used provers or $7$ extra provers?} \hnote{For now, $7$ extra provers.} to encode an honest Pauli prover using an error correcting code. The subroutines \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check} will be the same as those in $\cV_H$ except that the messages sent to the honest Pauli prover will now be distributed to these $7$ provers. The value of a strategy in $\Protocol_{n,r}$ will then be related to the value of the corresponding honest Pauli strategy in $\Protocol^H_{n,r}$.
 
 
 \paragraph{Description of the subroutines}
 
-Each of the subroutines of $V_{UPC}$ and $V_H$ follows a similar structure, summarized in Figure~\ref{fig:check_structure}. For simplicity, we give an ``operational'' description of the subroutines in $V_H$ and $V_R$, with the understanding that each should be broken down into three phases, as described in the figure below.
+Each of the subroutines of $\cV_{UPC}$ and $\cV_H$ follows a similar structure, summarized in Figure~\ref{fig:check_structure}. For simplicity, we give an ``operational'' description of the subroutines in $\cV_H$ and $\cV_{UPC}$, with the understanding that each should be broken down into three phases, as described in the figure below.
 
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
-Inptut: $(1^n,w,G,V,M,r)$\\
-  $w$ is a random string, $G$ a GTM, $V$ a VTM, $M$ a NTM, and $r$ the level of the verifier.\\
+Inptut: $(1^n,w,G,r)$\\
+  $w$ is a random string, $G$ is a GTM, and $r$ the level of the verifier.\\
 Each subroutine is decomposed in three phases. Each phase reads some tapes of the VTM and writes on some others. The phases are the following: 
 	\begin{enumerate}
 		\item (\textbf{ClockMeasurement}) In this phase the subroutine writes the description of a cicruit describing a quantum measurement on the measurement specification tape. The measurement applies to a clock register $\sC$. To describe the measurements, for any integer $t$ we use the notation 
@@ -72,22 +72,23 @@ If $t'$ is not specified it is understood that $t'=t+1$.
 
 \end{center}
 \begin{figure}[H]
-\caption{Template for each of the subroutines of $V_{UPC}$ and $V_H$}
+\caption{Template for each of the subroutines of $\cV_{UPC}$ and $\cV_H$}
 \label{fig:check_structure}
 \end{figure}
 
 \paragraph{Notation} 
-Fix integers $n, r > 1$. In what follows, we let $G = G_{UPC}$, $V = V_{NV}$, and $M$ be some fixed nondeterministic Turing machine. For notational clarity we will sometimes omit mention of the input parameters $(G,V,M)$ and treat them as fixed. The VTMs $V_H$ and $V_{UPC}$ take input $(1^n,w,r)$, where $w$ is a string that is used to make all random choices of the VTMs. $r$ is an integer to indicate the ``level'' for the verifier. 
+Fix integers $n, r > 1$. In what follows, we fix $G = G_{UPC}$. The VTMs $\cV_H$ and $\cV_{UPC}$ take input $(1^n,w,G,r)$, where $w$ is a string that is used to make all random choices of the VTMs. $r$ is an integer to indicate the ``level'' for the verifier. 
 
 
-\subsection{Analyzing $V_H$ with honest Pauli strategies}
+\subsection{Analyzing $\cV_H$ with honest Pauli strategies}
 
-We now analyze the protocol $\Protocol_{n,r}^H$ that corresponds to the verifier specified by $V_H$ on input $(1^n,w,G,V,M,r)$. We call this verifier the $r$-th level verifier. 
+We now analyze the protocol $\Protocol_{n,r}^H$ that corresponds to the verifier specified by $\cV_H$ on input $(1^n,w,G,r)$. We call this verifier the $r$-th level verifier. 
 
 \paragraph{Provers}
-The number of provers that $V_H$ interacts with depends on its input in the following way: since $G = G_{UPC}$, we know that $UPC_{N,r-1} = CKT(G,1^N,r-1)$ is protocol circuit that is computed by the GTM $G$ on input $(1^N,r-1,\cdot)$. We call the verifier in $UPC_{N,r-1}$ the $(r-1)$-th level verifier.
 
-Suppose that $UPC_{N,r-1}$ involves a set $\cP_{r-1}$ of $\kappa_{r-1}$ provers. The $r$-th level verifier then interacts with a set $\cH_r$ of $\alpha_r = \kappa_{r-1} + 1$ provers. These provers are labeled
+The number of provers that $\cV_H$ interacts with depends on its input in the following way: since $G = G_{UPC}$, the protocol circuit $CKT(G,1^N,r-1)$ is equal to $UPC_{N,r-1}$. Call $UPC_{N,r-1}$ the $(r-1)$-th level verifier.
+
+Suppose that the protocol of $UPC_{N,r-1}$ involves a set $\cP_{r-1}$ of $\kappa_{r-1}$ provers. The $r$-th level verifier then interacts with a set $\cH_r$ of $\alpha_r = \kappa_{r-1} + 1$ provers. These provers are labeled
 \begin{itemize}
 	\item $PV$: This prover plays the role of the verifier in the protocol described by $UPC_{N,r-1}$. 
 	\item $PP_1,\ldots,PP_{\kappa_{r-1}}$: These provers play the role of the $\kappa_{r-1}$ provers in $UPC_{N,r-1}$.
@@ -131,7 +132,7 @@ Recall that the state $\rho$ is on $\alpha_r + 1$ registers: the $r$-th level ve
 
 
 \medskip
-Next, we present the three subroutines of the VTM $V_H$, and prove rigidity results for each of the subroutines. Each subroutine is presented as a standalone protocol, where we implicitly understand the subroutine as a VTM (with fixed parameters $(n,r,G,V,M)$) that specifies a verifier. 
+Next, we present the three subroutines of the VTM $\cV_H$, and prove rigidity results for each of the subroutines. Each subroutine is presented as a standalone protocol, where we implicitly understand the subroutine as a VTM (with fixed parameters $(n,r,G)$) that specifies a verifier. 
 %
 %\subsection{Propagation Check}
 %
@@ -188,7 +189,7 @@ Next, we present the three subroutines of the VTM $V_H$, and prove rigidity resu
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
-    Input: $(1^n,w,G,V,M,r)$
+    Input: $(1^n,w,G,r)$
 	\begin{enumerate}
 		\item Select a uniformly random integer $t\in\{1,\ldots, \tau(N)\}$, where $N = 2^n$, and measure the clock register $\sC$ using the POVM 
 \[
@@ -364,13 +365,13 @@ Thus we have
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
-    Input: $(1^n,w,G,V,M,r)$ \\
+    Input: $(1^n,w,G,r)$ \\
 	\begin{enumerate}
 		\item Measure the $\sC$ register in the computational basis. Let $t \in \{1,\ldots,\tau(N)\}$ be the outcome. If $t \neq 0$, accept.
 		
 		\item Pick a random register $\what{\sR} \in \{ \what{\sV}_{in}, \quad \what{\sO} \what{\sV}_{work} \what{\sM} \what{\sK}_1 \what{\sK}_2, \quad \what{\sE}_1 \what{\sE}_1', \quad \what{\sE}_2 \what{\sE}_2' \}$.
 		\begin{enumerate}
-			\item If $\what{\sR} = \what{\sV}_{in}$, then pick a random qubit index $j \in \supp(\what{\sV}_{in})$. Set $q_V = Z_j$. If $a_V$ is equal to the $j$'th bit of the string that is $(G,V,M)$ padded by $0$, then accept. Otherwise, reject.
+			\item If $\what{\sR} = \what{\sV}_{in}$, then pick a random qubit index $j \in \supp(\what{\sV}_{in})$. Set $q_V = Z_j$. If $a_V$ is equal to the $j$'th bit of the string that is $(G,r)$ padded by $0$, then accept. Otherwise, reject.
 			\item If $\what{\sR} = \what{\sO} \what{\sV}_{work} \what{\sM} \what{\sK}_1 \what{\sK}_2$, then pick a random qubit index $j \in \supp(\what{\sR})$. Set $q_V = Z_j$. If $a_V = 0$, then accept. Otherwise, reject.
 			\item If $\what{\sR} = \what{\sE}_k \what{\sE}_k'$ for $k \in \{1,2\}$, then 
 			\begin{enumerate}
@@ -402,7 +403,7 @@ An honest Gate Check strategy $\strat$ with shared state
 	\ket{\psi}_{\sC \sP \sR} = \frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC} \otimes \ket{\psi_t}_{\sP \sR}
 \]
 is an honest Input Check strategy if the initial state $\ket{\psi_0}_{\sP \sR}$ is such the
-$\what{\sV}_{in}$ register is in the state $\ket{G,V,M,0}$, the $\what{\sO} \what{\sV}_{work} \what{\sM} \what{\sK}_1 \what{\sK_2}$ registers are all zero, and $\what{\sE}_1 \what{\sE}_1' \what{\sE}_2 \what{\sE}_2'$ registers are in the state $\ket{\Phi}_{\what{\sE}_1 \what{\sE}_1'} \otimes \ket{\Phi}_{\what{\sE}_2 \what{\sE}_2'}$. Here, the $\what{\sE}_1 \what{\sE}_2$ registers are held by the $PP_i$ provers. In other words, the $UPC_{N,r-1}$ protocol circuit is properly initialized.
+$\what{\sV}_{in}$ register is in the state $\ket{G,r,0}$, the $\what{\sO} \what{\sV}_{work} \what{\sM} \what{\sK}_1 \what{\sK_2}$ registers are all zero, and $\what{\sE}_1 \what{\sE}_1' \what{\sE}_2 \what{\sE}_2'$ registers are in the state $\ket{\Phi}_{\what{\sE}_1 \what{\sE}_1'} \otimes \ket{\Phi}_{\what{\sE}_2 \what{\sE}_2'}$. Here, the $\what{\sE}_1 \what{\sE}_2$ registers are held by the $PP_i$ provers. In other words, the $UPC_{N,r-1}$ protocol circuit is properly initialized.
 
 Recall that the registers $\what{\sO} \what{\sK}_1 \what{\sK}_2 \cdots$ are held by the honest Pauli prover $PV$.
 %For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. A strategy $\strat$ is an honest Propagation strategy if the Pauli operators are trusted and the shared state has the following form:
@@ -467,7 +468,7 @@ Suppose now that the shared state in \textbf{Input Check} is $\rho_{0}$. \hnote{
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
-    Input: $(1^n,w,G,V,M,r)$
+    Input: $(1^n,w,G,r)$
     \begin{enumerate}
 		\item Measure the $\sC$ register in the computational basis. Let $t \in \{1,\ldots,\tau(N)\}$ be the outcome. If $t \neq \tau(N)$, accept.
 		
