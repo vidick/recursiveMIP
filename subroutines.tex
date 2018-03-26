@@ -1,244 +1,221 @@
 %!TEX root = main.tex
 
-\section{Subroutines of the VTM $V_{UEVC}$}
+\section{The VTM $V_R$}
+\label{sec:vtm_r}
 
-In this section detail the checks that are performed in the case $r>1$ of the VTM $V_{UEVC}$ described in Figure~\ref{fig:lambda}. Each subroutine corresponds to a test that is performed by the extended verifier associated with the VTM, such that, provers passing the test with high enough probability must satisfy a certain rigidity property. The tests, together with the associated rigidity properties, are described in the following subsections. 
+We now specify the VTM $V_R$, which interacts with $\kappa_R$ provers. The VTM is specified in high level pseudocode in Figure~\ref{fig:vtm}. It receives input $(1^n,w,\lambda)$, where $\lambda$ is interpreted as a tuple $(G,V_{final},M,r)$ where $G$ is a Gate Turing Machine, $V_{final}$ is another VTM, $M$ is a nondeterministic Turing machine, and $r$ is an integer written in binary. The input string $w$ is used to determine all random choices made by $V_R$.
 
-Furthermore, the random choices made by the subroutines below are based on the random string $w$ that is passed in as input. 
+\begin{center}
+\begin{mdframed}
+    Input: $(1^n,w,G,V_{final},M,r)$
+    \begin{itemize}
+    	\item If $r = 1$, run the VTM specified by $V_{final}$ on input $(1^n,w,M)$.
+	
+		\item If $r > 1$, run each of the following subroutines with probability $1/4$: \textbf{Stabilizer check}, \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check}.
+%			do the following. Using the string $w$, execute one of the following subroutines: \emph{Stabilizer check}, \emph{Propagation check}, \emph{Input check}, and \emph{Output check}, described in Figures~\ref{fig:pauli_check},~\ref{fig:prop_check},~\ref{fig:input_check}, and Figure~\ref{fig:output_check} respectively.
+		\end{itemize}
+\end{mdframed}
 
-\paragraph{Notation} Each of the subroutines follows a similar structure, summarized in Figure~\ref{fig:check_structure}. The subroutines all take the same input $(1^n,w,r,G,V,M)$. $w$ is a string that is used to make all random choices. $r$ is an integer that indicates a ``level'' for the verifier. It is used to parametrize a set $\mathcal{P}_r$ of $\kappa(r)$ provers, each playing different roles. 
+\begin{figure}[H]
+\caption{The VTM $V_R$}
+\label{fig:vtm}
+\end{figure}
+\end{center}
 
-The subroutines describe tests that are to be performed by the $r$-th level verifier. The tests are meant to enforce that the provers hold a history state for the protocol that would be carried out by the $(r-1)$-th level verifier and the set of provers $\mathcal{P}_{r-1} \subseteq \mathcal{P}_r$. 
+Fix integers $n, r$, and fix $\lambda = (G_{UPC},V_{NV},M,r)$. Recall from Section~\ref{sec:vtm} that a VTM $V_R$ specifies verifier circuits $C_Q^{(n)}(\lambda)$ and $C_A^{(n)}$. In a slight abuse of notation, we use $V_R^{(n,r)}$ to denote $(C_Q^{(n)}(\lambda),C_A^{(n)})$. Let $\Protocol_{n,r}$ denote the protocol that is executed by this verifier. 
 
-The provers in the set $\mathcal{P}_r$ have the following labels and associated roles:
-\begin{itemize}
-	\item $PV$: This prover plays the role of $UEVC_{N,r-1}$
-	\item $PP_1,\ldots,PP_{\kappa(r-1)}$: These provers play the role of the $\kappa(r-1)$ provers $\mathcal{P}_{r-1}$ that the $(r-1)$-th level verifier interacts with.
-	\item $PA$: This is an ancilla prover
-%	\item $PA_1,\ldots,PA_{\kappa(r-1)}$: These are ancilla provers.
-\end{itemize}
-%We match the ancilla provers with the other provers in $\mathcal{P}_r$ in the following way: the ancilla prover corresponding to $PV$ is $PA_V$, and the ancilla prover corresponding to $PP_i$ is $PA_i$ for all $i$. 
-We let $\mathcal{R}_r$ denote the set $\{PV,PP_1,\ldots,PP_{\kappa(r-1)} \} \subset \mathcal{P}_r$ to denote the set of non-ancilla provers. Furthermore, we order the provers in $\mathcal{P}_r$ for notational convenience: $PV < PP_1 < \cdots < PP_{\kappa(r-1)} < PA$. 
-We use the label $P$ to refer to an arbitrary prover $P\in\mathcal{P}_r$. 
-
-In what follows we use the notation $\sC,\sV_{in},\sV_{work}$, and $\sM_i$ introduced in Section~\ref{sec:specs} to refer to registers on which the circuit $UEVC_{n,r}$ associated with the VTM acts on. In addition, we write $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\{ \sM_{r-1,i} \}_i$ to denote the registers that $UEVC_{N,r-1}$ acts on. We let $\sM_{r-1}$ denote the union of $\{ \sM_{r-1,i} \}_i$, and we let $\sV_{r-1}$ denote the union of $\sC_{r-1}$, $\sV_{r-1,in},\sV_{r-1,work}$, and $\sM_{r-1}$. 
-
-For a given register $\sR$, we write $\supp(\sR)$ to denote the set of qubits in $\sR$.
+We will show that provers succeeding in the protocol $\Protocol_{n,r}$ with high enough probability must, up to local isometries, share a history state of the simcom game $\mathscr{Z}_{N,r-1}$ whose verifier is $V_R^{(N,r-1)}$ where $N = 2^n$. This in turn allows us to relate the value of $\Protocol_{n,r}$ to the simcom value of $\mathscr{Z}_{N,r-1}$. This is the main idea behind the proof of Proposition~\ref{prop:UPC_soundness}.
 
 
+The argument proceeds in two stages. In the first stage, we analyze a VTM $V_H$ that is a modification of $V_R$: 
 
+\begin{center}
+\begin{mdframed}
+    Input: $(1^n,w,G,V_{final},M,r)$
+    \begin{itemize}
+    	\item Run each of the following subroutines with probability $1/3$: \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check}.
+%			do the following. Using the string $w$, execute one of the following subroutines: \emph{Stabilizer check}, \emph{Propagation check}, \emph{Input check}, and \emph{Output check}, described in Figures~\ref{fig:pauli_check},~\ref{fig:prop_check},~\ref{fig:input_check}, and Figure~\ref{fig:output_check} respectively.
+		\end{itemize}
+\end{mdframed}
+
+\begin{figure}[H]
+\caption{The VTM $V_H$}
+\label{fig:vtm_h}
+\end{figure}
+\end{center}
+
+Observe that $V_H$ is the same as $V_R$ except it does not run the VTM $V_{final}$ when $r = 1$, and furthermore it runs a different set of subroutines: \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check}. We present and analyze these subroutines first; we will restrict ourselves to \textbf{honest Pauli strategies}, in which there is a specific prover (called the \textbf{honest Pauli prover}) that is only asked to perform Pauli measurements, and its measurement operators are indeed the honest ones.
+
+We will show that honest Pauli strategies passing the protocol $\Protocol^H_{n,r}$ corresponding to $V_H$ with high enough probability must involve a history state for $\mathscr{Z}_{N,r-1}$.
+
+The second stage of the argument will then show that the \textbf{Stabilizer check} subroutine of $V_R$ will essentially force a set of $7$ provers to encode an honest Pauli prover using an error correcting code. The subroutines \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check} will be the same as those in $V_H$ except that the messages sent to the honest Pauli prover will now be distributed to these $7$ provers. The value of a strategy in $\Protocol_{n,r}$ will then be related to the value of the corresponding honest Pauli strategy in $\Protocol^H_{n,r}$.
+
+
+\paragraph{Description of the subroutines}
+
+Each of the subroutines of $V_R$ and $V_H$ follows a similar structure, summarized in Figure~\ref{fig:check_structure}. For simplicity, we give an ``operational'' description of the subroutines in the sections below, with the understanding that each should be broken down into three phases, as described in the figure.
 
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
-Inptut: $(1^n,w,r,G,V,M)$\\
-  $w$ is a random string, $r$ the level of the verifier, $G$ a GTM, $V$ a VTM, and $M$ a TM.\\
+Inptut: $(1^n,w,G,V,M,r)$\\
+  $w$ is a random string, $G$ a GTM, $V$ a VTM, $M$ a NTM, and $r$ the level of the verifier.\\
 Each subroutine is decomposed in three phases. Each phase reads some tapes of the VTM and writes on some others. The phases are the following: 
 	\begin{enumerate}
-		\item (\textsc{ClockMeasurement}) In this phase the subroutine writes the description of a cicruit describing a quantum measurement on the measurement specification tape. The measurement applies to a clock register $\sC$, divided into two parts, $\sC_{p}$ and $\sC_{mip}$. To describe the measurements, for any integer $t$ we use the notation 
+		\item (\textbf{ClockMeasurement}) In this phase the subroutine writes the description of a cicruit describing a quantum measurement on the measurement specification tape. The measurement applies to a clock register $\sC$. To describe the measurements, for any integer $t$ we use the notation 
 $$\ket{\pm_{t,t'}} \,=\, \frac{1}{\sqrt{2}}\big(\ket{t}\pm\ket{t'}\big)\;.$$
 If $t'$ is not specified it is understood that $t'=t+1$.
-	\item (\textsc{GenQuestions}) In this phase the subroutine has access to the measurement outcome tape, and writes questions on the player question tape. The questions are denoted  by $q_V$, $q_{P,1},\ldots,q_{P,\kappa(r-1)}$, $q_{A,1},\ldots,q_{A,\sigma(r)}$, where the subscript indicates the label of the prover to which the question is to be sent. 
-		\item (\textsc{CheckAnswers}) In this phase the subroutine has access to the player answer tape, and writes on the referee decision tape. The player answer tape is assumed to contain answers labeled as $a_V$, $a_{P,1},\ldots,a_{P,\kappa(r-1)}$, $a_{A,1},\ldots,a_{A,\sigma(r)}$, where the subscript indicates the label of the prover from which the answer is obtained.
+	\item (\textbf{GenQuestions}) In this phase the subroutine has access to the measurement outcome tape, and writes questions on the player question tape. 
+	\item (\textbf{CheckAnswers}) In this phase the subroutine has access to the player answer tape, and writes on the referee decision tape. 
 	\end{enumerate}    
 \end{mdframed}
 
 \end{center}
 \begin{figure}[H]
-\caption{Template for each of the subroutines of $V_{UEVC}$}
+\caption{Template for each of the subroutines of $V_R$ and $V_H$}
 \label{fig:check_structure}
 \end{figure}
 
+\paragraph{Notation} 
+Fix integers $n, r > 1$. In what follows, we let $G = G_{UPC}$, $V = V_{NV}$, and $M$ be some fixed nondeterministic Turing machine. For notational clarity we will sometimes omit mention of the input parameters $(G,V,M)$ and treat them as fixed. The VTMs $V_H$ and $V_R$ take input $(1^n,w,r)$, where $w$ is a string that is used to make all random choices of the VTMs. $r$ is an integer to indicate the ``level'' for the verifier. 
 
 
-\subsection{Propagation Check}
+\subsection{Analyzing $V_H$ with honest Pauli strategies}
 
-\begin{center}
-\begin{mdframed}
-    Input: $(T,\reg{C},\{g_1,\ldots,g_T\}$, where $T$ is an integer, $\reg{C}$ the label for a clock register,  $g_1,\ldots,g_T$ question symbols. 
-	\begin{enumerate}
-		\item (\textsc{ClockMeasurement}) Select a uniformly random integer $t\in\{1,\ldots,T\}$. Write on the measurement specification tape a description for the circuit $C_M$ that implements the following measurement on clock register $\reg{C}$: 
-\[
-	\{ 	\Pi^0 = \ketbra{+_t}{+_t}, 
-	\Pi^1 = \ketbra{-_t}{-_t}, 
-	\Pi^2 = \Id - \Pi^0 - \Pi^1 \}\;.
-\]	
-Let $s\in \{0,1,2\}$ denote the result of the measurement.
-	\item (\textsc{GenQuestions}) Set $q_P = g_t$.
-		\item (\textsc{CheckAnswers}) If $s = 2$, then accept. Otherwise, accept if and only if $a_P = s$. 
-	\end{enumerate}    
-\end{mdframed}
+We now analyze the protocol $\Protocol_{n,r}^H$ that corresponds to the verifier specified by $V_H$ on input $(1^n,w,G,V,M,r)$. We call this verifier the $r$-th level verifier. 
 
-\end{center}
-\begin{figure}[H]
-\caption{Propagation Check}
-\label{fig:prop_check_0}
-\end{figure}
+\paragraph{Provers}
+The number of provers that $V_H$ interacts with depends on its input in the following way: since $G = G_{UPC}$, we know that $UPC_{N,r-1} = CKT(G,1^N,r-1)$ is protocol circuit that is computed by the GTM $G$ on input $(1^N,r-1,\cdot)$. We call the verifier in $UPC_{N,r-1}$ the $(r-1)$-th level verifier.
 
-
-
-
-\paragraph{Honest Propagation Check strategy} An honest Propagation Check strategy is one in which the shared state is a history state of the computation $G_T\cdots G_1$, where $G_i$ is the binary observable measured by the prover on question $g_i$. In other words, it has the following form:
-\[
-	\frac{1}{\sqrt{T}} \sum_{t = 0}^{T} \ket{t}_{\reg{C}} \otimes G_t\cdots G_1 \ket{\psi_0}_{\sP}\;,
-\]
-for some state $\ket{\psi_0}_{\sP}$.
-
-\begin{lemma}	
-\label{lem:prop_check_0}
-\leavevmode
-\begin{enumerate}
-\item (\textbf{Completeness}) An honest Propagation strategy passes the $\textsc{Propagation Check}$ subprotocol with probability $1$. 
-\item (\textbf{Soundness}) Any strategy that passes the $\textsc{Propagation Check}$ subprotocol with probability at least $1 - \eps$ is $\delta$-close to an honest Propagation Check strategy, for some $\delta = \poly[N;\eps]$.
-\end{enumerate}
-\end{lemma}
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%		PAULI CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Pauli check}
-\label{sec:pauli_check}
-
-The \textsc{Pauli Check} subroutine describes an interaction between the $r$-th level verifier and the provers $\mathcal{P}_r$. In the subroutine, the verifier interacts with two players, taken from the set $\mathcal{P}_r$. The first player is always $PA$, and called ``player A'' in the subroutine. The second player is called ``player B'', and it is chosen randomly among the set $\mathcal{R}_r = \{ PV, PP_1,\ldots,PP_{\kappa(r-1)}\}$. For the rest of the subroutine, the verifier will only interact with players A and B. Note that player A is always told which prover plays the role of player B.  
-%provers $PA_1$ and $PV$. In the description of the check we refer to the former as ``player A'' and to the latter as ``player B''. 
-
-In the subroutine, the verifier performs one of several tests, chosen uniformly at random. The tests are summarized in Figure~\ref{fig:pauli_check} in an ``operational'' language. Formally, each test should be put in the form of actions for the VTM, following the template introduced in Figure~\ref{fig:check_structure}. 
-
-\vspace{10pt}
-\begin{center}
-\begin{mdframed}
-    Input: $(1^n,w,r,G,V,M)$ \\
-    \\
-	Let player A denote prover $PA$.
-    Choose a random prover $P^*$ from the set of non-ancilla provers $\mathcal{R}_r$, and let player B denote prover $P^*$. Send player A the label $P^*$. \\
-    \\
-    Perform one of the tests uniformly at random. Each test should be interpreted as a three-phase procedure, as described in Figure~\ref{fig:check_structure}. The \textsc{ClockMeasurement} phase involves a measurement on the clock register $\reg{C}_p$ of dimension $2(N+1)(\kappa(r-1)+1)$, with computational basis labeled by 
-    \[
-    (t,t')\in \{0,\ldots,2N\} \times \{0,\ldots,2N\}\; .
-    \]
-    
-	\begin{enumerate}
-
-\item \emph{(Propagation check)} Let $\reg{C}_{p,1}$ and $\reg{C}_{p,2}$ denote the two registers of $\reg{C}_p$. Execute each of the following with equal probability:
-\begin{enumerate}
-\item Measure register $\reg{C}_{p,2}$ to obtain an outcome $t'\in\{0,\ldots,2N\}$. If $t'\neq 0$ then accept. Otherwise, execute $\prop(2N,\reg{C}_{p,1},\{CW_1,\ldots,CW_{2N}\})$ between the verifier and B.
-\item Execute $\prop(2N,\reg{C}_{p,2},\{W_1,\ldots,W_{2N}\})$ between the verifier and B.
-\end{enumerate}
-
- \item \emph{(EPR test)} Measure the first register of $\reg{C}_{p}$ in the computational basis to obtain an outcome $t\in\{0,\ldots,2N\}$. 
-%Select $t'\in\{1,\ldots,2N\}$ uniformly at random. Measure the second register of $\reg{C}_{p}$ using a basis containing $\{\ket{+_{0,t'}},\ket{-_{0,t'}}\}$. Accept if neither of these two outcomes is obtained. 
-Generate questions $(q_A,q_B)$ as in the $2N$-qubit EPR test with A and B. Send $q_A$ to Alice, and $q_B$ to B. Accept if $t\neq 0$ or if the Pauli question to B is of the form $CW_t$. Otherwise, accept if and only if the answers to the EPR questions are valid.
-%\tnote{Intended goal: Checks that whenever A or B is sent an EPR question, it applies the corresponding Pauli observable, independently of any other question asked. A consequence of this test and the form of questions to player B is that we can write the observables it applies as a product of an observable for the EPR question, and an observable for the Pauli question, where each observable only depends on the corresponding question (and not on the pair of questions).}
-
-\item \emph{(CTL check)} Measure the first register of $\reg{C}_{p}$ in a basis containing $\{\ket{+_t},\ket{-_t}\}$ to obtain an outcome $c$ where $c\in\{0,1,2\}$. If $c=2$ then accept. Send player A the EPR question $X_{t}$, and send player $B$ the Pauli question $W_t$. Accept if and only if, either A's answer is $0$ and $c=1$, or A's answer is $1$ and $c$ matches B's answer to the Pauli question. %If $t'>0$, accept if $t\neq t'$. Send player A the EPR question $X_t$ and accept if the answer is not $1$. Send player B the Pauli question $W'_t$ and accept if and only if the outcome matches $c$.
-
-\item{\emph{(Pauli relation check)}} Measure both  registers of $\reg{C}_p$  in the computational basis to obtain outcomes $t,t'\in\{0,\ldots,2N\}$. Accept if $(t,t')\neq (2N,0)$. Select $u\in\{1,\ldots,N\}$ uniformly at random. Send A the EPR question $X_u$, and B the EPR question $Z_u$. Do either of the following with equal probability:
-\begin{enumerate}
-\item Send B the Pauli question $W_{2u}$. Accept if and only if the product of the players' three answers is $1$.
-\item Send B the Pauli question $W_{2u-1}$. Accept if and only if A's answer to the EPR question matches B's answer to the Pauli question. 
-\end{enumerate}  
-\end{enumerate}  
-\end{mdframed}
-\end{center}
-\begin{figure}[H]
-\caption{Pauli Check}
-\label{fig:pauli_check}
-\end{figure}
-
-
-\paragraph{Question types}
-There are three types of questions: ``EPR questions'', ``Pauli questions'' and ``CTL-Pauli questions''. 
+Suppose that $UPC_{N,r-1}$ involves a set $\cP_{r-1}$ of $\kappa_{r-1}$ provers. The $r$-th level verifier then interacts with a set $\cH_r$ of $\alpha_r = \kappa_{r-1} + 1$ provers. These provers are labeled
 \begin{itemize}
-\item \emph{EPR questions} range over the question set of the $2N$-qubit EPR test \tnote{this needs to be defined somewhere}. They are of the form $X'_i$ or $Z'_j$, for $i,j\in\{1,\ldots,2N\}$, or $(V'_i,W'_j)$ for $V,W\in\{X,Z\}$ and $i\neq j \in \{1,\ldots,2N\}$. \tnote{In fact there are additional question types involved, but these are the more relevant ones} When player A is sent an EPR question, it is additionally sent the identity of player B (i.e. which prover in $\mathcal{R}_r$ it corresponds to).
-\item \emph{Pauli questions} range over the set of subsets 
-$$\{W_1(w_1),W_2(w_2),W_3(w_3)\}\,\subseteq\,\{X(a),Z(b)\,|\; a,b\in\{0,1\}^N\}$$
- of cardinality at most $3$, and such that all (at most) three Pauli operators $W_i(w_i)$ in the set mutually commute, and all strings $w_i$ have Hamming weight at most $3$.
-\item \emph{CTL-Pauli questions} range over the set $\{CX_i,CZ_j|i,j\in\{1,\ldots,N\}\}$.
+	\item $PV$: This prover plays the role of the verifier in the protocol described by $C_{N,r-1}$. 
+	\item $PP_1,\ldots,PP_{\kappa_{r-1}}$: These provers play the role of the $\kappa_{r-1}$ provers in $C_{N,r-1}$.
 \end{itemize}
-Player A is always sent an EPR question and the identity of player B. Player B is always sent a pair consisting of an EPR question and a Pauli, or CTL-Pauli question. In the test as described in Figure~\ref{fig:pauli_check} Pauli questions consist of a single Pauli operator. In fact, the Pauli question is always embedded in a triple of commuting Pauli operators of weight at most $3$, where the other two operators are chosen uniformly among pairs that mutually commute and commute with the ``real'' question. In addition, even if the test only calls for a Pauli question, an EPR question is asked and chosen at random. (For a CTL-Pauli question of the form $CX_i$ (resp. $CZ_j$), the EPR question can be any question not involving the index $i$ (resp. $n+j$).) In all cases, only the player's answer to the ``real'' question is taken into account in the verifier's decision. 
+We use the label $P$ to refer to an arbitrary prover $P\in\cH_r$. Questions to and answers from the provers are denoted  by $q_V$, $q_{P,1},\ldots,q_{P,\kappa_{r-1}}$, and $a_V$, $a_{P,1},\ldots,a_{P,\kappa_{r-1}}$, respectively, where the subscript indicates the label of the prover. Furthermore, the provers' private registers are labeled $\sP_V, \sP_{P,1},\ldots,\sP_{P,\kappa_{r-1}}$ where the subscripts have the same meaning.
 
-\paragraph{Honest Pauli Check strategy}
-An \emph{honest Pauli Check strategy} is a strategy $\mathcal{S} = (\ket{\psi},\{ M_P \})$ that satisfies the following conditions. The state $\ket{\psi}$ is a pure state on registers $\sC \sP_1 \cdots \sP_{\kappa(r)} \sR$, where $\sC = \sC_p \sC_{mip}$ is a clock register given to the $r$-th level verifier, $\sP_1 \cdots \sP_{\kappa(r)}$ are registers distributed among the provers in $\mathcal{P}_r$, and $\sR$ is a purifying register. For all provers $P \in \mathcal{P}_r$, the register $\sP_P$ is given to $P$.\footnote{Here we label the prover registers in two ways. To refer to prover $P$'s registers, we use $\sP_P$. If we are simply iterating over them, then we use an integer index such as $\sP_i$.}  For each non-ancilla prover $P \in \mathcal{R}_r$, the register $\sP_P$ includes two registers $\sB'_P \sB_P$, where $\sB'_P$ consists of $2N$ qubits and $\sB_P$ consists of $N$ qubits. The register $\sP_{PA}$ (corresponding to ancilla prover $PA$) includes registers $\{ \sA_P' \}_{P \in \mathcal{R}_r}$, where $\sA_P'$ consists of $2N$ qubits. We let $\sZ$ denote the union of the qubits in $\sP_1 \cdots \sP_{\kappa(r)}$ that are not part of $\{ \sA_P' \sB_P' \sB_P \}$. 
-\hnote{At some point we should make a picture of all the provers with all the registers.}
-\tnote{the description should be for a designated prover $P^*$; right now this is not specified correctly}
+%The subroutines all take the same input $(1^n,w,G,V,M,r)$. $w$ is a string that is used to make all random choices. $r$ is an integer that indicates a ``level'' for the verifier. It is used to parametrize a set $\mathcal{P}_r$ of $\kappa_R$ provers, each playing different roles. 
 
-The state $\ket{\psi}$ has the following form:
-\begin{equation}
-	\ket{\psi} = \frac{1}{2N+1} \sum_{ t,t' \in \set{0,\ldots,2N} } \ket{t,t'}_{\sC_p} \otimes \ket{\psi_{t,t'}}_{\sC_{mip} \sP \sR}\;,
-	\label{eq:honest-psi}
-\end{equation}
-where 
-\[
-	\ket{\psi_{0,0}}_{\sC_{mip} \sP \sR} = \Paren{ \bigotimes_{P \in \mathcal{R}_r} \ket{\Phi}_{\sA_P' \sB_P'}} \otimes \ket{\varphi_0}_{\sC_{mip} \sB_{PV} \cdots \sB_{PP_{\kappa(r-1)}} \sZ \sR}\;,
-\]
-for some state $\ket{\varphi_0}$. Here, the state $\ket{\Phi}_{\sA_P' \sB_P'}$ is a tensor product of $2N$ EPR pairs across registers $\sA_P'$ and $\sB_P'$. For $t\geq 0$ and 
-$P \in \mathcal{R}_r$, define inductively
-\begin{align}
-	\ket{\psi_{0,t+1}} =  CW_t \ket{\psi_{0,t}} \;,
-\end{align}
-and for $t' \geq 0$ define 
-\begin{align}
-	\ket{\psi_{t'+1,t}} =  W_{t'} \ket{\psi_{t',t}} \;,
-\end{align}
-where if $t$ or $t'$ is even (resp. odd), $CW_t$ or $W_{t'}$ is a controlled-$X$ or $X$ (resp. controlled-$Z$ or $Z$) gate whose control qubit is the $\sB_P'$ part of the $t$-th EPR pair of $\ket{\Phi}_{\sA_P' \sB_P'}$, and whose target qubit is the $\lceil t/2\rceil$-th qubit of $\sB_P$. 
+%The subroutines describe tests that are to be performed by the verifier in the protocol $UPC_{n,r}$. We call this the $r$-th level verifier. The tests are meant to enforce that the provers hold a history state for the simcom protocol described by $UPC_{N,r-1}$ where $N = 2^n$. 
+%that would be carried out by the $(r-1)$-th level verifier and the set of provers $\mathcal{P}_{r-1} \subseteq \mathcal{P}_r$. 
 
-\tnote{is something like this ok?}\tnote{currently the test only gives one Pauli, not two}Moreover, there are $2N$ observables $\{W_i|W\in\{X,Z\},i\in\{1,\ldots,N\}$ acting on register $\reg{B}_{P^*}$ such that the $W_i$ satisfy the Pauli (anti-)commutation relations, and moreover whenever prover $P^*$ is sent a question labeled as $(W_i,W'_j)$ for $W,W'\in\{X,Z\}$ and $i,j\in\{1,\ldots,N\}$ such that $W_i$ and $W'_j$ commute, it returns the two outcomes obtained by performing the corresponding measurements on register $\reg{B}_P$ of state $\ket{\psi}$. 
-\tnote{Here I am formulating this as if the strategy is Pauli on the whole state. Then, the soundness should say that a successful strategy is isometric to this one, \emph{on the state $\ket{\psi_{0,0}}$}, but not on on $\ket{\psi}$} 
+%The provers in the set $\mathcal{P}_r$ have the following labels and associated roles:
+%\begin{itemize}
+%	\item $PV$: This prover plays the role of the verifier in the simcom game described by $UPC_{N,r-1}$. In this first stage of the analysis, we assume $PV$ is an honest Pauli prover.
+%	\item $PP_1,\ldots,PP_{\kappa_{r-1}}$: These provers play the role of the $\kappa_{r-1}$ provers $\mathcal{P}_{r-1}$ that the $(r-1)$-th level verifier interacts with.
+%%	\item $PA$: This is an ancilla prover
+%%	\item $PA_1,\ldots,PA_{\kappa_{r-1}}$: These are ancilla provers.
+%\end{itemize}
+%We match the ancilla provers with the other provers in $\mathcal{P}_r$ in the following way: the ancilla prover corresponding to $PV$ is $PA_V$, and the ancilla prover corresponding to $PP_i$ is $PA_i$ for all $i$. 
+%We let $\mathcal{R}_r$ denote the set $\{PV,PP_1,\ldots,PP_{\kappa_{r-1}} \} \subset \mathcal{P}_r$ to denote the set of non-ancilla provers. 
+%We order the provers in $\mathcal{P}_r$ for notational convenience: $PV < PP_1 < \cdots < PP_{\kappa_{r-1}}$. 
+
+
+%In what follows, we use the standard notation $\sC,\sV_{in},\sV_{work}, \sK_1, \sE_j$, etc., to refer to registers that $UPC_{n,r}$ acts on. To refer to registers that are involved in the $(r-1)$-th level interaction as described by $UPC_{N,r-1}$, we use the hat symbol, such as $\what{\sC}$, $\what{\sV}_{in},\what{\sV}_{work}$, and $\{ \what{\sM}_i \}_i$.
+
+% we use the notation $\sC,\sV_{in},\sV_{work}$, and $\sM_i$ introduced in Section~\ref{sec:specs} to refer to registers on which the verifier in $UPC_{n,r}$ acts on. In addition, we write $\what{\sC}$, $\what{\sV}_{in},\what{\sV}_{work}$, and $\{ \what{\sM}_i \}_i$ to denote the registers that $UPC_{N,r-1}$ acts on. We let $\what{\sM}$ denote the union of $\{ \what{\sM}_i \}_i$. 
 
 
 
-\paragraph{Guarantees}
+\paragraph{Honest Pauli strategy} 
+The protocol circuit $UPC_{n,r}$ has registers $\sO \sK_1 \sK_2 \sC \sV \sM \sE_1 \sE_2$ that belong to the verifier. We will use a hat on these register labels to denote the same registers for the exponentially bigger protocol circuit $UPC_{N,r-1}$, such as $\what{\sO}$, $\what{\sV}$, $\what{\sE}_1$, etc.
 
-
-\begin{lemma}[Completeness and soundness of the Pauli Check]
-\label{lem:pauli_check}
-\leavevmode
+A strategy $\strat = (\rho,\{M_i\})$ for $\Protocol_{n,r}^H$ is an \textbf{honest Pauli strategy} if
 \begin{enumerate}
-	\item (\textbf{Completeness}) Any honest Pauli Check strategy passes the Pauli Check  with probability $1$.
-	\item (\textbf{Soundness}) For any $\eps\geq 0$ there is a $\delta = \poly[N;\eps]$ such that any strategy $\mathcal{S}$ that passes the Pauli Check with probability at least $1 - \eps$ is $\delta$-isometric to an honest Pauli Check strategy on the state $\ket{\psi_{0,0}}$ that is obtained by projecting register $\reg{C}_p$ on $\ket{0,0}$. \tnote{is this formulation ok}
+	\item The prover $PV$'s private register $\sP_V$ contains the registers $\what{\sO} \what{\sK}_1 \what{\sK}_2 \what{\sC} \what{\sV} \what{\sM} \what{\sE}_1 \what{\sE}_2$ that are identical in dimension to those in the verifier in the protocol circuit $UPC_{N,r-1}$, and
+	\item $PV$'s measurement operators are honest Pauli measurements.
 \end{enumerate}
-\end{lemma}
+Recall that the state $\rho$ is on $\alpha_r + 1$ registers: the $r$-th level verifier holds register $\sC$, and prover $P \in \cH_r$ holds register $\sP_P$.
 
-The completeness part of the lemma is shown in Lemma~\ref{lem:paulicheck-compleness}. The soundness is given in Lemma~\ref{lem:paulicheck-soundness}. 
+%that are like those in $UPC_{N,r-1}$, and furthermore its measurement operators correspond to honest Pauli measurements on these registers. 
+
+
+%
+%\subsection{Propagation Check}
+%
+%\begin{center}
+%\begin{mdframed}
+%    Input: $(T,P,\reg{C},\{g_1,\ldots,g_T\})$, where $T$ is an integer, $P$ is the label for a prover, $\reg{C}$ the label for a clock register,  $g_1,\ldots,g_T$ question symbols. 
+%	\begin{enumerate}
+%		\item (\textbf{ClockMeasurement}) Select a uniformly random integer $t\in\{1,\ldots,T\}$. Write on the measurement specification tape a description for the circuit $C_M$ that implements the following measurement on clock register $\reg{C}$: 
+%\[
+%	\{ 	\Pi^0 = \ketbra{+_t}{+_t}, 
+%	\Pi^1 = \ketbra{-_t}{-_t}, 
+%	\Pi^2 = \Id - \Pi^0 - \Pi^1 \}\;.
+%\]	
+%Let $s\in \{0,1,2\}$ denote the result of the measurement.
+%	\item (\textbf{GenQuestions}) Set $q_P = g_t$.
+%		\item (\textbf{CheckAnswers}) If $s = 2$, then accept. Otherwise, accept if and only if $a_P = s$. 
+%	\end{enumerate}    
+%\end{mdframed}
+%
+%\end{center}
+%\begin{figure}[H]
+%\caption{Propagation Check}
+%\label{fig:prop_check_0}
+%\end{figure}
+%
+%
+%
+%
+%\paragraph{Honest Propagation Check strategy} An honest Propagation Check strategy is one in which the shared state is a history state of the computation $G_T\cdots G_1$, where $G_i$ is the binary observable measured by the prover on question $g_i$. In other words, it has the following form:
+%\[
+%	\frac{1}{\sqrt{T}} \sum_{t = 0}^{T} \ket{t}_{\reg{C}} \otimes G_t\cdots G_1 \ket{\psi_0}_{\sP}\;,
+%\]
+%for some state $\ket{\psi_0}_{\sP}$.
+%
+%\begin{lemma}	
+%\label{lem:prop_check_0}
+%\leavevmode
+%\begin{enumerate}
+%\item (\textbf{Completeness}) An honest Propagation strategy passes the $\textbf{Propagation Check}$ subprotocol with probability $1$. 
+%\item (\textbf{Soundness}) Any strategy that passes the $\textbf{Propagation Check}$ subprotocol with probability at least $1 - \eps$ is $\delta$-close to an honest Propagation Check strategy, for some $\delta = \poly[N;\eps]$.
+%\end{enumerate}
+%\end{lemma}
+%
+
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%		GATE CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Gate check}
+\subsection{Gate2 check}
 \label{sec:prop_check}
 
-\tnote{I renamed this gate check because I wanted a more general ``propagation check''. But I did not edit the section}
+%\tnote{I renamed this gate check because I wanted a more general ``propagation check''. But I did not edit the section}
 
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
-    Input: $(1^n,w,r,G,V,M)$
+    Input: $(1^n,w,G,V,M,r)$
 	\begin{enumerate}
-		\item (\textsc{ClockMeasurement}) Select a uniformly random integer $t\in\{1,\ldots, \tau(N)\}$, where $N = 2^n$. Write on the measurement specification tape a description for the circuit $C_M$ that implements the following measurement, which is a tensor product of a two-outcome POVM $F$ acting on clock register $\reg{C}_p$ and a three outcome POVM $\Pi_t$ acting on clock register $\reg{C}_{mip}$: 
-\[
-	\{F^0 = \ketbra{0}{0}, F^1 = \Id - F^0 \}\;,
-\]
+		\item Select a uniformly random integer $t\in\{1,\ldots, \tau(N)\}$, where $N = 2^n$, and measure the clock register $\sC$ using the POVM 
 \[
 	\{ 	\Pi^0 = \ketbra{+_t}{+_t}, 
 	\Pi^1 = \ketbra{-_t}{-_t}, 
 	\Pi^2 = \Id - \Pi^0 - \Pi^1 \}\;.
 \]	
-Let $(p,s) \in \{0,1\} \times \{0,1,2\}$ denote the result of the six-outcome measurement $F \otimes \Pi_t$.
+Let $s \in \{0,1,2\}$ denote the result of the measurement. If $s = 2$, accept.
+%		\item (\textbf{ClockMeasurement}) Select a uniformly random integer $t\in\{1,\ldots, \tau(N)\}$, where $N = 2^n$. Write on the measurement specification tape a description for the circuit $C_M$ that implements the following measurement, which is a tensor product of a two-outcome POVM $F$ acting on clock register $\reg{C}_p$ and a three outcome POVM $\Pi_t$ acting on clock register $\reg{C}_{mip}$: 
+%\[
+%	\{F^0 = \ketbra{0}{0}, F^1 = \Id - F^0 \}\;,
+%\]
+%\[
+%	\{ 	\Pi^0 = \ketbra{+_t}{+_t}, 
+%	\Pi^1 = \ketbra{-_t}{-_t}, 
+%	\Pi^2 = \Id - \Pi^0 - \Pi^1 \}\;.
+%\]	
+%Let $(p,s) \in \{0,1\} \times \{0,1,2\}$ denote the result of the six-outcome measurement $F \otimes \Pi_t$.
 
-	\item (\textsc{GenQuestions}) Execute the GTM $G$ to compute $g = G(N,r-1,t)$. 
-	\begin{itemize}
-		\item If $g$ is a Toffoli gate or doubled Hadamard gate, then generate questions according to \textsc{Toffoli Check} or \textsc{Hadamard Check}, respectively. 
-		\item If $g$ is a prover question to prover $P$, then set $q_P = \star$.
-	\end{itemize}
-		\item (\textsc{CheckAnswers}) If $p \neq 0$, accept. If $s = 2$, then accept. Otherwise:
-		\begin{itemize}
-			\item If $g$ is a Toffoli gate or doubled Hadamard gate, check the answers according to \textsc{Toffoli Check} or \textsc{Hamadard Check}, respectively. 
-			\item If $g$ is a prover question to prover $P$, then accept only if $a_P = s$. 
-		\end{itemize}
+	\item Execute the GTM $G$ to compute $g = G(N,r-1,t)$. 
+	\item If $g$ is a Toffoli gate or doubled Hadamard gate, then run the \textbf{Toffoli Check} or \textbf{Hadamard Check} with $PV$, respectively. 
+	\item If $g$ is a prover question to prover $P$, then set $q_P = \star$. Accept only if the answer $a_P = s$.
+%	
+%	
+%	\item (\textbf{CheckAnswers}) If $s = 2$, then accept. Otherwise:
+%		\begin{itemize}
+%			\item If $g$ is a Toffoli gate or doubled Hadamard gate, check the answers according to \textbf{Toffoli Check} or \textbf{Hamadard Check}, respectively. 
+%			\item If $g$ is a prover question to prover $P$, then accept only if $a_P = s$. 
+%		\end{itemize}
 	\end{enumerate}    
 \end{mdframed}
 
@@ -248,31 +225,33 @@ Let $(p,s) \in \{0,1\} \times \{0,1,2\}$ denote the result of the six-outcome me
 \label{fig:prop_check}
 \end{figure}
 
-The procedures  \textsc{Toffoli Check} and \textsc{Hadamard Check} are taken from~\cite{ji2016compression}. For completeness, we include a description. For simplicity we give an ``operational'' description of the procedures, with the understanding that each should be broken down into three phases, as described in Figure~\ref{fig:check_structure}.
+The procedures  \textbf{Toffoli Check} and \textbf{Hadamard Check} are taken from~\cite{ji2016compression}. For completeness, we include a description. A Toffoli or doubled Hadamard gate $g$ returned by the GTM $G$ always comes together with labels for a set of qubits on which the gate acts on. These qubits refer to qubits on which the $(r-1)$-level verifier of $UPC_{N,r-1}$ acts on. 
 
-A Toffoli or doubled Hadamard gate $g$ returned by the GTM $G$ always comes together with labels for a set of qubits on which the gate acts on. These qubits refer to qubits on which the $(r-1)$-level verifier $UEVC_{N,r-1}$ acts on. In the protocol executed by the $r$-level verifier $UEVC_{n,r}$, the qubits are distributed among the provers. In the description of the tests, we refer to the ``prover holding qubit $u$'' to specify the appropriate prover. For example, if $u$ is a qubit in $\reg{V}_{r-1,in}$ then the prover is $PV$; if it is a qubit in $\reg{M}_{r-1,j}$ then the prover is $PP_j$, etc. 
+%In the protocol executed by the $r$-level verifier $UPC_{n,r}$, the qubits are distributed among the provers. In the description of the tests, we refer to the ``prover holding qubit $u$'' to specify the appropriate prover. For example, if $u$ is a qubit in $\reg{V}_{r-1,in}$ then the prover is $PV$; if it is a qubit in $\reg{M}_{r-1,j}$ then the prover is $PP_j$, etc. 
 
-In the Hadamard and Toffoli Checks, the verifier will send to each prover a pair of questions: an EPR question and a Pauli question (as done in the Pauli Check subroutine). This is because the prover should not be able to distinguish between whether it is performing the Pauli Check or the Gate Check (or any other check). Thus the ``true'' question in these tests is the Pauli question, but they will be augmented with a random EPR check question. Only the provers' answers to the Pauli questions are taken into consideration.
+%In the Hadamard and Toffoli Checks, the verifier will send to each prover a pair of questions: an EPR question and a Pauli question (as done in the Pauli Check subroutine). This is because the prover should not be able to distinguish between whether it is performing the Pauli Check or the Gate Check (or any other check). Thus the ``true'' question in these tests is the Pauli question, but they will be augmented with a random EPR check question. Only the provers' answers to the Pauli questions are taken into consideration.
 
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
     \textbf{Toffoli Check} \\
-	Input: $(1^n,w,r,s,g)$, where $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$. 
+	Input: $(1^n,w,r,s,g)$, where $g$ is a Toffoli gate acting on qubits $u_1,u_2,u_3$ of $UPC_{N,r-1}$, and $s \in \{0,1\}$. 
 	\begin{enumerate}
 		\item Sample $\alpha \in \{0,1\}$ uniformly at random, and accept if $\alpha = 1$. Otherwise, continue.
-		\item Send the questions $Z_{u_1}$, $Z_{u_2}$, and $X_{u_3}$ to the prover holding qubit $u_1$, $u_2$, and $u_3$ respectively (along with random EPR questions). Let $a_1,a_2,a_3 \in \{0,1\}$ be the three answer bits corresponding to the Pauli questions. 
+		\item Set $q_V = (Z_{u_1},Z_{u_2},X_{u_3})$. Let $a_V = (a_1,a_2,a_3)$ be the three answer bits corresponding to the Pauli questions.
+
 		\item Reject if $a_1 = a_2 = 1 \wedge s \oplus a_3 = 1$, or $a_1 a_2 = 0 \wedge s = 1$.
 		\item Accept otherwise.
 	\end{enumerate}    
     \vspace{10pt}
 \textbf{Hadamard Check} \\
-	Input: $(1^n,w,r,s,g)$, where $g$ is a double Hadamard gate acting on qubits $u_1,u_2$ of $UEVC_{N,r-1}$, and $s \in \{0,1\}$.
+	Input: $(1^n,w,r,s,g)$, where $g$ is a double Hadamard gate acting on qubits $u_1,u_2$ of $UPC_{N,r-1}$, and $s \in \{0,1\}$.
 
 	\begin{enumerate}
 		\item Sample $\alpha \in \{0,1\}$ uniformly at random.
-		\item If $\alpha = 0$, send the questions  $X_{u_1} X_{u_2}$ and $Z_{u_1} Z_{u_2}$ to the prover holding qubits $u_1$ and $u_2$ (along with random EPR questions).\footnote{We assume without loss of generality that the two qubits of a doubled Hadamard gate are held by the same prover.} Let $a_1,a_2$ be the two answer bits corresponding to the Pauli questions. Reject if $s \oplus a_1 = s \oplus a_2 = 1$, accept otherwise.
-		\item If $\alpha = 1$, send the questions $X_{u_1} Z_{u_2}$ and $Z_{u_1} X_{u_2}$ to the prover holding qubits $u_1$ and $u_2$. Let $a_1,a_2$ be the two answer bits. Reject if $s \oplus a_1 = s \oplus a_2 = 1$ and accept otherwise.
+		\item If $\alpha = 0$, set $q_V = ( X_{u_1} X_{u_2}, Z_{u_1} Z_{u_2})$. Let $a_1,a_2$ be the two answer bits corresponding to the Pauli questions. Reject if $s \oplus a_1 = s \oplus a_2 = 1$, accept otherwise.
+		
+		\item If $\alpha = 1$, set $q_V = (X_{u_1}Z_{u_2},Z_{u_1} X_{u_2})$. Let $a_1,a_2$ be the two answer bits. Reject if $s \oplus a_1 = s \oplus a_2 = 1$ and accept otherwise.
 	\end{enumerate}    
 \end{mdframed}
 
@@ -284,7 +263,7 @@ In the Hadamard and Toffoli Checks, the verifier will send to each prover a pair
 
 \begin{lemma}[Hadamard and Toffoli Check~\cite{ji2016compression}]
 \label{lem:ver_gate_check}
-	Let $\mathcal{S}$ be an honest Pauli strategy with $\rho_{\sC_{mip} \sP}$ as the shared state in \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}). Let $U$ denote a doubled Hadamard gate (resp. Toffoli gate). Then the \textsc{Hadamard Check} (resp. \textsc{Toffoli Check}) rejects with probability 
+	Let $\strat$ be an honest Pauli strategy with $\rho_{\sC \sP}$ as the shared state in \textbf{Hadamard Check} (resp. \textbf{Toffoli Check}). Let $U$ denote a doubled Hadamard gate (resp. Toffoli gate). Then the \textbf{Hadamard Check} (resp. \textbf{Toffoli Check}) rejects with probability 
 	
 	\[
 		\frac{1}{4} \Tr_{\rho} \paren{ \Id - J_t \otimes U }
@@ -296,58 +275,58 @@ In the Hadamard and Toffoli Checks, the verifier will send to each prover a pair
 %	where $\ket{-_t} = \frac{1}{\sqrt{2}} \left( \ket{t} - \ket{t+1} \right)$.
 \end{lemma}
 
-\paragraph{The high level}  At a high level, this test  proceeds as follows. The $r$-th level verifier samples a random time $t \in \{1,\ldots,\tau(N)\}$, and computes the $t$-th gate $g_t$ of $UEVC_{N,r-1}$ using the GTM $G = G_{UEVC}$. Most of the time, the gate $g_t$ is a (doubled) Hadamard or Toffoli gate that is computed by the $(r-1)$-th level verifier $UEVC_{N,r-1}$. To check the propagation of such a gate, the $r$-level verifier executes the corresponding Hamadard or Toffoli Check (see Figure~\ref{fig:toffoli_hadamard_check}) to generate the corresponding questions. %If the gate $g_t$ does not act on any of the $\{ \sM_i\}$ register of $UEVC_{N,r-1}$, then the Hadamard/Toffoli check questions are sent to prover $PV$. If $g_t$ acts partially on the $\sM_i$ register, then the questions are partially sent to $PV$, and partially sent to $PP_i$. If $g_t$ acts fully on $\sM_i$, then all the questions are sent to $PP_i$.
-In some cases the gate $g_t$ is not a gate, but rather it represents the $i$-th prover's unitary. In that case, prover $i$ is sent the question $\star$.  
+\paragraph{The high level}  At a high level, this test  proceeds as follows. The $r$-th level verifier samples a random time $t \in \{1,\ldots,\tau(N)\}$, and computes the $t$-th gate $g_t$ of $UPC_{N,r-1}$ using the GTM $G = G_{UPC}$. Most of the time, the gate $g_t$ is a (doubled) Hadamard or Toffoli gate that is computed by the $(r-1)$-th level verifier $UPC_{N,r-1}$. To check the propagation of such a gate, the $r$-level verifier executes the corresponding Hamadard or Toffoli Check (see Figure~\ref{fig:toffoli_hadamard_check}) to generate the corresponding questions. In some cases the gate $g_t$ is not a gate, but rather it represents the $i$-th prover's unitary. In that case, prover $i$ is sent the question $\star$.  
 
 Any prover who was not explicitly sent a question is sent a null question, denoted by $\bot$.
 
-\paragraph{Question types} There are two types of questions in this test: pairs of EPR and Pauli operations (the types of questions that are asked to the non-ancilla provers in the Pauli Check subroutine), and a prover reflection question $\star$.
-
+\paragraph{Question types} There are two types of questions in this test: Pauli operations and a prover reflection question $\star$.
 
 \paragraph{Honest Gate Check strategy} 
 \hnote{An honest gate check strategy is to actually leave the luggage on the jetway when they ask you to, instead of sneakily taking it on the plane with you... ahem....}
 
-For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. An honest Pauli strategy $\mathcal{S}$ is an honest Gate Check strategy if the shared state $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$, when projected onto the space where the $\sC_p$ register is all zeroes, is a history state of the computation $g_1g_2\cdots g_{\tau(N)}$. In other words, it has the following form:
+For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. An honest Pauli strategy $\strat$ is an honest Gate Check strategy if the shared state $\ket{\psi}_{\sC \sP \sR}$ is a history state of the computation $g_1g_2\cdots g_{\tau(N)}$. In other words, it has the following form:
 \[
-	\left( \ketbra{0}{0}_{\sC_p} \right) \, \ket{\psi}_{\sC_p \sC_{mip} \sP \sR} = \alpha_N \ket{0}_{\sC_p} \otimes \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}
+	\ket{\psi}_{\sC \sP \sR} = \frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC} \otimes \ket{\psi_t}_{\sP \sR}
 \]
-for some normalization $\alpha_N = 1/\poly(N)$ and where for all $t$, the state $\ket{\psi_t}_{\sP \sR}$ is defined to be $g_t \ket{\psi_{t-1}}_{\sP \sR}$ with $g_t$ being either a doubled Hadamard, a Toffoli, or a prover reflection acting on the correct registers. The state $\ket{\psi_0}$ is arbitrary. The $r$'th level verifier holds register $\sC = \sC_p \sC_{mip}$ and the provers in $\mathcal{P}_r$ jointly hold $\sP$. The register $\sP$ itself is decomposed into a tensor product of registers $\bigotimes_P \sP_P$. 
+where for all $t$, the state $\ket{\psi_t}_{\sP \sR}$ is defined to be $g_t \ket{\psi_{t-1}}_{\sP \sR}$ with $g_t$ being either a doubled Hadamard, a Toffoli, or a prover reflection acting on the correct registers. The state $\ket{\psi_0}$ is arbitrary.  %The register $\sP$ itself is decomposed into a tensor product of registers $\bigotimes_P \sP_P$. 
 
-Since $\mathcal{S}$ is an honest Pauli Check strategy, the register $\sP_P$ corresponding to a non-ancilla prover $P \in \mathcal{R}_r$ has additional structure: it includes two registers $\sB_P' \sB_P$. We will further refine the naming of these registers.
+%Since $\strat$ is an honest Pauli Check strategy, the register $\sP_P$ corresponding to a non-ancilla prover $P \in \mathcal{R}_r$ has additional structure: it includes two registers $\sB_P' \sB_P$. We will further refine the naming of these registers.
 
-The register $\sB_{PV}$ (belonging to prover $PV$) consists of $N$ qubits, and is divided into three registers $\sC_{r-1}, \sV_{r-1,in}, \sV_{r-1,work}$, each of size $N/3$ qubits \hnote{Subject to change...}. 
-For all $i$, the $\sB_{PP_i}$ register also has the name $\sM_{r-1,i}$. From this point on, we will not refer to the $\sB_P$ registers and use these new names.
+%The register $\sB_{PV}$ (belonging to prover $PV$) consists of $N$ qubits, and is divided into three registers $\sC_{r-1}, \sV_{r-1,in}, \sV_{r-1,work}$, each of size $N/3$ qubits \hnote{Subject to change...}. 
+%For all $i$, the $\sB_{PP_i}$ register also has the name $\sM_{r-1,i}$. From this point on, we will not refer to the $\sB_P$ registers and use these new names.
 
 \begin{lemma}	
 \label{lem:prop_check}
 \leavevmode
 \begin{enumerate}
-\item (\textbf{Completeness}) An honest Gate Check strategy passes the $\textsc{Gate Check}$ subprotocol with probability $1$. 
-\item (\textbf{Soundness}) All honest Pauli strategies $\mathcal{S}$ that pass the $\textsc{Gate Check}$ subprotocol with probability at least $1 - \eps$ are $\delta$-close to an honest Gate Check strategy for some $\delta = \poly[N;\eps]$.
+\item (\textbf{Completeness}) An honest Gate Check strategy passes the $\textbf{Gate check}$ subprotocol with probability $1$. 
+\item (\textbf{Soundness}) All honest Pauli strategies $\strat$ that pass the $\textbf{Gate check}$ subprotocol with probability at least $1 - \eps$ are $\delta$-close to an honest Gate Check strategy for some $\delta = \poly[N;\eps]$.
 \end{enumerate}
 \end{lemma}
 \begin{proof}
 	The completeness statement of the Theorem is straightforward. We now argue about the soundness statement. This analysis largely follows that of~\cite{ji2016compression}. 
 	
-	Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state in the honest Pauli strategy $\mathcal{S}$, and let $\rho = \ketbra{\psi}{\psi}$. By assumption, the rejection probability with $\rho$ as the shared state is at most $\eps$.
+	Let $\ket{\psi}_{\sC \sP \sR}$ denote the shared state in the honest Pauli strategy $\strat$, and let $\rho = \ketbra{\psi}{\psi}$. By assumption, the rejection probability with $\rho$ as the shared state is at most $\eps$.
 	
-	Let $\Pi = \ketbra{0}{0}_{\sC_p}$, the projection onto the all zeroes state of $\sC_p$. Since $\mathcal{S}$ is an honest Pauli strategy, we have that $\Tr_\rho (\Pi) \geq 1/\poly(N)$. Let 
-	\[
-		\rho_0 = \frac{\Pi \rho \Pi}{\Tr_\rho(\Pi)} = \frac{\Pi \ketbra{\psi}{\psi} \Pi}{\bra{\psi} \Pi \ket{\psi}}.
-	\]
-	The probability that the \textsc{Gate Check} subroutine rejects when the shared state is $\rho_0$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
+%	Let $\Pi = \ketbra{0}{0}_{\sC_p}$, the projection onto the all zeroes state of $\sC_p$. Since $\strat$ is an honest Pauli strategy, we have that $\Tr_\rho (\Pi) \geq 1/\poly(N)$. Let 
+%	\[
+%		\rho_0 = \frac{\Pi \rho \Pi}{\Tr_\rho(\Pi)} = \frac{\Pi \ketbra{\psi}{\psi} \Pi}{\bra{\psi} \Pi \ket{\psi}}.
+%	\]
+%	The probability that the \textbf{Gate Check} subroutine rejects when the shared state is $\rho_0$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
 	
-	Suppose now that the shared state in the \textsc{Gate Check} is $\rho_0$. We now give an expression for the rejection probability. For any $t \in \{0,1,\ldots,\tau(N)\}$, let $r_t$ denote the rejection probability conditioned on the verifier choosing $t$. If $g_t$ corresponds to a doubled Hadamard gate or a Toffoli gate, by Lemma~\ref{lem:ver_gate_check} the rejection probability is 
+%	Suppose now that the shared state in the \textbf{Gate Check} is $\rho_0$. 
+	
+	We give an expression for the rejection probability. For any $t \in \{0,1,\ldots,\tau(N)\}$, let $r_t$ denote the rejection probability conditioned on the verifier choosing $t$. If $g_t$ corresponds to a doubled Hadamard gate or a Toffoli gate, by Lemma~\ref{lem:ver_gate_check} the rejection probability is 
 	\[
-		r_t = \frac{1}{4} \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
+		r_t = \frac{1}{4} \Tr_{\rho} \left ( \Id - J_t \otimes g_t \right ).
 	\]
 	If $g_t$ corresponds to a prover question to prover $PP_j$, then the rejection probability is equal to
 	\[
-		r_t = \frac{1}{2} \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
+		r_t = \frac{1}{2} \Tr_{\rho} \left ( \Id - J_t \otimes g_t \right ).
 	\]
 	where we define $g_t$ to be prover $PP_j$'s reflection upon the question $\star$. The overall rejection probability satisfies
 	\[
-		\eps' \geq \E_t r_t  \geq \frac{1}{4} \E_t \Tr_{\rho_0} \left ( \Id - J_t \otimes g_t \right ).
+		\eps' \geq \E_t r_t  \geq \frac{1}{4} \E_t \Tr_{\rho} \left ( \Id - J_t \otimes g_t \right ).
 	\]	
 	In other words, we have
 	\[
@@ -355,17 +334,19 @@ For all $i$, the $\sB_{PP_i}$ register also has the name $\sM_{r-1,i}$. From thi
 	\]
 	where we define
 	\[
-		\rho' = Q^\dagger \rho_0 Q, \qquad Q = \sum_t \ketbra{t}{t}_{\sC_{mip}} \otimes g_t \cdots g_1.
+		\rho' = Q^\dagger \rho Q, \qquad Q = \sum_t \ketbra{t}{t}_{\sC_{mip}} \otimes g_t \cdots g_1.
 	\]
 Thus we have
 	\[
-		\Tr_{\rho_0} \E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right) \leq \eps'.
+		\Tr_{\rho} \E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right) \leq \eps'.
 	\]
-	For reasons that will become clear soon, we will let $H_{prop}$ denote the operator $\E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right)$. Notice that $H_{prop}$ is positive semidefinite, has smallest eigenvalue $0$ and the second smallest eigenvalue is at least $1/\poly(N)$. Using Lemma~\ref{lem:closeness_to_groundspace}, we have that $\rho_0$ is $\poly[N;\eps]$-close to a pure state $\ketbra{\theta}{\theta}$ satisfying $H_{prop} \ket{\theta} = 0$. 
+	For reasons that will become clear soon, we will let $H_{prop}$ denote the operator $\E_t  \left ( Q\ketbra{-_t}{-_t}Q^\dagger  \right)$. Notice that $H_{prop}$ is positive semidefinite, has smallest eigenvalue $0$ and the second smallest eigenvalue is at least $1/\poly(N)$. Using Lemma~\ref{lem:closeness_to_groundspace}, we have that $\rho$ is $\poly[N;\eps]$-close to a pure state $\ketbra{\theta}{\theta}$ satisfying $H_{prop} \ket{\theta} = 0$. 
 	
-	Now notice that $H_{prop}$ resembles the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$~\cite{kitaev2002classical}. Thus any state $\ket{\theta}$ in the kernel of $H_{prop}$ must be a history state $\ket{\theta}_{\sC_{mip} \sP \sR} = \frac{1}{\sqrt{\tau(N)+1}} \sum_t \ket{t}_{\sC_{mip}} \otimes \ket{\theta_t}_{\sP \sR}$ where $\ket{\theta_t} = g_t \ket{\theta_{t-1}}$.
+	Now notice that $H_{prop}$ resembles the propagation term of the Feynman-Kitaev Hamiltonian that checks the propagation of the computation $g_1 g_2 \cdots g_{\tau(N)}$~\cite{kitaev2002classical}. Thus any state $\ket{\theta}$ in the kernel of $H_{prop}$ must be a history state $\ket{\theta}_{\sC \sP \sR} = \frac{1}{\sqrt{\tau(N)+1}} \sum_t \ket{t}_{\sC} \otimes \ket{\theta_t}_{\sP \sR}$ where $\ket{\theta_t} = g_t \ket{\theta_{t-1}}$.
 	
-	We can thus construct a new honest Pauli strategy $\mathcal{S}'$ where the prover operators are the same as in $\mathcal{S}$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ (i.e. is a history state for the computation $g_1 g_2 \cdots g_{\tau(N)}$) and otherwise has the form~\eqref{eq:honest-psi}.\footnote{Such a state $\ket{\psi'}$ can be constructed by starting with $\ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ and ``propagating'' the Pauli operators as needed by the Pauli Check.} We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so $\mathcal{S}'$ is $\poly[N;\eps]$-close to $\mathcal{S}$, and furthermore $\mathcal{S}'$ is an honest Gate Check strategy. This concludes the proof. %\hnote{We will need to write what it means for two strategies to be close.}
+	This concludes the proof.
+	
+%	We can thus construct a new honest Pauli strategy $\strat'$ where the prover operators are the same as in $\strat$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ (i.e. is a history state for the computation $g_1 g_2 \cdots g_{\tau(N)}$) and otherwise has the form~\eqref{eq:honest-psi}.We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so $\strat'$ is $\poly[N;\eps]$-close to $\strat$, and furthermore $\strat'$ is an honest Gate Check strategy. This concludes the proof. %\hnote{We will need to write what it means for two strategies to be close.}
 %	The propagation term has spectral gap $1/\poly(N)$ and its zero eigenspace is exactly the space of history states of the aforementioned computation.
 	
 	%This, combined with Lemma~\ref{lem:closeness_to_groundspace}, implies that $\rho_0$ is $\poly[N;\eps]$-close to a history state of the computation $g_1g_2\cdots g_{\tau(N)}$.%\tnote{should the last implication refer to a theorem?}
@@ -374,32 +355,29 @@ Thus we have
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%		INPUT CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Input check}
+\subsection{Input2 check}
 \label{sec:input_check}
 
 
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
-    Input: $(1^n,w,r,G,V,M)$ \\
-    %\hnote{The input register to $UEVC_{N,r}$ is $\alpha N$-bits long.}
-    To hide which subroutine is being run, the verifier will send a random EPR question along with the ``real'' Pauli question. Let $E$ be a uniformly random EPR question. Only the answer corresponding to the Pauli question will be considered.\\
+    Input: $(1^n,w,G,V,M,r)$ \\
 	\begin{enumerate}
-		\item (\textsc{ClockMeasurement}) Write into the measurement specification tape the circuit $C_M$ that measures $\sC_p \sC_{mip}$ in the computational basis, with the outcome being $(t_p,t_{mip})$.
-		\item (\textsc{GenQuestions}) If $(t_p,t_{mip})$ is not $(0,0)$, then continue to the \textsc{CheckAnswers} phase. Otherwise, pick a random qubit $j \in \supp(\sV_{r-1} \setminus \{\sC_{r-1} \})$. Set $q_V = (E,Z_j)$.
-		\begin{itemize}
-			\item If $j \in \supp(\sM_{r-1,i})$, set $q_{P,i} = (E,Z_j)$.
-			\item If $j \notin \supp(\sM_{r-1,i})$, set $q_V = (E,Z_j)$.
-		\end{itemize}
+		\item Measure the $\sC$ register in the computational basis. Let $t \in \{1,\ldots,\tau(N)\}$ be the outcome. If $t \neq 0$, accept.
 		
-		\item (\textsc{CheckAnswers}) 
-		\begin{itemize}
-			\item If $(t_p,t_{mip})$ is not $(0,0)$, then accept. 
-			\item If $j \notin \supp(\sV_{r-1,in} \setminus \sM_{r-1})$ and $a_V = 0$, then accept. 
-			\item If $j \in \supp(\sV_{r-1,in})$ and $a_V$ is equal to the $j$'th bit of the string that is $(G,V,M)$ padded by $0$, then accept. 
-			\item If $j \in \supp(\sM_{r-1,i})$ and $a_{P,i} = 0$, then accept.
-			\item Otherwise, reject.
-		\end{itemize}
+		\item Pick a random register $\what{\sR} \in \{ \what{\sV}_{in}, \quad \what{\sO} \what{\sV}_{work} \what{\sM} \what{\sK}_1 \what{\sK}_2, \quad \what{\sE}_1 \what{\sE}_1', \quad \what{\sE}_2 \what{\sE}_2' \}$.
+		\begin{enumerate}
+			\item If $\what{\sR} = \what{\sV}_{in}$, then pick a random qubit index $j \in \supp(\what{\sV}_{in})$. Set $q_V = Z_j$. If $a_V$ is equal to the $j$'th bit of the string that is $(G,V,M)$ padded by $0$, then accept. Otherwise, reject.
+			\item If $\what{\sR} = \what{\sO} \what{\sV}_{work} \what{\sM} \what{\sK}_1 \what{\sK}_2$, then pick a random qubit index $j \in \supp(\what{\sR})$. Set $q_V = Z_j$. If $a_V = 0$, then accept. Otherwise, reject.
+			\item If $\what{\sR} = \what{\sE}_k \what{\sE}_k'$ for $k \in \{1,2\}$, then 
+			\begin{enumerate}
+				\item Pick a random prover index $i \in \{1,\ldots,\kappa_{r-1}\}$. 
+				\item Pick a random qubit index $j \in \supp(\what{\sE}_{k,i})$.
+				\item Pick a random $D \in \{X,Z\}$.
+				\item Set $q_V = D_{kij}$ and $q_{PP_i} = D_{kj}$. Accept if $a_V = a_{PP_i}$ and reject otherwise.
+			\end{enumerate}
+		\end{enumerate}
 	\end{enumerate}    
 \end{mdframed}
 \end{center}
@@ -408,16 +386,24 @@ Thus we have
 \label{fig:input_check}
 \end{figure}
 
-\paragraph{The high level} First, we will assume that the strategy is an honest \textsc{Gate Check} strategy (and thus an honest Pauli strategy), meaning that the provers will share a history state of the protocol between the $(r-1)$-th level verifier $UEVC_{N,r-1}$ and a number of provers. The \textsc{Input Check} subroutine will check that in the first snapshot of the history state, the prover $PV$ (which is supposed to play the role of $UEVC_{N,r-1}$) has the $\sV_{r-1,in}$ register initialized to the input $(G,V,M)$, and $\sV_{r-1,work} $ set to zeroes. Furthermore, the subroutine will check that the $PP_i$ prover has the message register $\sM_{r-1,i}$ set to all zeroes.
+\paragraph{The high level} First, we will assume that the strategy is an honest \textbf{Gate Check} strategy (and thus an honest Pauli strategy), meaning that the provers will share a history state of the protocol specified by $UPC_{N,r-1}$. The \textbf{Input Check} subroutine will check that the first snapshot of the history state is properly initialized.
+
+% the prover $PV$ (which is supposed to play the role of the verifier of $UPC_{N,r-1}$) has the $\what{\sV}_{in}$ register initialized to the input $(G,V,M)$, and $\what{\sO} \what{\sV}_{work} \what{\sM} \what{\sK}_1 \what{\sK}_2$ set to zeroes. Furthermore, the subroutine will check that the $PV$ shares the maximally entangled state with $PP_i$ in the $\what{\sE}_{1,i} \what{\sE}_{2,i}$ registers.
+
+%the $PP_i$ prover has the message register $\sM_{r-1,i}$ set to all zeroes.
+
+\paragraph{Question types} All provers are sent single qubit Pauli questions.
 
 \paragraph{Honest Input Check strategy}
-An honest Gate Check strategy $\mathcal{S}$ with shared state
+An honest Gate Check strategy $\strat$ with shared state
 \[
-	\ket{\psi}_{\sC_{mip} \sC_p \sP \sR} = \frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sC_p \sP \sR}
+	\ket{\psi}_{\sC \sP \sR} = \frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC} \otimes \ket{\psi_t}_{\sP \sR}
 \]
-is an honest Input Check strategy if the initial state $\ket{\psi_0}_{\sP \sR}$ is such that the $\sV_{r-1} \setminus \sC_{r-1} = \sV_{r-1,in}\sV_{r-1,work} \sM_{r-1}$ registers are in the state $\ket{G,V,M,0}$. In other words, the $(r-1)$-th level verifier is properly initialized.
+is an honest Input Check strategy if the initial state $\ket{\psi_0}_{\sP \sR}$ is such the
+$\what{\sV}_{in}$ register is in the state $\ket{G,V,M,0}$, the $\what{\sO} \what{\sV}_{work} \what{\sM} \what{\sK}_1 \what{\sK_2}$ registers are all zero, and $\what{\sE}_1 \what{\sE}_1' \what{\sE}_2 \what{\sE}_2'$ registers are in the state $\ket{\Phi}_{\what{\sE}_1 \what{\sE}_1'} \otimes \ket{\Phi}_{\what{\sE}_2 \what{\sE}_2'}$. Here, the $\what{\sE}_1 \what{\sE}_2$ registers are held by the $PP_i$ provers. In other words, the $UPC_{N,r-1}$ protocol circuit is properly initialized.
 
-%For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. A strategy $\mathcal{S}$ is an honest Propagation strategy if the Pauli operators are trusted and the shared state has the following form:
+Recall that the registers $\what{\sO} \what{\sK}_1 \what{\sK}_2 \cdots$ are held by the honest Pauli prover $PV$.
+%For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. A strategy $\strat$ is an honest Propagation strategy if the Pauli operators are trusted and the shared state has the following form:
 %where $\ket{\psi_t}_{\sP \sE} = g_t \ket{\psi_{t-1}}_{\sP \sE}$ with $g_t$ being either a doubled Hadamard, a Toffoli, or a prover reflection. The state $\ket{\psi_0}$ is arbitrary.
 
 
@@ -426,42 +412,43 @@ is an honest Input Check strategy if the initial state $\ket{\psi_0}_{\sP \sR}$ 
 \label{lem:input_check}
 \leavevmode
 \begin{enumerate}
-	\item (\textbf{Completeness}) An honest Input Check strategy passes the $\textsc{Input Check}$ subprotocol with probability $1$. 
-	\item (\textbf{Soundness}) All honest Gate Check strategies $\mathcal{S}$ that pass the $\textsc{Input Check}$ subprotocol with probability at least $1 - \eps$ are $\poly[N;\eps]$-close to the honest Input Check strategy.
+	\item (\textbf{Completeness}) An honest Input Check strategy passes the $\textbf{Input Check}$ subprotocol with probability $1$. 
+	\item (\textbf{Soundness}) There exists a $\delta = \poly[N;\eps]$ such that all honest Gate Check strategies $\strat$ that pass the $\textbf{Input Check}$ subprotocol with probability at least $1 - \eps$ are $\delta$-isometric to the honest Input Check strategy.
 \end{enumerate}
 \end{lemma}
 \begin{proof}
 The completeness statement of the Theorem is straightforward. We now argue about the soundness statement.
 
-Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state. Let $\rho = \ketbra{\psi}{\psi}$. Since the strategy $\mathcal{S}$ is an honest Gate Check strategy (and therefore an honest Pauli Check strategy), we have that
-\begin{enumerate}
-	\item $\Tr_\rho \left ( \ketbra{0}{0}_{\sC_p} \right) \geq 1/\poly(N)$
-	\item $	\left( \ketbra{0}{0}_{\sC_p} \right) \, \ket{\psi}_{\sC_p \sC_{mip} \sP \sR} = \alpha_N \sum_{t = 0}^{\tau(N)} \ket{0}_{\sC_p} \otimes \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}$ for some $\alpha_N = 1/\poly(N)$.
-\end{enumerate}
-Let $\Pi = \ketbra{0,0}{0,0}_{\sC_p \sC_{mip}}$. These two items imply that $\Tr_\rho (\Pi) \geq 1/\poly(N)$. Let 
+Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state. Let $\rho = \ketbra{\psi}{\psi}$. Since the strategy $\strat$ is an honest Gate Check strategy (and therefore an honest Pauli Check strategy), we have that
 \[
-	\rho_{00} = \frac{\Pi \rho \Pi}{\Tr_\rho (\Pi)} = \ketbra{0,0}{0,0}_{\sC} \otimes \ketbra{\psi_0}{\psi_0}_{\sP \sR}.
+\ket{\psi}_{\sC\sP \sR} = \frac{1}{\sqrt{\tau(N)+1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC} \otimes \ket{\psi_t}_{\sP \sR}
 \]
-The probability that \textsc{Input Check} rejects when the shared state is $\rho_{00}$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
+Let $\Pi = \ketbra{0}{0}_{\sC}$. These two items imply that $\Tr_\rho (\Pi) \geq 1/\poly(N)$. Let 
+\[
+	\rho_{0} = \frac{\Pi \rho \Pi}{\Tr_\rho (\Pi)} = \ketbra{0}{0}_{\sC} \otimes \ketbra{\psi_0}{\psi_0}_{\sP \sR}.
+\]
+The probability that \textbf{Input Check} rejects when the shared state is $\rho_{0}$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
 
-Suppose now that the shared state in \textsc{Input Check} is $\rho_{00}$. Let $\sX = \sV_{r-1} \setminus \sC_{r-1}$ (i.e. all the qubits of $\sV_{r-1}$ except those in $\sC_{r-1}$) and $\sY = \sP \sR \setminus \sX$ (i.e. all the qubits of $\sP \sR$ except those in $\sX$). Consider an ordering of the qubits in the registers $\sX$  so that $\sV_{r-1,in}$ goes first, followed by the rest of the registers. Let $x$ denote the string of length $|\sV_{r-1,in}|$ that is $(G,V,M)$ padded with zeroes. The probability of rejection is then
-	\begin{equation}
-		\Tr_{\rho_{00}} ( H_{init} ) \leq \eps'
-		\label{eq:init}
-	\end{equation}
-	where we define 
-	\[
-		H_{init} = \frac{1}{\left | \sX \right|} \left ( \sum_{i \in \sV_{r-1,in}} \ketbra{\overline{x}_i}{\overline{x}_i}_i +  \sum_{i \notin \sV_{r-1,in}} \ketbra{1}{1}_i \right)
-	\] 
-	where the first sum is over all the qubits in $\sV_{r-1,in}$ and the second sum is over all qubits in $\sX \setminus \sV_{r-1,in}$. We use $\overline{x}_i$ to denote the complement of the bit $x_i$. The subscripts on a projector (such as $\ketbra{1}{1}_i$) indicates which qubit it acts on. We use $|\sX|$ to denote the number of qubits in $\sX$. 
-	
-	Notice that $H_{init}$ resembles the term of the Feynman-Kitaev Hamiltonian that checks if the history state is initialized correctly. The unique eigenvector of eigenvalue $0$ of $H_{init}$ (on the register $\sA$) is the state $\ket{G,V,M,0}$. The inequality in~\eqref{eq:init} and Lemma~\ref{lem:closeness_to_groundspace} implies that
-	\[
-		\Norm{ \ket{\psi_0}_{\sP \sR} - \ket{G,V,M,0}_{\sX} \otimes \ket{\theta}_{\sY} }^2 \leq \poly[N;\eps]
-	\]
-	for some state $\ket{\theta}_{\sY}$.
-	
-	Thus we can construct a new honest Gate strategy $\mathcal{S}'$ where the prover operators are the same as in $\mathcal{S}$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0,0}_{\sC} \otimes \ket{G,V,M,0}_{\sX} \otimes \ket{\theta}_{\sY}$, and otherwise has the form of an honest Gate strategy. We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so therefore $\mathcal{S}'$ is $\poly[N;\eps]$-close to $\mathcal{S}$, and furthermore $\mathcal{S}'$ is an honest Input Check strategy. This concludes the proof.
+Suppose now that the shared state in \textbf{Input Check} is $\rho_{0}$. \hnote{Need to update this proof...}
+
+%Let $\sX = \sV_{r-1} \setminus \sC_{r-1}$ (i.e. all the qubits of $\sV_{r-1}$ except those in $\sC_{r-1}$) and $\sY = \sP \sR \setminus \sX$ (i.e. all the qubits of $\sP \sR$ except those in $\sX$). Consider an ordering of the qubits in the registers $\sX$  so that $\sV_{r-1,in}$ goes first, followed by the rest of the registers. Let $x$ denote the string of length $|\sV_{r-1,in}|$ that is $(G,V,M)$ padded with zeroes. The probability of rejection is then
+%	\begin{equation}
+%		\Tr_{\rho_{00}} ( H_{init} ) \leq \eps'
+%		\label{eq:init}
+%	\end{equation}
+%	where we define 
+%	\[
+%		H_{init} = \frac{1}{\left | \sX \right|} \left ( \sum_{i \in \sV_{r-1,in}} \ketbra{\overline{x}_i}{\overline{x}_i}_i +  \sum_{i \notin \sV_{r-1,in}} \ketbra{1}{1}_i \right)
+%	\] 
+%	where the first sum is over all the qubits in $\sV_{r-1,in}$ and the second sum is over all qubits in $\sX \setminus \sV_{r-1,in}$. We use $\overline{x}_i$ to denote the complement of the bit $x_i$. The subscripts on a projector (such as $\ketbra{1}{1}_i$) indicates which qubit it acts on. We use $|\sX|$ to denote the number of qubits in $\sX$. 
+%	
+%	Notice that $H_{init}$ resembles the term of the Feynman-Kitaev Hamiltonian that checks if the history state is initialized correctly. The unique eigenvector of eigenvalue $0$ of $H_{init}$ (on the register $\sA$) is the state $\ket{G,V,M,0}$. The inequality in~\eqref{eq:init} and Lemma~\ref{lem:closeness_to_groundspace} implies that
+%	\[
+%		\Norm{ \ket{\psi_0}_{\sP \sR} - \ket{G,V,M,0}_{\sX} \otimes \ket{\theta}_{\sY} }^2 \leq \poly[N;\eps]
+%	\]
+%	for some state $\ket{\theta}_{\sY}$.
+%	
+%	Thus we can construct a new honest Gate strategy $\strat'$ where the prover operators are the same as in $\strat$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0,0}_{\sC} \otimes \ket{G,V,M,0}_{\sX} \otimes \ket{\theta}_{\sY}$, and otherwise has the form of an honest Gate strategy. We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so therefore $\strat'$ is $\poly[N;\eps]$-close to $\strat$, and furthermore $\strat'$ is an honest Input Check strategy. This concludes the proof.
 	
 %	$\Big( \rho_{00} \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ is $\poly(N) \eps'$-close to $\ketbra{G,V,M,0}{G,V,M,0}$. This finishes the proof.
 
@@ -471,20 +458,24 @@ Suppose now that the shared state in \textsc{Input Check} is $\rho_{00}$. Let $\
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%		OUTPUT CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Output check}
+\subsection{Output2 check}
 \label{sec:output_check}
 
 
 \vspace{10pt}
 \begin{center}
 \begin{mdframed}
-    Input: $(1^n,w,r,G,V,M)$ \\
-To hide which subroutine is being run, the verifier will send a random EPR question along with the ``real'' Pauli question. Let $E$ be a uniformly random EPR question. Only the answer corresponding to the Pauli question will be considered.\\
-	\begin{enumerate}
-		\item (\textsc{ClockMeasurement}) Write into the measurement specification tape the circuit $C_M$ that measures $\sC_p \sC_{mip}$ in the computational basis, with the outcome being $(t_p,t_{mip})$.
+    Input: $(1^n,w,G,V,M,r)$
+    \begin{enumerate}
+		\item Measure the $\sC$ register in the computational basis. Let $t \in \{1,\ldots,\tau(N)\}$ be the outcome. If $t \neq \tau(N)$, accept.
 		
-		\item (\textsc{GenQuestions}) If $(t_p,t_{mip})$ is not $(0,\tau(N))$, then continue to the \textsc{CheckAnswers} phase. Set $q_V = (E,Z_j)$ where $j$ denotes the index of the first qubit of $\sV_{r-1,work}$.
-		\item (\textsc{CheckAnswers}) If $(t_p,t_{mip})$ is not $(0,\tau(N))$, then accept. If $a_V = 1$, then accept. Otherwise, reject.
+		\item Let $j_O$ and $j_{out}$ be the indices of the qubits of the $\what{\sO}$ and $\what{\sV}_{out}$ registers, respectively. For $i \in \{1,\ldots,\kappa_{r-1}\}$, let $j_{i,1},\ldots,j_{i,h}$ denote the indices of the qubits in the $\what{\sK}_{2,i}$ register. 
+		\item Set $q_V = (Z_{j_O},Z_{j_{out}},Z_{j_{1,1}},\ldots,Z_{j_{\kappa_{r-1},h}})$. In other words, ask $PV$ to measure its registers $\what{\sO} \what{\sV}_{out} \what{\sK}_2$ in the computational basis. 
+		\item For $i \in \{1,\ldots,\kappa_{r-1}\}$, set $q_{PP_i} = \Diamondblack$. 
+		\item Let $a_V = (o,b,k_1,\ldots,k_{\kappa_{r-1}})$ where $k_i \in \{0,1\}^{2\log |\cA_i|}$. Let $a_{PP_i} = k_i'$. 
+		\item If $o = 0$, then accept.
+		\item If there exists an $i$ such that $k_i \neq k_i'$, then accept.
+		\item If $b = 1$, then accept. Otherwise, reject. 
 	\end{enumerate}    
 \end{mdframed}
 \end{center}
@@ -494,47 +485,75 @@ To hide which subroutine is being run, the verifier will send a random EPR quest
 \end{figure}
 
 
-\paragraph{The high level} The \textsc{Output Check} checks that the last snapshot $\ket{\psi_{\tau(N)}}$ of the history state has the output qubit (the first qubit of the workspace register) set to $1$ (or close to it). To do so, the subroutine will command the prover $PV$ to measure  qubit $\supp(\sV_{r-1,work})_1$ in the computation basis. 
+\paragraph{The high level} The \textbf{Output Check} checks that the last snapshot $\ket{\psi_{\tau(N)}}$ of the history state represents an accepting configuration of the simcom game $UPC_{N,r-1}$. 
+%the output qubit (the first qubit of the workspace register) set to $1$ (or close to it). To do so, the subroutine will command the prover $PV$ to measure  qubit $\supp(\sV_{r-1,work})_1$ in the computation basis. 
 
 % post-selects on the clock register $\sR$ in reading the last time $\tau(N)$ of the circuit, and the verifier will ask prover $1$ to measure its first qubit in the computational basis, which should correspond to the output bit of the history state. 
 
-%\paragraph{Honest strategy} 
+\paragraph{Question types} 
+The honest Pauli prover $PV$ is sent multi-qubit Pauli questions. The provers $PP_i$ are all sent the question $\Diamondblack$, wherein they are supposed to produce teleportation keys.
 
 \begin{lemma}	
 \label{lem:output_check}
-Let $\omega_{N,r-1}$ denote the maximum acceptance probability of the protocol that is executed by the verifier $UEVC_{N,r-1}$ on input $(G_{UEVC},V_{NV},M)$. 
+Let $\omega_{N,r-1}^{SC}$ denote the maximum acceptance probability of the simcom game that is executed by the verifier $UPC_{N,r-1}$ on input $(G_{UPC},V_{NV},M)$. 
 \begin{enumerate}
-	\item (\textbf{Completeness}) If $\omega_{N,r-1} = 1$, then there exists an honest Input Check strategy that passes the Output Check protocol with probability $1$.
+	\item (\textbf{Completeness}) If $\omega_{N,r-1}^{SC} = 1$, then there exists an honest Input Check strategy that passes the Output Check protocol with probability $1$.
 	
 	\item (\textbf{Soundness}) All honest Input Check strategies pass the Output Chek subprotocol with probability at most 
 \[
-	1 - \frac{1 - \omega_{N,r-1}}{\poly(N)}.
+	1 - \frac{1 - \omega_{N,r-1}^{SC}}{\poly(N)}.
 \] 
 \end{enumerate}
 \end{lemma}
 \begin{proof}
 The Completeness part of the Theorem statement follows from the fact that one can construct an honest Input Check strategy that corresponds to provers using the perfect strategy that achieves $\omega_{N,r-1} = 1$.
 
-We now argue the Soundness part of the Theorem statement. Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state. Let the rejection probability with this shared state be $\eps$. Since the strategy is an honest Input Check strategy, the shared state (when conditioned on $\sC_p$ register being zero) is a history state of the protocol executed by the verifier $UEVC_{N,r-1}$ with a number of provers,
-\[
-\frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}
-\]
-with the initial snapshot state $\ket{\psi_0}$ being properly initialized to $\ket{G,V,M,0}$ in the $\sV_{r-1} \setminus \{ \sC_{r-1} \}$ registers. Note that the probability of rejection in the protocol described by the history state is 
-\[
-	\Tr \left ( \ketbra{0}{0}_{out} \, \ketbra{\psi_{\tau(N)}}{\psi_{\tau(N)}} \right) \geq 1 - \omega_{N,r-1}.
-\]
-where $\ketbra{0}{0}_{out}$ is the projector onto the state $\ket{0}$ of the first qubit of the workspace register.
-
-Let $\rho = \ketbra{\psi}{\psi}$. Let $\Pi = \ketbra{0}{0}_{\sC_p} \otimes \ketbra{\tau(N)}{\tau(N)}_{\sC_{mip}}$. We have that $\Tr_\rho (\Pi) \geq 1/\poly(N)$. Let
-\[
-\rho_0 = \frac{\Pi \rho \Pi}{\Tr_\rho (\Pi)} = \ketbra{0,\tau(N)}{0,\tau(N)}_{\sC} \otimes \ketbra{\psi_{\tau(N)}}{\psi_{\tau(N)}}.
-\]
-The probability that \textsc{Output Check} rejects when the shared state $\rho_0$ is at most $\eps' = \poly(N) \eps$. The rejection probability when the shared state is $\rho_0$ can also be written as $\Tr \left ( \ketbra{0}{0}_{out} \, \ketbra{\psi_{\tau(N)}}{\psi_{\tau(N)}} \right)$, which is at least $1 - \omega_{N,r-1}$. This implies that
-\[
-	\eps \geq \frac{1 - \omega_{N,r-1}}{\poly(N)}
-\]
-
+We now argue the Soundness part of the Theorem statement. Let $\ket{\psi}_{\sC \sP \sR}$ denote the shared state. Let the rejection probability with this shared state be $\eps$. 
+\hnote{Update...}
 
 \end{proof}
+
+
+
+%Since the strategy is an honest Input Check strategy, the shared state (when conditioned on $\sC_p$ register being zero) is a history state of the protocol executed by the verifier $UPC_{N,r-1}$ with a number of provers,
+%\[
+%\frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}
+%\]
+%with the initial snapshot state $\ket{\psi_0}$ being properly initialized to $\ket{G,V,M,0}$ in the $\sV_{r-1} \setminus \{ \sC_{r-1} \}$ registers. Note that the probability of rejection in the protocol described by the history state is 
+%\[
+%	\Tr \left ( \ketbra{0}{0}_{out} \, \ketbra{\psi_{\tau(N)}}{\psi_{\tau(N)}} \right) \geq 1 - \omega_{N,r-1}.
+%\]
+%where $\ketbra{0}{0}_{out}$ is the projector onto the state $\ket{0}$ of the first qubit of the workspace register.
+%
+%Let $\rho = \ketbra{\psi}{\psi}$. Let $\Pi = \ketbra{0}{0}_{\sC_p} \otimes \ketbra{\tau(N)}{\tau(N)}_{\sC_{mip}}$. We have that $\Tr_\rho (\Pi) \geq 1/\poly(N)$. Let
+%\[
+%\rho_0 = \frac{\Pi \rho \Pi}{\Tr_\rho (\Pi)} = \ketbra{0,\tau(N)}{0,\tau(N)}_{\sC} \otimes \ketbra{\psi_{\tau(N)}}{\psi_{\tau(N)}}.
+%\]
+%The probability that \textbf{Output Check} rejects when the shared state $\rho_0$ is at most $\eps' = \poly(N) \eps$. The rejection probability when the shared state is $\rho_0$ can also be written as $\Tr \left ( \ketbra{0}{0}_{out} \, \ketbra{\psi_{\tau(N)}}{\psi_{\tau(N)}} \right)$, which is at least $1 - \omega_{N,r-1}$. This implies that
+%\[
+%	\eps \geq \frac{1 - \omega_{N,r-1}}{\poly(N)}
+%\]
+
+
+\subsection{Concluding the first stage}
+
+We conclude the first stage of the analysis by putting together Lemmas~\ref{lem:prop_check},~\ref{lem:input_check}, and~\ref{lem:output_check} to show the following:
+
+\begin{lemma}
+\label{lem:first_stage}
+Let $\omega_{N,r-1}^{SC}$ denote the maximum acceptance probability of the simcom game that is executed by the verifier $UPC_{N,r-1}$ on input $(G_{UPC},V_{NV},M)$. 
+\begin{enumerate}
+	\item (\textbf{Completeness}) If $\omega_{N,r-1}^{SC} = 1$, then there exists an honest Pauli strategy $\strat$ such that $\omega^{*}_\strat(\Protocol^H_{n,r}) = 1$.
+	
+	\item (\textbf{Soundness}) For all honest Pauli strategies, 
+\[
+	\omega^{*}_\strat(\Protocol^H_{n,r}) \leq 1 - \frac{1 - \omega_{N,r-1}^{SC}}{\poly(N)}.
+\] 
+\end{enumerate}
+\end{lemma}
+
+
+
+
 
 

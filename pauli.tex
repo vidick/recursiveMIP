@@ -1,6 +1,121 @@
 \section{Analysis of the Pauli check}
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%		PAULI CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Pauli check}
+\label{sec:pauli_check}
+
+The \textsc{Pauli Check} subroutine describes an interaction between the $r$-th level verifier and the provers $\mathcal{P}_r$. In the subroutine, the verifier interacts with two players, taken from the set $\mathcal{P}_r$. The first player is always $PA$, and called ``player A'' in the subroutine. The second player is always prover $PV$, and called ``player B''. For the rest of the subroutine, the verifier will only interact with players A and B. 
+\hnote{The Pauli Check is only performed between $PA$ and $PV$ now, because we're dealing with simcom games.}
+
+%Note that player A is always told which prover plays the role of player B.  
+%provers $PA_1$ and $PV$. In the description of the check we refer to the former as ``player A'' and to the latter as ``player B''. 
+
+In the subroutine, the verifier performs one of several tests, chosen uniformly at random. The tests are summarized in Figure~\ref{fig:pauli_check} in an ``operational'' language. Formally, each test should be put in the form of actions for the VTM, following the template introduced in Figure~\ref{fig:check_structure}. 
+
+\vspace{10pt}
+\begin{center}
+\begin{mdframed}
+    Input: $(1^n,w,r,G,V,M)$ \\
+    \\
+	Let player A denote prover $PA$.
+    Choose a random prover $P^*$ from the set of non-ancilla provers $\mathcal{R}_r$, and let player B denote prover $P^*$. Send player A the label $P^*$. \\
+    \\
+    Perform one of the tests uniformly at random. Each test should be interpreted as a three-phase procedure, as described in Figure~\ref{fig:check_structure}. The \textsc{ClockMeasurement} phase involves a measurement on the clock register $\reg{C}_p$ of dimension $2(N+1)(\kappa(r-1)+1)$, with computational basis labeled by 
+    \[
+    (t,t')\in \{0,\ldots,2N\} \times \{0,\ldots,2N\}\; .
+    \]
+    
+	\begin{enumerate}
+
+\item \emph{(Propagation check)} Let $\reg{C}_{p,1}$ and $\reg{C}_{p,2}$ denote the two registers of $\reg{C}_p$. Execute each of the following with equal probability:
+\begin{enumerate}
+\item Measure register $\reg{C}_{p,2}$ to obtain an outcome $t'\in\{0,\ldots,2N\}$. If $t'\neq 0$ then accept. Otherwise, execute $\prop(2N,\reg{C}_{p,1},\{CW_1,\ldots,CW_{2N}\})$ between the verifier and B.
+\item Execute $\prop(2N,\reg{C}_{p,2},\{W_1,\ldots,W_{2N}\})$ between the verifier and B.
+\end{enumerate}
+
+ \item \emph{(EPR test)} Measure the first register of $\reg{C}_{p}$ in the computational basis to obtain an outcome $t\in\{0,\ldots,2N\}$. 
+%Select $t'\in\{1,\ldots,2N\}$ uniformly at random. Measure the second register of $\reg{C}_{p}$ using a basis containing $\{\ket{+_{0,t'}},\ket{-_{0,t'}}\}$. Accept if neither of these two outcomes is obtained. 
+Generate questions $(q_A,q_B)$ as in the $2N$-qubit EPR test with A and B. Send $q_A$ to Alice, and $q_B$ to B. Accept if $t\neq 0$ or if the Pauli question to B is of the form $CW_t$. Otherwise, accept if and only if the answers to the EPR questions are valid.
+%\tnote{Intended goal: Checks that whenever A or B is sent an EPR question, it applies the corresponding Pauli observable, independently of any other question asked. A consequence of this test and the form of questions to player B is that we can write the observables it applies as a product of an observable for the EPR question, and an observable for the Pauli question, where each observable only depends on the corresponding question (and not on the pair of questions).}
+
+\item \emph{(CTL check)} Measure the first register of $\reg{C}_{p}$ in a basis containing $\{\ket{+_t},\ket{-_t}\}$ to obtain an outcome $c$ where $c\in\{0,1,2\}$. If $c=2$ then accept. Send player A the EPR question $X_{t}$, and send player $B$ the Pauli question $W_t$. Accept if and only if, either A's answer is $0$ and $c=1$, or A's answer is $1$ and $c$ matches B's answer to the Pauli question. %If $t'>0$, accept if $t\neq t'$. Send player A the EPR question $X_t$ and accept if the answer is not $1$. Send player B the Pauli question $W'_t$ and accept if and only if the outcome matches $c$.
+
+\item{\emph{(Pauli relation check)}} Measure both  registers of $\reg{C}_p$  in the computational basis to obtain outcomes $t,t'\in\{0,\ldots,2N\}$. Accept if $(t,t')\neq (2N,0)$. Select $u\in\{1,\ldots,N\}$ uniformly at random. Send A the EPR question $X_u$, and B the EPR question $Z_u$. Do either of the following with equal probability:
+\begin{enumerate}
+\item Send B the Pauli question $W_{2u}$. Accept if and only if the product of the players' three answers is $1$.
+\item Send B the Pauli question $W_{2u-1}$. Accept if and only if A's answer to the EPR question matches B's answer to the Pauli question. 
+\end{enumerate}  
+\end{enumerate}  
+\end{mdframed}
+\end{center}
+\begin{figure}[H]
+\caption{Pauli Check}
+\label{fig:pauli_check}
+\end{figure}
+
+
+\paragraph{Question types}
+There are three types of questions: ``EPR questions'', ``Pauli questions'' and ``CTL-Pauli questions''. 
+\begin{itemize}
+\item \emph{EPR questions} range over the question set of the $2N$-qubit EPR test \tnote{this needs to be defined somewhere}. They are of the form $X'_i$ or $Z'_j$, for $i,j\in\{1,\ldots,2N\}$, or $(V'_i,W'_j)$ for $V,W\in\{X,Z\}$ and $i\neq j \in \{1,\ldots,2N\}$. \tnote{In fact there are additional question types involved, but these are the more relevant ones} When player A is sent an EPR question, it is additionally sent the identity of player B (i.e. which prover in $\mathcal{R}_r$ it corresponds to).
+\item \emph{Pauli questions} range over the set of subsets 
+$$\{W_1(w_1),W_2(w_2),W_3(w_3)\}\,\subseteq\,\{X(a),Z(b)\,|\; a,b\in\{0,1\}^N\}$$
+ of cardinality at most $3$, and such that all (at most) three Pauli operators $W_i(w_i)$ in the set mutually commute, and all strings $w_i$ have Hamming weight at most $3$.
+\item \emph{CTL-Pauli questions} range over the set $\{CX_i,CZ_j|i,j\in\{1,\ldots,N\}\}$.
+\end{itemize}
+Player A is always sent an EPR question and the identity of player B. Player B is always sent a pair consisting of an EPR question and a Pauli, or CTL-Pauli question. In the test as described in Figure~\ref{fig:pauli_check} Pauli questions consist of a single Pauli operator. In fact, the Pauli question is always embedded in a triple of commuting Pauli operators of weight at most $3$, where the other two operators are chosen uniformly among pairs that mutually commute and commute with the ``real'' question. In addition, even if the test only calls for a Pauli question, an EPR question is asked and chosen at random. (For a CTL-Pauli question of the form $CX_i$ (resp. $CZ_j$), the EPR question can be any question not involving the index $i$ (resp. $n+j$).) In all cases, only the player's answer to the ``real'' question is taken into account in the verifier's decision. 
+
+\paragraph{Honest Pauli Check strategy}
+An \emph{honest Pauli Check strategy} is a strategy $\mathcal{S} = (\ket{\psi},\{ M_P \})$ that satisfies the following conditions. The state $\ket{\psi}$ is a pure state on registers $\sC \sP_1 \cdots \sP_{\kappa(r)} \sR$, where $\sC = \sC_p \sC_{mip}$ is a clock register given to the $r$-th level verifier, $\sP_1 \cdots \sP_{\kappa(r)}$ are registers distributed among the provers in $\mathcal{P}_r$, and $\sR$ is a purifying register. For all provers $P \in \mathcal{P}_r$, the register $\sP_P$ is given to $P$.\footnote{Here we label the prover registers in two ways. To refer to prover $P$'s registers, we use $\sP_P$. If we are simply iterating over them, then we use an integer index such as $\sP_i$.}  For each non-ancilla prover $P \in \mathcal{R}_r$, the register $\sP_P$ includes two registers $\sB'_P \sB_P$, where $\sB'_P$ consists of $2N$ qubits and $\sB_P$ consists of $N$ qubits. The register $\sP_{PA}$ (corresponding to ancilla prover $PA$) includes registers $\{ \sA_P' \}_{P \in \mathcal{R}_r}$, where $\sA_P'$ consists of $2N$ qubits. We let $\sZ$ denote the union of the qubits in $\sP_1 \cdots \sP_{\kappa(r)}$ that are not part of $\{ \sA_P' \sB_P' \sB_P \}$. 
+\hnote{At some point we should make a picture of all the provers with all the registers.}
+\tnote{the description should be for a designated prover $P^*$; right now this is not specified correctly}
+
+The state $\ket{\psi}$ has the following form:
+\begin{equation}
+	\ket{\psi} = \frac{1}{2N+1} \sum_{ t,t' \in \set{0,\ldots,2N} } \ket{t,t'}_{\sC_p} \otimes \ket{\psi_{t,t'}}_{\sC_{mip} \sP \sR}\;,
+	\label{eq:honest-psi}
+\end{equation}
+where 
+\[
+	\ket{\psi_{0,0}}_{\sC_{mip} \sP \sR} = \Paren{ \bigotimes_{P \in \mathcal{R}_r} \ket{\Phi}_{\sA_P' \sB_P'}} \otimes \ket{\varphi_0}_{\sC_{mip} \sB_{PV} \cdots \sB_{PP_{\kappa(r-1)}} \sZ \sR}\;,
+\]
+for some state $\ket{\varphi_0}$. Here, the state $\ket{\Phi}_{\sA_P' \sB_P'}$ is a tensor product of $2N$ EPR pairs across registers $\sA_P'$ and $\sB_P'$. For $t\geq 0$ and 
+$P \in \mathcal{R}_r$, define inductively
+\begin{align}
+	\ket{\psi_{0,t+1}} =  CW_t \ket{\psi_{0,t}} \;,
+\end{align}
+and for $t' \geq 0$ define 
+\begin{align}
+	\ket{\psi_{t'+1,t}} =  W_{t'} \ket{\psi_{t',t}} \;,
+\end{align}
+where if $t$ or $t'$ is even (resp. odd), $CW_t$ or $W_{t'}$ is a controlled-$X$ or $X$ (resp. controlled-$Z$ or $Z$) gate whose control qubit is the $\sB_P'$ part of the $t$-th EPR pair of $\ket{\Phi}_{\sA_P' \sB_P'}$, and whose target qubit is the $\lceil t/2\rceil$-th qubit of $\sB_P$. 
+
+\tnote{is something like this ok?}\tnote{currently the test only gives one Pauli, not two}Moreover, there are $2N$ observables $\{W_i|W\in\{X,Z\},i\in\{1,\ldots,N\}$ acting on register $\reg{B}_{P^*}$ such that the $W_i$ satisfy the Pauli (anti-)commutation relations, and moreover whenever prover $P^*$ is sent a question labeled as $(W_i,W'_j)$ for $W,W'\in\{X,Z\}$ and $i,j\in\{1,\ldots,N\}$ such that $W_i$ and $W'_j$ commute, it returns the two outcomes obtained by performing the corresponding measurements on register $\reg{B}_P$ of state $\ket{\psi}$. 
+\tnote{Here I am formulating this as if the strategy is Pauli on the whole state. Then, the soundness should say that a successful strategy is isometric to this one, \emph{on the state $\ket{\psi_{0,0}}$}, but not on on $\ket{\psi}$} 
+
+
+
+\paragraph{Guarantees}
+
+
+\begin{lemma}[Completeness and soundness of the Pauli Check]
+\label{lem:pauli_check}
+\leavevmode
+\begin{enumerate}
+	\item (\textbf{Completeness}) Any honest Pauli Check strategy passes the Pauli Check  with probability $1$.
+	\item (\textbf{Soundness}) For any $\eps\geq 0$ there is a $\delta = \poly[N;\eps]$ such that any strategy $\mathcal{S}$ that passes the Pauli Check with probability at least $1 - \eps$ is $\delta$-isometric to an honest Pauli Check strategy on the state $\ket{\psi_{0,0}}$ that is obtained by projecting register $\reg{C}_p$ on $\ket{0,0}$. \tnote{is this formulation ok}
+\end{enumerate}
+\end{lemma}
+
+The completeness part of the lemma is shown in Lemma~\ref{lem:paulicheck-compleness}. The soundness is given in Lemma~\ref{lem:paulicheck-soundness}. 
+
+
+
+
+
 \subsection{The EPR test}
 
 Let $k\geq 4$ be an integer. 

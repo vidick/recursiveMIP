@@ -14,60 +14,68 @@ Furthermore, $A$ runs in time $\poly(n) + \poly\log(R)$.
 
 Here, $\kappa(R) = 2R$. \hnote{Subject to change.} The main idea is to carefully compose the $\MIPstar$ compression scheme of~\cite{ji2016compression} $R$ times, each time shrinking the completeness-soundness gap by an exponential. 
 
-\subsection{Turing machines types}
 
-\paragraph{Gate Turing Machine (GTM)} A Turing machine $G$ is a Gate Turing Machine (GTM) for a family of circuits $\{C_{n,r}\}$ if $G$ takes as input $n$ (an integer in binary), $r$ (another integer in binary), and $t$ (an integer $1\leq t\leq n$ written in binary), and in $\poly(\log n)$ time outputs the description of the $t$-th gate of $C_{n,r}$. 
-
-We let $CKT(G,1^n,r)$ denote the circuit $C_{n,r}$ whose gates are computed by $G$ on input $(n,r,t)$.
-
-\paragraph{Verifier TM (VTM)} A VTM takes as input $1^n$, a string $w$ of length at most $n$, and an auxiliary input $V$. %an integer $r$ in binary, a string $w$ of length at most $n$,  and descriptions of GTMs $M$ and $G$. 
-It can be used as a building block in the description of a verifier circuit in an ENL. We refer to Section~\ref{sec:vtm} for a complete specification. 
-
-\subsection{Turing machines}
-
-\paragraph{Universal Extended Verifier GTM, $G_{UEVC}$} This is a GTM for $\{UEVC_{n,r}\}$. On input $n$, $r$ and $t$ it computes the $t$-th gate of $UEVC_{n,r}$.
-
-\paragraph{Universal Extended VTM, $V_{UEVC}$} This is a VTM that is used in the circuit $UEVC$. The auxiliary input $V$ is interpreted as $(r,G,M)$ where $r$ is an integer in binary, $G$ is a GTM and $V$ is a VTM. It is described in Section~\ref{sec:vtm-lambda}. 
-
-\paragraph{Natarajan-Vidick VTM, $V_{NV}$} This is a VTM that is called in the final stage of the recursive composition. It takes input $(1^n,w,M)$ where $M$ is interpreted as a non-deterministic Turing machine $M$. The VTM $V_{NV}$ computes the questions and checks the answers as required in the Natarajan-Vidick protocol (see the following Theorem) with $2$ provers to decide whether $\langle M, 1^n \rangle \in \mathcal{L}_1$.
-
-\begin{theorem}[\cite{natarajan2017two}]\label{thm:nv}
-%	$\NEXP$ is contained in $\MIPstar(2,1)$.
-There exists an $\delta > 0$ such that the following holds. Let $M$ be a nondeterministic Turing machine, and let $\omega$ denote the maximum acceptance probability of the two prover ENL that is executed by the VTM $V_{NV}$ on input $(1^n,w,M)$ where $w$ is a uniformly random $n$-bit string. If $\langle M, 1^n \rangle \in \mathcal{L}_1$, then $\omega = 1$. Otherwise $\omega \leq 1 - \delta$. 
-\end{theorem}
 
 \subsection{Circuits}
 \label{sec:circuits}
 
-\paragraph{Universal Extended Verifier Circuit, $UEVC_{n,r}$} This is a family of circuits for an $\kappa(r)$-prover extended verifier of size $\poly(n)$. The universal extended verifier takes an input $(G,V,M)$. It expects $G$ to be the description of a GTM for some circuit family, $V$ to be a Verifier Turing Machine that executes a $k$-prover game for some $k \leq \kappa(r)$, and $M$ to be a non-deterministic Turing machine. % $M$ to be the description of 
-We let $N = 2^n$.
-\begin{itemize}
-\item If $r=1$ the verifier plays the $k$-prover game that is executed by VTM $V$ on input $(1^n,w,M)$, where $w$ is a random string.
+\paragraph{Universal Protocol Circuit, $UPC_{n,r}$} %This is a family of circuits for a $\kappa(r)$-prover simcom game where the verifier has size $\poly(n)$. 
+This is a family of $\kappa(r)$-prover protocol circuits of size $\poly(n)$. The $UPC_{n,r}$ circuit takes an input $(G,V_{final},M)$. It expects $G$ to be the description of a GTM for some circuit family, $V_{final}$ to be a VTM, and $M$ to be a non-deterministic Turing machine. At a high level, $UPC_{n,r}$ is the circuit of the $\kappa(r)$-prover simcom game (see Figure \ref{fig:simcom}) where the verifier circuits $(C_Q,C_A)$ are specified by a VTM $V_R$ that we explain in detail in Section~\ref{sec:vtm_r}. For a more detailed specification of $UPC_{n,r}$, see Section~\ref{sec:upc}.
 
-\item If $r>0$ the verifier executes the $\kappa(r)$-prover extended game that corresponds to checking the history state for the $r$-prover extended verifier whose circuit is $CKT(G,1^N,r-1)$, with input to that circuit being $(G,V,M)$. Note that $UEVC_{n,r}$ cannot compute the entirety of $CKT(G,1^N,r-1)$ in $\poly(n)$ time. But it is enough for $UEVC_{n,r}$ to use the procedure $G(N,r-1,t)$ for a random value of $1\leq t\leq N$.
-\end{itemize}
+We use $\omega^{SC}(UPC_{n,r}(G,V_{final},M))$ to denote the the value of the simcom game that is specified by the circuit $UPC_{n,r}$ on input $(G,V_{final},M)$.
+
+\subsection{Turing machines}
+
+\paragraph{Universal Extended Verifier GTM, $G_{UPC}$} This is a GTM for $\{UPC_{n,r}\}$. On input $n$, $r$ and $t$ it computes the $t$-th gate of $UPC_{n,r}$. 
+
+\paragraph{Recursive Compression VTM, $V_R$} This is the VTM that specifies the verifier used in our recursive compression scheme. The auxiliary input $\lambda$ is interpreted as $(G,V_{final},M,r)$ where $G$ is a GTM, $V_{final}$ is a VTM, and $M$ is a nondeterministic Turing machine, and $r$ is an integer in binary. It is described in Section~\ref{sec:vtm_r}. 
+
+\paragraph{Natarajan-Vidick VTM, $V_{NV}$} This is a VTM that is called in the final stage of the recursive composition. The auxiliary input $\lambda$ is interpeted as a non-deterministic Turing machine $M$. The VTM $V_{NV}$ computes the questions and checks the answers as required in the Natarajan-Vidick protocol (see the following Theorem) with $2$ provers to decide whether $\langle M, 1^n \rangle \in \mathcal{L}_1$.
+
+\begin{theorem}[\cite{natarajan2017two}]\label{thm:nv}
+%	$\NEXP$ is contained in $\MIPstar(2,1)$.
+There exists an $\delta > 0$ such that the following holds. Let $M$ be a nondeterministic Turing machine, and let $\omega$ denote the maximum acceptance probability of the two prover protocol that is executed by the VTM $V_{NV}$ on input $(1^n,w,M)$ where $w$ is a uniformly random $n$-bit string. If $\langle M, 1^n \rangle \in \mathcal{L}_1$, then $\omega = 1$. Otherwise $\omega \leq 1 - \delta$. 
+\end{theorem}
+
+
+%We let $N = 2^n$. At a high level, the circuit $UPC_{n,r}$ behaves as follows:
+%\begin{itemize}
+%\item Generate a uniformly random string $w \in \{0,1\}^n$. 
+%\item If $r=1$, execute the $k$-prover simcom game where the verifier is specified by the VTM $V_{final}$ on input $(1^n,w,M)$.
+%
+%\item If $r>0$, execute the $\kappa(r)$-prover simcom game where the verifier is specified by the VTM $V_R$ on input $(1^n,w,r,G,V_{final},M)$. 
+
+%Note that $UPC_{n,r}$ cannot compute the entire
+
+%that corresponds to checking a history state of the $\kappa(r-1)$-prover simcom game that is specified by $CKT(G,1^N,r-1)$, with the input to that circuit being $(G,V_{final},M)$.
+%for the $r$-prover extended verifier whose circuit is $CKT(G,1^N,r-1)$, with input to that circuit being $(G,V,M)$. 
+%Note that $UPC_{n,r}$ cannot compute the entirety of $CKT(G,1^N,r-1)$ in $\poly(n)$ time. But it is enough for $UPC_{n,r}$ to use the procedure $G(N,r-1,t)$ for a random value of $1\leq t\leq N$.
+%\end{itemize}
+
+%We define $\omega^{SC}(UPC_{n,r})$ to denote the value of the simcom game that is described by $UPC_{n,r}$. 
+
+\subsection{The analysis of the recursion}
 
 \begin{restatable}{proposition}{soundness}
-	Let $G_{UEVC}$ be the GTM for the circuit family $\{UEVC_{n,r}\}$, let $V_{NV}$ be the Natarajan-Vidick VTM, and let $M$ be a nondeterministic Turing machine. For any integer $n$ and $r$ let $\omega_{n,r} = \omega^*(UEVC_{n,r})$, when the input to $UEVC_{n,r}$ is $(G_{UEVC},V_{NV},M)$. 
+	Let $G_{UPC}$ be the GTM for the circuit family $\{UPC_{n,r}\}$, let $V_{NV}$ be the Natarajan-Vidick VTM, and let $M$ be a nondeterministic Turing machine. For any integer $n$ and $r$ let $\omega_{n,r}^{SC} = \omega^{SC}(UPC_{n,r}(G_{UPC},V_{NV},M))$.
 	
 	Then for any integer $n$, $N=2^n$, and $r$,
 	\begin{itemize}
-	\item \emph{(Completeness)} If $\omega_{N,r}=1$ then $\omega_{n,r+1}=1$.
+	\item \emph{(Completeness)} If $\omega_{N,r}^{SC}=1$ then $\omega_{n,r+1}^{SC}=1$.
 	\item \emph{(Soundness)} For $r \geq 1$ we have
 	\[
-		\omega_{n,r+1} \,\leq\, 1 - \frac{(1 - \omega_{N,r})^\alpha}{\poly(N)}\;.
+		\omega_{n,r+1}^{SC} \,\leq\, 1 - \frac{1 - \omega_{N,r}^{SC}}{\poly(N)}.
 	\]
-	for some $\alpha > 1$.
 	\end{itemize}
-	\label{prop:uevc_soundness}
+	\label{prop:UPC_soundness}
 \end{restatable}
 
-We defer the proof of Proposition~\ref{prop:uevc_soundness} until Section~\ref{sec:soundness}. 
+We defer the proof of Proposition~\ref{prop:UPC_soundness} until Section~\ref{sec:soundness}. 
 
 
 \begin{corollary}
 \label{cor:recursive_enl}
-Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an instance of $\mathcal{L}_R$. There exists a constant $c > 0$ such that the $\kappa(R)$-prover extended verifier specified by the circuit $UEVC_{n,R}$ on input $(G_{UEVC},V_{NV},M)$ has value 
+Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an instance of $\mathcal{L}_R$. There exists a constant $c > 0$ such that the simcom game specified by the circuit $UPC_{n,R}$ on input $(G_{UPC},V_{NV},M)$ has value 
 \begin{align*}
 		&= 1  \quad & \text{if } \langle M,1^n \rangle\in \mathcal{L}_R \\
 		&\leq 1 - \exp^{R-1}_2(-cn) \quad &\text{if } \langle M,1^n \rangle\notin \mathcal{L}_R.
@@ -75,18 +83,18 @@ Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an inst
 %where recall $\exp^0_a(-b) = 1/b$ by definition for $b \geq 0$.
 \end{corollary}
 \begin{proof}
-	For all $m$, the value $\omega_{m,1}$ when the circuit $UEVC_{m,1}$ is run on input $(G_{UEVC},V_{NV},M)$ is $1$ if $\langle M,1^m \rangle$ is in $\mathcal{L}_1$ and is at most $1 - \delta$ otherwise for some universal constant $\delta > 0$.
+	For all $m$, the value $\omega_{n,1}^{SC}$ when the circuit $UPC_{n,1}$ is run on input $(G_{UPC},V_{NV},M)$ is $1$ if $\langle M,1^n \rangle$ is in $\mathcal{L}_1$ and is at most $1 - 1/\poly(n)$ otherwise. \hnote{Add more justification}.
 	
 	Applying the previous Proposition repeatedly, we obtain that if $\langle M,\exp^{R-1}_2(n) \rangle \in \mathcal{L}_1$, or equivalently if $\langle M,1^n \rangle \in \mathcal{L}_R$, then
 	\[
-		\omega_{n,R} = \omega_{2^n,R-1} = \cdots = \omega_{\exp^{R-1}_2(n),1} = 1.
+		\omega_{n,R}^{SC} = \omega_{2^n,R-1}^{SC} = \cdots = \omega_{\exp^{R-1}_2(n),1}^{SC} = 1.
 	\]
 	Otherwise, if  $\langle M,1^n \rangle \notin \mathcal{L}_R$, then we have
 	\begin{align*}
-		\omega_{n,R} &\leq 1 - \poly(2^{-n})(1-\omega_{2^n,R-1})^\alpha \\
-					&\leq 1 - \poly(\exp^2_2(-n))(1- \omega_{\exp^2_2(n),R-2})^{\alpha^2} \\
+		\omega_{n,R}^{SC} &\leq 1 - \poly(2^{-n})(1-\omega_{2^n,R-1}^{SC}) \\
+					&\leq 1 - \poly(\exp^2_2(-n))(1- \omega_{\exp^2_2(n),R-2}^{SC}) \\
 					&\vdots \\
-					&\leq 1 - \poly(\exp^{R-1}_2(-n))(1-\omega_{\exp^{R-1}_2(n),1})^{\alpha^{R-1}} \\
+					&\leq 1 - \poly(\exp^{R-1}_2(-n))(1-\omega_{\exp^{R-1}_2(n),1}^{SC}) \\
 					&\leq 1 - \exp^{R-1}_2(-cn).
 	\end{align*}
 \end{proof}
@@ -100,160 +108,119 @@ Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an inst
 	 where $f_n(R) = \exp^{R-1}_2(-cn)$ for some $c > 1$.
 \end{theorem}
 \begin{proof}
-	Fix an instance of $\langle M,1^n \rangle$ of $\mathcal{L}_R$. By Corollary~\ref{cor:recursive_enl} we have an extended non-local game $\what{G}_M$  of size $\poly(n,|M|)$ and involving $\kappa(R)$ provers such that $\omega^*(\what{G}_M) = 1$ if $\langle M,1^n \rangle \in \mathcal{L}_R$, and otherwise $\omega^*(\what{G}_M) \leq 1 - f_R(n)$. 
+	Fix an instance of $\langle M,1^n \rangle$ of $\mathcal{L}_R$. By Corollary~\ref{cor:recursive_enl} we have a simcom game $\mathscr{Z}_M$  of size $\poly(n,|M|)$ and involving $\kappa(R)$ provers such that $\omega^{SC}(\mathscr{Z}_M) = 1$ if $\langle M,1^n \rangle \in \mathcal{L}_R$, and otherwise $\omega^{SC}(\mathscr{Z}_M) \leq 1 - f_R(n)$. 
+	
+	By Lemma~\ref{lem:convert_to_simcom} there exists a three-turn protocol $\Protocol_M$ such that $\omega^*(\Protocol_M) = 1$ if $\langle M,1^n \rangle \in \mathcal{L}_R$, and $\omega^*(\Protocol_M) \leq 1 - f_R(n)$ otherwise.
 	
 	To convert this to an $\MIPstar$ protocol, we use the compression result of~\cite{ji2016compression} as a blackbox, which gives an efficient method to transform any quantum interactive protocol $\mathscr{P}$ involving $r$ provers into a nonlocal game $G_{\mathscr{P}}$ involving $r + 8$ provers with the following property: if $\omega^*(\mathscr{P}) = 1$, then $\omega^*(G_{\mathscr{P}}) = 1$. Otherwise, 
 	\[
 		\omega^*(G_{\mathscr{P}}) \leq 1 - \frac{1 - \omega^*(\mathscr{P})}{\poly(n)}. 
 	\]
-	Since the transformation from $\langle M,1^n \rangle$ to $\what{G}_M$ is efficient and the compression reduction of~\cite{ji2016compression} is efficient, we obtain the desired Theorem statement.
+	Since the transformation from $\langle M,1^n \rangle$ to $\Protocol_M$ is efficient and the compression reduction of~\cite{ji2016compression} is efficient, we obtain the desired Theorem statement.
 	\hnote{Will probably need to make clearer...}
 \end{proof}
 
-\section{Detailed specifications}
+%
+%\subsection{Table of notation}
+%
+%For the reader's convenience, we include a table of notation.
+%
+%\begin{figure}[H]
+%\begin{center}
+%    \begin{tabular}{ | l | p{10cm} |}
+%    \hline
+%    \textbf{Notation} & \textbf{Explanation} \\ \hline
+%    $\kappa(r)$ 		& Upper bound on the number of provers that the verifier $UPC_{n,r}$, on input $(G_{UPC},V_{NV},M)$, will interact with.  \\ \hline
+%    
+%    $G_{UPC}(n,r,t)$ 			& The Gate Turing Machine (GTM) for the circuit family $\{ UPC_{n,r} \}$ \\ \hline
+%    
+%    $V_R(r,G,M)$			& The Verifier Turing Machine (VTM) that is used in $UPC$ \\ \hline
+%    \end{tabular}
+%\end{center}
+%\caption{Table of notation}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\begin{center}
+%    \begin{tabular}{ | l | p{10cm} |}
+%    \hline
+%    \textbf{Register} & \textbf{Usage}\\ \hline
+%    $\sC$			& Register that is prepared by provers; supposed to hold the clock register 			\\ \hline
+%    $\sV_{in}$ 		& The register that stores the input string 	 \\ \hline
+%    $\sV_{work}$	& The workspace register 									\\ \hline
+%    $\sM_i$			& Message register that is passed to and from  the $i$'th prover	  \\ \hline
+%%    $\sV_{out}$		& Stores the output							&			\\ \hline
+%    \end{tabular}
+%\end{center}
+%\caption{Table of registers}
+%\end{figure}
+%
 
-\subsection{Table of notation}
 
-For the reader's convenience, we include a table of notation.
+%The circuit $C_Q$ computes a $\kappa(r)$-tuple of queries $(q_1,\ldots,q_{\kappa(r)})$, where query $q_i$ is written on register $\sM_i$. The circuit $C_A$ acts on $\sV \sM$ and writes a single bit of output in the first qubit of register $\sV_{work}$. 
 
-\begin{figure}[H]
+%\subsection{The VTM $V_R$}
+%\label{sec:vtm}
+
+\section{The circuit $UPC_{n,r}$ and its GTM $G_{UPC}$}
+\label{sec:upc}
+
+The circuit $UPC_{n,r}$ is meant to be interpreted as the circuit for a simcom game with $\kappa(r)$ provers, as described in Section~\ref{sec:prelim_simcom} and depicted in Figure \ref{fig:simcom}. Part of a simcom game are subcircuits $C_Q$, $C_A$, and $P$. In $UPC_{n,r}$, the subcircuits $C_Q$ and $C_A$ are determined by the VTM $V_R$ that we will describe fully in Section~\ref{sec:vtm_r}. The subcircuit $P$ is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa(r)}$. %where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
+
+The registers of the circuit $UPC_{n,r}$ have the following specification. The registers $\sK_1, \sK_2$ are $2m$ qubits wide each and $\sE_1,\sE_1',\sE_2,\sE_2'$ are $m$ qubits wide each, where $m = O(\kappa(r) \log n)$. The register $\sV$ has two subregisters: $\sV_{in}$ and $\sV_{work}$. The circuit receives the input triple $\lambda = (G,V,M)$ in a register $\sV_{in}$. The registers $\sK_1 \sK_2 \sV_{work} \sM$ are initialized in the all zeroes state. The $\sE_1 \sE_1' \sE_2 \sE_2'$ registers are initialized with maximally entangled states as described in Section~\ref{sec:prelim_simcom}. The $\sC \sP \sK_2'$ registers are initialized with an arbitrary state.
+
+%That is, in addition to registers $\sC \sV \sM \sP$, the circuit acts on registers $\sK_1 \sK_2 \sK_2'$ and $\sE_1 \sE_2 \sE_1' \sE_2'$ as described in Section~\ref{sec:prelim_simcom}, and depicted in Figure \ref{fig:simcom}. The registers $\sK_1, \sK_2$ are $2m$ qubits wide each and $\sE_1,\sE_1',\sE_2,\sE_2'$ are $m$ qubits wide each, where $m = O(\kappa(r) \log n)$.
+
+
+%The circuit $UPC_{n,r}$ is specified by two subcircuits $C_Q$ and $C_A$, which have act on the $\sC \sV \sM$ registers. Since $UPC_{n,r}$ is a protocol circuit, the subcircuit $P$ that acts on registers $\sE_1' \sE_2' \sP \sK_2'$ is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa(r)}$ where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
+
+The circuit $UPC_{n,r}$ is described in detailed pseudocode in Figure \ref{fig:upc} below.
+
 \begin{center}
-    \begin{tabular}{ | l | p{10cm} |}
-    \hline
-    \textbf{Notation} & \textbf{Explanation} \\ \hline
-    $\kappa(r)$ 		& Upper bound on the number of provers that the verifier $UEVC_{n,r}$, on input $(G_{UEVC},V_{NV},M)$, will interact with.  \\ \hline
-    
-    $G_{UEVC}(n,r,t)$ 			& The Gate Turing Machine (GTM) for the circuit family $\{ UEVC_{n,r} \}$ \\ \hline
-    
-    $V_{UEVC}(r,G,M)$			& The Verifier Turing Machine (VTM) that is used in $UEVC$ \\ \hline
-    \end{tabular}
-\end{center}
-\caption{Table of notation}
-\end{figure}
-
-\begin{figure}[H]
-\begin{center}
-    \begin{tabular}{ | l | p{10cm} |}
-    \hline
-    \textbf{Register} & \textbf{Usage}\\ \hline
-    $\sC$			& Register that is prepared by provers; supposed to hold the clock register 			\\ \hline
-    $\sV_{in}$ 		& The register that stores the input string 	 \\ \hline
-    $\sV_{work}$	& The workspace register 									\\ \hline
-    $\sM_i$			& Message register that is passed to and from  the $i$'th prover	  \\ \hline
-%    $\sV_{out}$		& Stores the output							&			\\ \hline
-    \end{tabular}
-\end{center}
-\caption{Table of registers}
-\end{figure}
-
-\subsection{$UEVC$}
-
-\label{sec:specs}
-
-The circuit $UEVC_{n,r}$ is meant to be interpreted as the verifier in an ENL game with $\kappa(r)$ provers, where $\kappa(r)$ is a function to be determined later (but this function will be $O(r)$). It receives the input triple $x = (G,V,M)$ in a register $\sV_{in}$. The circuit $UEVC_{n,r}$ is specified by three subcircuits, which all have access to $\sV_{in}$ and a register $\sV_{work}$ which is a sufficiently large ancilla register:
-
-\begin{enumerate}
-\item A quantum circuit $C_M$ that acts on $\sV_{in}$, $\sV_{work}$, as well as a quantum register $\sC$, and returns a classical outcome $s$. %in register $\sV_{mo}$;
-\item A classical circuit $C_Q$ that acts on $\sV_{in}$, $\sV_{work}$ %and $\sV_{mo}$ 
-and computes an $\kappa(r)$-tuple of queries $(q_1,\ldots,q_{\kappa(r)})$, where query $q_i$ is written on register $\sM_i$;
-\item A classical circuit $C_A$ that acts on registers $\sV_{in}$, $\sV_{work}$, %$\sV_{mo}$, 
-and $\sM_{i}$, and writes a single bit of output in the first qubit of register $\sV_{work}$. % register $\sV_{out}$.  
-\end{enumerate}
-The way these circuits are interpreted as a verifier in an ENL is as follows. First, the circuit $C_M$ is executed on the input $x$ and the contents of the quantum register $\sC$, that is assumed to contain the provers' first quantum message. The outcome $s$ of the measurement is then passed along to circuit $C_Q$, that also has access to the input $x$ and the workspace $\sV_{work}$ and computes questions $q_i$ in registers $\sM_{i}$ for $i\in\{1,\ldots,\kappa(r)\}$. Prover $i$ is sent register $\sM_i$, on which it writes its answer $a_i$. Finally, circuit $C_A$ has access to the input $x$, the workspace $\sV_{work}$, the measurement outcome $s$, and the answers $a_i$ in registers $\sM_i$, and it computes the referee's decision in the protocol, and stores the decision bit in the first qubit of $\sV_{work}$. (We assume that the workspace $\sV_{work}$ stores a copy of the questions $\{q_i\}$ as well as the random strings that are used for each of the three circuits). 
-
-We wish to specify these three circuits in a way that makes it clear that the associated GTM $G_{UEVC}$, which on input $(n,r,t)$ computes the $t$-th gate of $UEVC_{n,r}$, can be executed in time polynomial in its input length, and in particular polylogarithmic in $n$. To make this possible we introduce an intermediate notion of \emph{Verifier Turing Machine}. 
-
-
-\subsection{ Verifier Turing Machines}
-\label{sec:vtm}
-
-A Verifier Turing Machine (VTM) is a Turing machine description of the computations that an extended verifier is supposed to perform: for example, to compute the queries $\{q_i\}$ or to compute whether to accept or reject, depending on the provers' answers.
-
-
-A VTM has the following types of tapes:
-\begin{enumerate}
-	\item Input tape. This tape is used to store the input to the VTM: $1^n$ and a string $V$ of length at most $n$. 
-	\item Work tape. This is where all the computation takes place.
-	\item Communication tapes. There are two tapes of this kind: the measurement outcome tape and the player answer tape. 
-	\item Output tapes. There are three tapes of this kind: the measurement specification tape, the player question tape, and the referee decision tape. 
-\end{enumerate}
-In addition, a VTM has the following structure. When executed on a properly formatted input $(1^n,V)$ the VTM runs in exactly $3p(n)$ time steps, where $p(n)$ is a fixed polynomial that is a property of the VTM. Moreover, the $3p(n)$ time steps can be divided into three phases of equal length with the following properties: 
-\begin{enumerate}
-\item \textsc{ClockMeasurement} phase (timesteps $1$ through $p(n)$). During this phase the VTM only accesses the input tape (read only), the work tape, and the measurement specification tape (write only). At the end of the phase the measurement specification tape contains the description of a polynomial-size quantum circuit $C_M$.  
-\item  \textsc{GenQuestions} phase (timesteps $p(n) +1$ through $2p(n)$). During this phase the VTM only accesses the input tape (read only), the work tape, the measurement outcome tape (read only), and the player question tape (write only). Assuming that at the beginning of the phase the measurement outcome tape contains a valid measurement outcome,\footnote{What we mean by ``valid'' will become clear when we show how a VTM is used to specify a verifier circuit in Section~\ref{sec:uevc}.} at the end of the phase the player question tape contains the description of an $\kappa(r)$-tuple of questions. 
-\item \textsc{CheckAnswers} phase (timesteps $2p(n) + 1$ through $3p(n)$). During this phase the VTM only accesses the input tape (read only), the work tape, the measurement outcome tape (read only), the player answer tape (read only), and the referee decision tape (write only). Assuming that at the beginning of the phase the measurement outcome tape contains a valid measurement outcome, and the player answer tape contains a valid $\kappa(r)$-tuple of answers, at the end of the phase the referee decision tape contains a single bit. 
-\end{enumerate}
-
-\subsection{The VTM $V_{UEVC}$}
-\label{sec:vtm-lambda}
-
-We now specify a specific VTM $V_{UEVC}$. The VTM is specified in high level pseudocode in Figure~\ref{fig:lambda}. It receives input $(1^n,w,V)$, where $V$ is interpreted as a tuple $(r,G,V,M)$ where $r$ is an integer written in binary, $G$ is a Gate Turing Machine, $V$ is another VTM, and $M$ is a nondeterministic Turing machine. The input string $w$ is used to determine all random choices made by $V_{UEVC}$.
-
-\begin{figure}[H]
-\begin{center}
-\framebox{
-\begin{minipage}{0.9\textwidth}
-    Input: $(1^n,w,r,G,V,M)$
-    \begin{itemize}
-    	\item If $r = 1$, run the VTM specified by $V$ on input $(1^n,w,M)$.
-	
-		\item If $r > 1$, do the following. Using the string $w$, execute one of the following subroutines: \emph{Pauli check}, \emph{Propagation check}, \emph{Input check}, and \emph{Output check}, described in Figures~\ref{fig:pauli_check},~\ref{fig:prop_check},~\ref{fig:input_check}, and Figure~\ref{fig:output_check} respectively.
-
-		\end{itemize}
-    
-\end{minipage}
-}
-
-\end{center}
-\caption{The VTM $V_{UEVC}$}
-\label{fig:lambda}
-\end{figure}
-
-\subsection{The circuit $UEVC_{n,r}$}
-
-The three circuits that constitute $UEVC_{n,r}$ are described in Figure~\ref{fig:uevc}. Each of them is essentially an elaborate Turing machine simulator that emulates a phase of $V$. Recall the specification of the registers on which the circuits $UEVC_{n,r}$ operate given at the start of Section~\ref{sec:specs}. 
-
-
-
-\begin{figure}[H]
-\begin{center}
-\framebox{
-\begin{minipage}{0.9\textwidth}
-    Input: The description of a GTM $G$, a VTM $V$, and a nondeterministic Turing machine $M$.
-	  \begin{enumerate}
-        \item (\textbf{Measurement circuit}) Use a quantum circuit to compute a random string $w \in \{0,1\}^n$ in the work register $\sV_{work}$. %Copy the string $(1^n,w,r,G,V,M)$ to register $\sV_{in}$. 
-Simulate $V_{UEVC}$ on input $(1^n,w,r,G,V,M)$ for $p(n)$ steps using TMSIM. Let register $\sV_m$ contain the contents of the measurement specification tape of $V_{UEVC}$.   Execute CKTSIM on the part of register $\sV_{work}$ that contains the contents of the measurement specification tape of $V_{UEVC}$ and register $\sC$, writing the classical output $s$ into $\sV_{work}$.
-%registers $\sV_{m}$ (circuit description) and $\sC$, writing the classical output in register $\sV_{mo}$.
-        \item (\textbf{Questions circuit}) Simulate $V_{UEVC}$ for $p(n)$ additional steps, using $s$ to specify the contents of the measurement outcome tape.
-        %using register $\sV_{mo}$ to specify the contents of the measurement outcome tape. 
-        Let registers $\sM_{i}$, $i\in\{1,\ldots,\kappa(r)\}$, contain the contents of the prover question tape of $V_{UEVC}$.
-        \item (\textbf{Prover query}) Query prover $i$ for $i \in \{1,\ldots,\kappa(r)\}$. 
-        \item (\textbf{Decision circuit}) Simulate $V_{UEVC}$ for $p(n)$ additional steps, using registers $\sM_{i}$ to specify the contents of the prover answer tape. Write the decision bit that is on the referee decision tape onto the first qubit of $\sV_{work}$.
+\begin{mdframed}
+%    Input: The description of a GTM $G$, a VTM $V_{final}$, and a nondeterministic Turing machine $M$.
+	\begin{enumerate}
+		\item Write the integer $r$ in binary after the input triple $\lambda = (G,V,M)$ in the register $\sV_{in}$.
+		\item Apply the $C_Q(n,V_R)$ circuit on the $\sC \sV \sM$ registers.
+    \item Apply a Bell measurement on the $\sM$ and $\sE_1$ registers, and save the measurement outcome in register $\sK_1$.
+    \item For $i \in \{1,\ldots,\kappa(r)\}$, apply the prover reflection $P_i$ on the $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$ registers.
+    \item Apply $H^{\otimes 2m}$ (the $2m$-fold tensor product of the Hadamard gate) on $\sK_2$. 
+    \item Swap the $\sM$ and $\sE_2$ registers.
+    \item Controlled on $\sK_2$, apply the Pauli correction operation on $\sM$.
+    \item Apply the $C_A(n,V_R)$ circuit on the $\sC \sV \sM$ registers.
+    \item Apply a CNOT gate to $\sO$ if $\sK_1$ is all zeroes.
     \end{enumerate}
-\end{minipage}
-}
-
-\end{center}
-\caption{Description of quantum circuit \textsc{$UEVC_{n,r}$}}
-\label{fig:uevc}
+\end{mdframed}
+\begin{figure}[H]
+\caption{Description of the protocol circuit \textsc{$UPC_{n,r}$}}
+\label{fig:upc}
 \end{figure}
+\end{center}
 
-Let $\tau(n,r)$ denote the circuit size of $UEVC_{n,r}$. To complete the description of the circuit it remains to describe the GTM $G_{UEVC}$. \tnote{At some point we need to clarify how large $r$ is allowed to be, as a function of $n$}
+
+
+%verifier in an ENL game with $\kappa(r)$ provers, where $\kappa(r)$ is a function to be determined later (but this function will be $O(r)$). 
+
+
+%The three circuits that constitute $UPC_{n,r}$ are described in Figure~\ref{fig:UPC}. Each of them is essentially an elaborate Turing machine simulator that emulates a phase of $V$. Recall the specification of the registers on which the circuits $UPC_{n,r}$ operate given at the start of Section~\ref{sec:upc}. 
+
+
+Let $\tau(n,r)$ denote the circuit size of $UPC_{n,r}$. It remains to describe the GTM $G_{UPC}$. \tnote{At some point we need to clarify how large $r$ is allowed to be, as a function of $n$}
 
 \begin{lemma}
-	There exists a GTM $G_{UEVC}$ such that on input $(n,r,t)$, three integers written in binary and such that $1 \leq t \leq \tau(n,r)$, computes the $t$-th gate of the circuit $UEVC_{n,r}$ in time $\poly\log(n) + \poly \log(r)$.
+	There exists a GTM $G_{UPC}$ such that on input $(n,r,t)$, three integers written in binary and such that $1 \leq t \leq \tau(n,r)$, computes the $t$-th gate of the circuit $UPC_{n,r}$ in time $\poly\log(n) + \poly \log(r)$.
 \end{lemma}
 
 \begin{proof}
-	Given $(n,r,t)$, it is straightforward to compute which of the four steps of $UEVC_{n,r}$ described above the time $t$ corresponds to. Here we use the fact that the phases of $V$ are run for exactly $p(n)$ steps. Furthermore, the description of $V_{UEVC}$ is hardwired into $G_{UEVC}$.
+	Given $(n,r,t)$, it is straightforward to compute which of the eight steps of $UPC_{n,r}$ described above the time $t$ corresponds to. If the time $t$ corresponds to a time in the $C_Q$ or $C_A$ circuits, we invoke the GTMs from Lemma~\ref{lem:succinct_vtm_circuits}. Otherwise, all the other gates are easily seen to be efficiently computable. \hnote{Write more here...}
 	
-	If $t$ is a gate in the measurement circuit, it is either a gate used to generate the random string $w$, or a gate used to copy inputs between different registers, or a gate of TMSIM, or a gate of CKTSIM. Which case holds can be determined easily.
-	
-	If $t$ is a gate in the questions circuit, it is either a gate used to copy inputs between different registers, or a gate of TMSIM. Which case holds can be determined easily.
-	
-	If $t$ corresponds to a query to prover $i$, then $G(n,r,t)$ will output a gate whose label is ``Query prover $i$.'' 
-	
-	If $t$ is a gate in the decision circuit, it is either a gate used to copy inputs between different registers, or a gate of TMSIM. Which case holds can be determined easily.
-	
-
+%	 Furthermore, the description of $V_R$ is hardwired into $G_{UPC}$.
+%	
+%	If $t$ is a gate in the measurement circuit, it is either a gate used to generate the random string $w$, or a gate used to copy inputs between different registers, or a gate of TMSIM, or a gate of CKTSIM. Which case holds can be determined easily.
+%	
+%	If $t$ is a gate in the questions circuit, it is either a gate used to copy inputs between different registers, or a gate of TMSIM. Which case holds can be determined easily.
+%	
+%	If $t$ corresponds to a query to prover $i$, then $G(n,r,t)$ will output a gate whose label is ``Query prover $i$.'' 
+%	
+%	If $t$ is a gate in the decision circuit, it is either a gate used to copy inputs between different registers, or a gate of TMSIM. Which case holds can be determined easily.
 \end{proof}

@@ -1,0 +1,54 @@
+\section{The stabilizer encoding}
+\label{sec:stabilizer}
+
+
+
+\subsection{Analyzing $V_R$ with general strategies}
+
+We now carry out the second stage of the analysis, where we analyze the value of the protocol where the VTM is $V_R$ instead of $V_H$. 
+
+\paragraph{Provers} The set $\cP_r$ of provers that $V_R$ interacts with has size $\kappa_r = \kappa_{r-1} + 7$. What was originally prover $PV$ is now represented by provers $PV_1,\ldots,PV_7$. 
+
+\subsection{Stabilizer check}
+
+\begin{center}
+\begin{mdframed}
+    Input: $(1^n,w,G,V,M,r)$ \\
+	\begin{enumerate}
+		\item Do the multi qubit stabilizer test.
+	\end{enumerate}    
+\end{mdframed}
+\end{center}
+\begin{figure}[H]
+\caption{Stabilizer Check}
+\label{fig:stabilizer_check}
+\end{figure}
+
+\paragraph{The high level} The Stabilizer check is performed with the provers $PV_1,\ldots,PV_7$, and checks that they share a $7$-qubit stabilizer encoding of the registers $\what{\sO}, \what{\sK}_1,\what{\sK}_2, \what{\sC}, \what{\sV}, \what{\sM}, \what{\sE}_1, \what{\sE}_2$. 
+
+% the prover $PV$ (which is supposed to play the role of the verifier of $UPC_{N,r-1}$) has the $\what{\sV}_{in}$ register initialized to the input $(G,V,M)$, and $\what{\sO} \what{\sV}_{work} \what{\sM} \what{\sK}_1 \what{\sK}_2$ set to zeroes. Furthermore, the subroutine will check that the $PV$ shares the maximally entangled state with $PP_i$ in the $\what{\sE}_{1,i} \what{\sE}_{2,i}$ registers.
+
+%the $PP_i$ prover has the message register $\sM_{r-1,i}$ set to all zeroes.
+
+\paragraph{Question types} 
+
+\paragraph{Honest Input Check strategy}
+A strategy $\strat = (\rho,\{M_i\})$ with shared state $\ket{\psi}_{\sC \sP \sR}$ is an \textbf{honest Stabilizer strategy} if the measurement operators of the provers $PV_1,\ldots,PV_7$ are all honest Pauli measurements, the registers $\sP_{V,1},\ldots,\sP_{V,7}$ contain a distributed encoding of the registers $\what{\sO}, \what{\sK}_1,\what{\sK}_2, \what{\sC}, \what{\sV}, \what{\sM}, \what{\sE}_1, \what{\sE}_2$.
+
+\hnote{Probably better ways of saying all these things}
+
+
+\begin{lemma}	
+\label{lem:stabilizer_check}
+\leavevmode
+\begin{enumerate}
+	\item (\textbf{Completeness}) An honest Stabilizer Check strategy passes the $\textbf{Stabilizer Check}$ subprotocol with probability $1$. 
+	\item (\textbf{Soundness}) There exists a $\delta = \poly[N;\eps]$ such that all strategies $\strat$ that pass the $\textbf{Stabilizer Check}$ subprotocol with probability at least $1 - \eps$ are $\delta$-isometric to an honest Stabilizer strategy.
+\end{enumerate}
+\end{lemma}
+
+
+\subsection{The other subroutines}
+The \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check} subroutines are exactly the same as \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check} except whatever question was supposed to be sent to $PV$ is now sent simultaneously to $PV_1,\ldots,PV_r$. Answers that were meant to be from $PV$ are now computed by taking the XOR of all the answers from $PV_1,\ldots,PV_7$. 
+
+

@@ -26,6 +26,8 @@ Furthermore, for convenience we will define $\exp^0_a(b) = b$.% and $\exp^0_a(-b
 We use the terminology ``quantum register'' to refer to specific finite dimensional Hilbert spaces. We use sans-serif script to denote registers, such as $\sA$, $\sB$. For example, ``register $\reg{A}$'' refers to the Hilbert space $\mathcal{H}_{\reg{A}}$. 
 $\Dens(\sA)$ denotes the set of density matrices on $\sA$, and $\Lin(\sA)$ the set of linear operators on $\sA$.
 
+For a given register $\sR$, we write $\supp(\sR)$ to denote the set of qubits in $\sR$.
+
 \paragraph{State-dependent distance measures}
 
 For a quantum state $\rho \in \Dens(\sA)$ and positive semidefinite operators $M,N \in \Lin(\sA)$, we define 
@@ -55,7 +57,7 @@ For a quantum state $\rho \in \Dens(\sA)$ and positive semidefinite operators $M
 
 \subsection{Quantum interactive protocols} 
 
-We define quantum interactive protocols between a quantum verifier $V$ and provers $P_1,P_2,\ldots,P_r$. In this paper we focus exclusively on \emph{three-turn protocols}, in which the order of interaction is as follows. First the provers send a message to the verifier; second the verifier sends a message to the provers; third the provers send a message back; finally, the verifier performs a computation and returns a decision bit,  ``accept'' or ``reject''. 
+We define quantum interactive protocols between a quantum verifier $V$ and provers $P_1,P_2,\ldots,P_k$. In this paper we focus exclusively on \emph{three-turn protocols}, in which the order of interaction is as follows. First the provers send a message to the verifier; second the verifier sends a message to the provers; third the provers send a message back; finally, the verifier performs a computation and returns a decision bit,  ``accept'' or ``reject''. 
 
 %For simplicity, we will restrict our attention to protocols with a single prover $P$. Extending the discussion to multiple provers is straightforward. 
 
@@ -63,7 +65,7 @@ For simplicity we first restrict our attention to protocols with a single prover
 
 We can assume without loss of generality that every operation in this protocol is a reflection, i.e. a Hermitian operator that squares to identity. The verifier circuits $C_Q,C_A$ consist of Hadamard gates ($H$) and Toffoli gate ($T$), which are reflections. The prover's unitary $P$ can be made a reflection by introducing an ancilla qubit that indicates whether the unitary is to be run forward or backward. In other words, every unitary $P$ can be embedded in a reflection as $\wt{P} = \ketbra{1}{0} \otimes P + \ketbra{0}{1} \otimes P^\dagger$. 
 
-The extension to $r$ provers is straightforward: the registers $\sM$ and $\sP$ are divided into $r$ parts: $\sM_1,\ldots,\sM_r$ and $\sP_1,\ldots,\sP_r$. The $i$-th prover's unitary $P_i$ acts on $\sM_i \sP_i$. 
+The extension to $k$ provers is straightforward: the registers $\sM$ and $\sP$ are divided into $k$ parts: $\sM_1,\ldots,\sM_k$ and $\sP_1,\ldots,\sP_k$. The $i$-th prover's unitary $P_i$ acts on $\sM_i \sP_i$. 
 
 Figure \ref{fig:qip} depicts this protocol as a circuit:
 
@@ -82,27 +84,27 @@ A verifier $V = (C_Q,C_A)$ will implicitly define $3$-turn quantum interactive p
 \subsubsection{Non-local games} 
 
 
-An $r$-player \textbf{non-local game} is a special kind of interactive protocol, where there are only two turns (the first turn is omitted), and the message registers are classical. A non-local game $G$ is specified by a tuple $(\mathcal{Q},\mathcal{A},\mu,V)$ where $\mathcal{Q} = \mathcal{Q}_1 \times \cdots \times \mathcal{Q}_r$ and $\mathcal{A} = \mathcal{A}_1 \times \cdots \times \mathcal{A}_r$ are finite sets, $\mu$ is a distribution over $\mathcal{Q}$, and $V: \mathcal{Q} \times \mathcal{A} \to \{0,1\}$ is a predicate. 
+An $k$-player \textbf{non-local game} is a special kind of interactive protocol, where there are only two turns (the first turn is omitted), and the message registers are classical. A non-local game $G$ is specified by a tuple $(\mathcal{Q},\mathcal{A},\mu,V)$ where $\mathcal{Q} = \mathcal{Q}_1 \times \cdots \times \mathcal{Q}_k$ and $\mathcal{A} = \mathcal{A}_1 \times \cdots \times \mathcal{A}_k$ are finite sets, $\mu$ is a distribution over $\mathcal{Q}$, and $V: \mathcal{Q} \times \mathcal{A} \to \{0,1\}$ is a predicate. 
 
 %A non-local game is played in the following manner. Before the game starts, the players distribute a shared state $\rho_{\sP_1 \cdots \sP_r}$ between themselves where player $i$ gets register $\sP_i$. In the game, the referee uses private randomness to sample a tuple of \emph{questions} $\vec{q} = (q_1,\ldots,q_r)$ from $\mu$, and sends $q_i$ to player $i$, who then performs local measurements on register $\sP_i$ of $\rho$ and returns the measurement outcome $a_i \in \mathcal{A}_i$ (called an \emph{answer}) to the referee. The referee accepts if and only if $V(\vec{q},\vec{a}) = 1$, where $\vec{a} = (a_1,\ldots,a_r)$.
 
-To formulate an $r$-player non-local game as a two-turn quantum interactive protocol we can introduce a circuit $C_Q$ that samples questions $(q_1,\ldots,q_r)$ from the distribution $\mu$, and saves a copy of $q_i$ in the register $\sM_i$. After the provers' unitaries $P = P_1 \otimes \cdots \otimes P_r$ have been applied, the circuit $C_A$ measures the registers $\sM$  in the standard basis to obtain a tuple of answers $(a_1,\ldots,a_r)$, and then computes the predicate $V((q_1,\ldots,q_r),(a_1,\ldots,a_r))$ to decide whether to accept or reject.
+To formulate an $k$-player non-local game as a two-turn quantum interactive protocol we can introduce a circuit $C_Q$ that samples questions $(q_1,\ldots,q_k)$ from the distribution $\mu$, and saves a copy of $q_i$ in the register $\sM_i$. After the provers' unitaries $P = P_1 \otimes \cdots \otimes P_k$ have been applied, the circuit $C_A$ measures the registers $\sM$  in the standard basis to obtain a tuple of answers $(a_1,\ldots,a_k)$, and then computes the predicate $V((q_1,\ldots,q_k),(a_1,\ldots,a_k))$ to decide whether to accept or reject.
 
 
 \subsubsection{Strategies}
 
-Let $V = (C_Q,C_A)$ be a verifier for an $r$-prover protocol $\Protocol_V$. A \textbf{strategy} $\strat$ for $\Protocol_V$ consists of a pair $(\rho,\{P_i\}_{i\in\{1,\ldots,r\}})$, where
+Let $V = (C_Q,C_A)$ be a verifier for an $k$-prover protocol $\Protocol_V$. A \textbf{strategy} $\strat$ for $\Protocol_V$ consists of a pair $(\rho,\{P_i\}_{i\in\{1,\ldots,k\}})$, where
 \begin{enumerate}
-	\item $\rho$ is a state on $r+1$ (finite dimensional) registers $\sC, \sP_1, \ldots, \sP_r$
-	\item For each $i\in\{1,\ldots,r\}$, $P_i$ is a reflection acting on the registers $\sM_i \sP_i$.
+	\item $\rho$ is a state on $k+1$ (finite dimensional) registers $\sC, \sP_1, \ldots, \sP_k$
+	\item For each $i\in\{1,\ldots,k\}$, $P_i$ is a reflection acting on the registers $\sM_i \sP_i$.
 \end{enumerate}
-Note that given $V$, the size of the register $\sC$ is fixed (because it is specified by the verifier circuit $V$) in any strategy $\strat$ for $\Protocol_V$. However, the size of the registers $\sP_i$, $i\in\{1,\ldots,r\}$, can be arbitrary.
+Note that given $V$, the size of the register $\sC$ is fixed (because it is specified by the verifier circuit $V$) in any strategy $\strat$ for $\Protocol_V$. However, the size of the registers $\sP_i$, $i\in\{1,\ldots,k\}$, can be arbitrary.
 
 The \textbf{value of $\strat$ in $\Protocol_V$} is denoted by $\omega^*_\strat(V)$ and is defined as
 \[
 	\omega^*_{\strat}(V) = \Tr \Paren{ \Pi_{out} \, \paren{ C_A P C_Q} \, \rho \otimes \ketbra{0}{0}_{\sV \sM} \, \paren{C_A P C_Q}^\dagger}
 \]
-where $\Pi_{out} = \ketbra{1}{1}_{\sV_{out}}$ is the projector onto the $\ket{1}$ state of the output qubit of the $\sV$ register, $\ketbra{0}{0}_{\sV \sM}$ is the all zeroes state in the $\sV \sM$ registers, and $P = P_1 \otimes \cdots \otimes P_r$. 
+where $\Pi_{out} = \ketbra{1}{1}_{\sV_{out}}$ is the projector onto the $\ket{1}$ state of the output qubit of the $\sV$ register, $\ketbra{0}{0}_{\sV \sM}$ is the all zeroes state in the $\sV \sM$ registers, and $P = P_1 \otimes \cdots \otimes P_k$. 
 
 
 The \textbf{value of a protocol $\Protocol_V$} is denoted by $\omega^*(V)$ and is defined as 
@@ -126,7 +128,7 @@ We define notions of closeness of strategies.
 %\end{definition}
 
 \begin{definition}[Closeness of strategies]
-	Let $V = (C_Q,C_A)$ be a verifier and let $\strat = (\rho,\{P_i\}), \strat' = (\rho',\paren{P_i'})$ be strategies for the $r$-prover protocol $\Protocol_V$. Then $\strat$ is \textbf{$\eps$-close} to $\strat'$ if and only if
+	Let $V = (C_Q,C_A)$ be a verifier and let $\strat = (\rho,\{P_i\}), \strat' = (\rho',\paren{P_i'})$ be strategies for the $k$-prover protocol $\Protocol_V$. Then $\strat$ is \textbf{$\eps$-close} to $\strat'$ if and only if
 	\begin{enumerate}
 		\item $ \norm{ \rho - \rho'}_1 \leq \eps$
 		\item $\Norm{ P \sigma P^\dagger - P' \sigma P'^\dagger }_1 \leq \eps$		
@@ -137,14 +139,14 @@ We define notions of closeness of strategies.
 		%\Norm{ P - P' }^2_{\wt{\rho}} \leq \eps
 		%\]
 	\end{enumerate}
-where $\sigma = C_Q \rho \otimes \ketbra{0}{0}_{\sV \sM} C_Q^\dagger$, $P = P_1 \otimes \cdots \otimes P_r$ and $P' = P_1' \otimes \cdots \otimes P_r'$.
+where $\sigma = C_Q \rho \otimes \ketbra{0}{0}_{\sV \sM} C_Q^\dagger$, $P = P_1 \otimes \cdots \otimes P_k$ and $P' = P_1' \otimes \cdots \otimes P_k'$.
 
 \end{definition}
 
 \begin{definition}[Isometric strategies]
-	Let $\strat = (\rho,\{P_i\})$ and $\strat' = (\rho',\{P_i'\})$ be strategies for an $r$-prover protocol $\Protocol_V$ corresponding to some verifier $V = (C_Q,C_A)$, and $0\leq \eps\leq 1$. Suppose $\rho \in \Dens(\sC \sP_1 \cdots \sP_r)$ and $\rho' \in \Dens(\sC \sP_1' \cdots \sP_r')$. Then $\strat$ is \textbf{$\eps$-isometric} to $\strat'$ if and only if there exist isometries: $I_i : \sP_i \to \sP_i'$ for each $i\in\{1,\ldots,r\}$ such that the strategy $\wt{\strat} = (\wt{\rho}, \set{ \wt{P}_i })$ is $\eps$-close to $\strat'$, where $\wt{\strat}$ is defined by
+	Let $\strat = (\rho,\{P_i\})$ and $\strat' = (\rho',\{P_i'\})$ be strategies for an $k$-prover protocol $\Protocol_V$ corresponding to some verifier $V = (C_Q,C_A)$, and $0\leq \eps\leq 1$. Suppose $\rho \in \Dens(\sC \sP_1 \cdots \sP_k)$ and $\rho' \in \Dens(\sC \sP_1' \cdots \sP_k')$. Then $\strat$ is \textbf{$\eps$-isometric} to $\strat'$ if and only if there exist isometries: $I_i : \sP_i \to \sP_i'$ for each $i\in\{1,\ldots,k\}$ such that the strategy $\wt{\strat} = (\wt{\rho}, \set{ \wt{P}_i })$ is $\eps$-close to $\strat'$, where $\wt{\strat}$ is defined by
 	\begin{enumerate}
-		\item $\wt{\rho} = (I_1 \otimes \cdots \otimes I_r) \rho (I_1 \otimes \cdots \otimes I_r)^\dagger$
+		\item $\wt{\rho} = (I_1 \otimes \cdots \otimes I_k) \rho (I_1 \otimes \cdots \otimes I_k)^\dagger$
 		\item For all $i$, $\wt{P}_i = I_i P_i I_i^\dagger$.
 	\end{enumerate}
 \end{definition}
@@ -244,68 +246,139 @@ We now define a canonically complete language for $\NEXPR$. Define $\mathcal{L}_
 \end{definition}
 
 
+\section{Circuit and Turing machines types}
 
+\subsection{Protocol circuits} 
+A protocol circuit is a quantum circuit description of a quantum interactive protocol between a verifier and a number of provers (see Figures \ref{fig:qip} and \ref{fig:simcom} for examples). Formally, an $k$-prover protocol circuit $C$ is specified a number of qubits $s$ and a finite sequence of gates $g_1,g_2,\ldots,g_\tau$. 
+
+There are three types of gates $g$ in a protocol circuit: a double Hadamard gate, a Toffoli gate, and a prover reflection gate. The description of a double Hadamard gate or a Toffoli gate comes with indices of the qubits the gate acts on. The description of a prover reflection gate comes with the indices of qubits the gate acts on, as well as the label of the prover that the reflection belongs to.
+
+When interpreted as a circuit, the $C$ has $s + k$ wires. The first $s$ wires correspond to $s$ qubits that the double Hadamard and Toffoli gates act on. The last $k$ wires are labeled $\sP_1,\ldots,\sP_k$ and correspond to the $k$ provers' private space. The $i$-th prover's reflection can act on the any wire from the first $s$ as well as $\sP_i$.
+
+The size of an $k$-prover protocol circuit with $\tau$ gates and $s$ qubits is defined to be $\tau + s + k$.
+
+
+\subsection{Gate Turing Machine (GTM)} 
+A Turing machine $G$ is a Gate Turing Machine (GTM) for a family of protocol circuits $\{C_{n,r}\}$ if $G$ takes as input $n$ (an integer in binary), $r$ (another integer in binary), and $t$ (an integer $1\leq t\leq n$ written in binary), and in $\poly(\log n)$ time outputs the description of the $t$-th gate of $C_{n,r}$. We let $CKT(G,1^n,r)$ denote the circuit $C_{n,r}$ whose gates are computed by $G$ on input $(n,r,t)$.
+
+\subsection{Verifier Turing Machine (VTM)} 
+\label{sec:vtm}
+
+A Verifier Turing Machine (VTM) $\cV$ is a Turing machine description of a family of verifiers $\{V^{(n)}\}$ in a three-turn quantum interactive protocol. Each verifier $V^{(n)}$ is a pair of circuits $(C_Q^{(n)},C_A^{(n)})$ that essentially simulate $\cV$ to, for example, compute queries to a set of provers or compute whether to accept or reject, depending on the answers.
+
+%is supposed to perform: for example, to compute the queries $\{q_i\}$ or to compute whether to accept or reject, depending on the provers' answers. 
+Formally, a VTM $\cV$ is a deterministic Turing machine that takes as input $(1^n,w,\lambda)$ where $n$ is an integer, $w$ of length at most $n$, and $\lambda$ is a string of length at most $\poly(n)$. It runs in time $\poly(n)$.  It has the following types of tapes:
+\begin{enumerate}
+	\item Input tape. This tape is used to store the input to the VTM: $1^n$ and a string $V$ of length at most $n$. 
+	\item Work tape. This is where all the computation takes place.
+	\item Communication tapes. There are two tapes of this kind: the measurement outcome tape and the prover answer tape. 
+	\item Output tapes. There are three tapes of this kind: the measurement specification tape, the prover question tape, and the referee decision tape. 
+\end{enumerate}
+There are a few properties that are inherent to a VTM $\cV$: First, there is a function $r_{\cV,n}$ that depends on the parameter $n$. On input $(1^n,w,\lambda)$, the prover question and answer tapes will be divided into $r_{\cV,n}$ components; $r_{\cV,n}$ denotes the number of provers the VTM will write messages for. \hnote{Need to update}
+
+Second, when executed on input $(1^n,w,V)$ the VTM $\cV$ runs in exactly $3p(n)$ time steps, where $p(n)$ is a fixed polynomial that is a property of the VTM. Moreover, the $3p(n)$ time steps can be divided into three phases of equal length with the following properties: 
+\begin{enumerate}
+\item \textsc{ClockMeasurement} phase (timesteps $1$ through $p(n)$). During this phase the VTM only accesses the input tape (read only), the work tape, and the measurement specification tape (write only). At the end of the phase the measurement specification tape contains the description of a polynomial-size quantum circuit $C_M$.  
+\item  \textsc{GenQuestions} phase (timesteps $p(n) +1$ through $2p(n)$). During this phase the VTM only accesses the input tape (read only), the work tape, the measurement outcome tape (read only), and the prover question tape (write only). At the end of the phase the prover question tape contains a $r_{\cV,n}$-tuple of questions. 
+\item \textsc{CheckAnswers} phase (timesteps $2p(n) + 1$ through $3p(n)$). During this phase the VTM only accesses the input tape (read only), the work tape, the measurement outcome tape (read only), the prover answer tape (read only), and the referee decision tape (write only). Assuming that at the beginning of the phase the measurement outcome tape contains a valid measurement outcome, and the prover answer tape contains a valid $r_{\cV,n}$-tuple of answers, at the end of the phase the referee decision tape contains a single bit. 
+\end{enumerate}
+
+\paragraph{From VTMs to verifiers} We now specify how a VTM $\cV$ specifies verifier circuits $\{ (C_Q^{(n)},C_A^{(n)}) \}$. Fix the parameter $n$. The circuits will act on three registers $\sC, \sV, \sM$ that are each $3p(n)$ qubits wide. The $\sV$ register is divided into two subregisters $\sV_{in}$ and $\sV_{work}$ (each are $3p(n)/2$ qubits wide). 
+
+%Recall that a verifier in a three-turn quantum interactive protocol is specified by two circuits $C_Q$ and $C_A$, which act on registers $\sC \sV \sM$. A VTM $V$ can be used to specify circuits $C_Q$ and $C_A$ as described in Figure \ref{fig:vtm_circuits}. The $\sV$ register is divided into two subregisters $\sV_{in}$ and $\sV_{work}$.
+
+\begin{center}
+\begin{mdframed}
+	The circuit $C_Q^{(n)}$:
+	  \begin{enumerate}
+        \item (\textbf{ClockMeasurement phase}) Use a quantum circuit to compute a random string $w \in \{0,1\}^n$ in the work register $\sV_{work}$. 
+Simulate $\cV$ on input $(1^n,w,\lambda)$ for $p(n)$ steps using TMSIM, where $\lambda$ is the contents of $\sV_{in}$. Let $s$ denote the contents of the measurement specification tape of $V_R$.   Execute CKTSIM on input $s$ and the $\sV_{work}, \sC$ registers.%, writing the classical output $s$ into $\sV_{work}$.
+%registers $\sV_{m}$ (circuit description) and $\sC$, writing the classical output in register $\sV_{mo}$.
+        \item (\textbf{GenQuestions phase}) Simulate $\cV$ for $p(n)$ additional steps. Copy the contents of the prover question tape of $\cV$ into registers $\sM_{i}$, $i\in\{1,\ldots,r_{\cV,n}\}$.
+    \end{enumerate}
+    
+    \medskip
+	The circuit $C_A(n,V)$:
+	  \begin{enumerate}    
+        \item (\textbf{CheckAnswers phase}) Simulate $\cV$ for $p(n)$ additional steps, using the $\sV_{work} \, \sM$ registers to specify the state of the Turing machine $\cV$ as well as the contents of its tapes. Specifically, $\sM$ is used to specify the contents of the prover answer tape. Write the decision bit that is on the referee decision tape onto the first qubit of $\sV_{work}$.
+        \end{enumerate}    
+        
+        \medskip
+       	We will use $C_Q^{(n)}(\lambda)$ to denote the circuit $C_Q^{(n)}$ where $\lambda$ is initialized in the register $\sV_{in}$.
+\end{mdframed}
+\begin{figure}[H]
+\caption{The circuits $C_Q$ and $C_A$ specified by a VTM $V$.}
+\label{fig:vtm_circuits}
+\end{figure}
+\end{center}
+
+The circuits $C_Q(n,V)$ and $C_A(n,V)$ have size $\poly(n,|V|)$ where $|V|$ denotes the description length of $V$. We now argue that these circuits can be computed extremely efficiently. 
+\begin{lemma}
+\label{lem:succinct_vtm_circuits}
+	There exists a GTM $G_{C_Q}$ (resp. $G_{C_A}$) such that on input $(n,t,V)$ where $n,t$ are integers written in binary such that $1 \leq t \leq |C_Q(n,V)|$ (resp. $1 \leq t \leq |C_A(n,V)|$), computes the $t$-th gate of $C_Q(n,V)$ (resp. $C_A(n,V)$) in time $\poly \log_{|V|} (n)$.
+\end{lemma}
+\begin{proof}
+Here we use the fact that the phases of $V$ are run for exactly $p(n)$ steps.
+\hnote{Insert justification.}
+\end{proof}
 
 
 \section{Simulated communication games}
+\label{sec:prelim_simcom}
 
 In this section we introduce a variant of three-turn protocols, called \textbf{simulated communication games} (or \textbf{simcom games} for short), where the verifier and provers do not explicitly exchange message registers. Instead, they use quantum teleportation to communicate. Furthermore, whereas in teleportation the sender transmits classical teleportation keys to the receiver, in simcom games no such transmission takes place. Instead, the communicating parties \emph{guess} what the correct teleportation keys are; if their guess is incorrect, the protocol accepts. If the guess is correct, then acceptance or rejection is determined by an output bit of the verifier. This explains why we call the communication \emph{simulated}; the parties can effectively transmit messages to each other when we post-select on the correct teleportation keys.
 
 \tnote{cut this:?}
 The benefit of using simcom games is that the actions of the verifier and the provers are disjoint: they act on separate registers. This will be very useful for us in our recursive compression result. There will be a quantitative loss in transforming normal quantum interactive protocols to simcom games, but this loss will small provided that the original message lengths were small. 
 
-More precisely, an $r$-prover simcom game involves a verifier $V$, which 
-%an $r$-partite question alphabet $\cQ = \cQ_1 \times \cdots \times \cQ_r$, and an $r$-partite answer alphabet $\cA = \cA_1 \times \cdots \times \cA_r$. 
-is still specified by two circuits $(C_Q,C_V)$ acting on registers $\sC \sV \sM$, and $r$ provers. The circuits $C_Q, C_A$ act on registers $\sC \sV \sM$ as before. However, the execution of the game is different from that of Figure \ref{fig:qip}. There are a number of extra registers: $\sK_1,\sK_2,\sK_2'$ are registers that are each isomorphic to two copies of $\sM$ (i.e. their dimensions are $(\dim \sM)^2$). The $\sK_1 \sK_2$ registers are initialized in the all zeroes state. The $\sK_2'$ register can start off in an arbitrary state. $\sE_1,\sE_1',\sE_2,\sE_2'$ are registers that are each isomorphic to $\sM$. They are initialized in the state  $\ket{\Phi}_{\sE_{1} \sE_{1}'} \otimes \ket{\Phi}_{\sE_{2} \sE_{2}'}$, where $\ket{\Phi}_{\sE_j \sE_j'}$ denotes the maximally entangled state between $\sE_j$ and $\sE_j'$. The allocation of registers is as follows: the verifier holds registers $\sK_1 \sK_2 \sC \sV \sM \sE_1 \sE_2$, and the $i$-th prover holds registers $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
+More precisely, an $k$-prover simcom game is specified by a verifier $V = (C_Q,C_A)$ and an $k$-partite question alphabet $\cQ = \cQ_1 \times \cdots \times \cQ_k$, and an $k$-partite answer alphabet $\cA = \cA_1 \times \cdots \times \cA_k$. The circuits $C_Q, C_A$ act on registers $\sC \sV \sM$ as before. However, the execution of the game is different from that of Figure \ref{fig:qip}. The dimension of $\sM$ is equal to $\max\{ |\cQ|, |\cA| \}$. There are a number of extra registers:
+\begin{enumerate}
+	\item $\sO$ is a qubit register that is initialized in the zero state.
+	\item $\sK_1$ is a register whose dimension is equal to $|\cQ|^2$. It is initialized in the all zeroes state.
+	\item $\sK_2,\sK_2'$ are registers whose dimensions are equal to $|\cA|^2$. $\sK_2$ is initialized in the all zeroes state.
+	\item $\sE_1,\sE_1'$ are registers whose dimensions are equal to $|\cQ|$. They are initialized $\ket{\Phi}_{\sE_{1} \sE_{1}'}$ which is the maximally entangled state between $\sE_1$ and $\sE_1'$.
+	\item $\sE_2,\sE_2'$ are registers whose dimensions are equal to $|\cA|$. They are initialized $\ket{\Phi}_{\sE_{2} \sE_{2}'}$.	
+%	that are each isomorphic to $\sM$. They are initialized in the state  $\ket{\Phi}_{\sE_{1} \sE_{1}'} \otimes \ket{\Phi}_{\sE_{2} \sE_{2}'}$, where $\ket{\Phi}_{\sE_j \sE_j'}$ denotes the maximally entangled state between $\sE_j$ and $\sE_j'$. 
+\end{enumerate}
+The allocation of registers is as follows: the verifier holds registers $\sO \sK_1 \sK_2 \sC \sV \sM \sE_1 \sE_2$, and the $i$-th prover holds registers $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
 
 \medskip
 \noindent The sequence of unitaries run in the simcom game is as follows:
 \begin{enumerate}
-	\item The circuit $C_Q$ is applied to registers $\sC \sV \sM$
-	\item A Bell measurement is applied to the registers $\sM \sE_1$, and the measurement outcome is saved in $\sK_1$
-	\item The provers then act on $\sE_1' \sE_2' \sP \sK_2'$, where the $i$-th prover's reflection is applied on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$
-	\item Then $m$ Hadamard gates are applied to $\sK_2$, where $m = \log \dim \sK_2$. In other words, the $\sK_2$ register stores the uniform superposition over all bitstrings of length $m$
-	\item A SWAP gate is applied between $\sE_2$ and $\sM$
-	\item Controlled on $\sK_2$, Pauli corrections (such as one would do in a teleportation protocol) is applied to the $\sM$ register
+	\item The circuit $C_Q$ is applied to registers $\sC \sV \sM$.
+	\item A Bell measurement is applied to the registers $\sM \sE_1$, and the measurement outcome is saved in $\sK_1$.
+	\item The provers then act on $\sE_1' \sE_2' \sP \sK_2'$, where the $i$-th prover's reflection is applied on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$.
+	\item Then $m$ Hadamard gates are applied to $\sK_2$, where $m = 2\log |\cA|$. In other words, the $\sK_2$ register stores the uniform superposition over all bitstrings of length $m$.
+	\item A SWAP gate is applied between $\sE_2$ and $\sM$.
+	\item Controlled on $\sK_2$, Pauli corrections (such as one would do in a teleportation protocol) is applied to the $\sM$ register.
 	\item The circuit $C_A$ is applied to $\sC \sV \sM$.
+	\item The $\sO$ register is set to $1$ if and only if the $\sK_1$ register is all zero. 
 \end{enumerate}
-
-%After the circuit $C_Q$ is applied, the maximally entangled state $\ket{\Phi}_{\sE_1 \sE_1'}$ is used to teleport the verifier's outgoing message to the provers: there is a teleportation circuit $TP$ acting on $\sM \sE_1$, which performs a Bell measurement on $\sM \sE_1$ and stores the measurement outcome in $\sK_1$. 
-
-%The provers then act on $\sE_1' \sE_2' \sP \sK_2'$, where the $i$-th prover acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. Next, a SWAP gate is applied between $\sE_2$ and $\sM$. Then, the circuit $C_A$ is applied to $\sC \sV \sM$. Finally, $m$ Hadamard gates are applied to $\sK_2$, where $m = \log \dim \sK_2$. In other words, the $\sK_2$ register stores the uniform superposition over all bitstrings of length $m$. 
-
-%However, instead of letting the provers act on $\sM \sP$ as before, the protocol behaves as follows: there are five additional registers $\sE_{1} \sE_{1}' \sE_{2} \sE_{2}' \sK$. The $\sE_j$ and $\sE_j'$ registers are each isomorphic to $\sM$. The $\sK$ register is isomorphic to two copies of $\sM$. The $\sE_1 \sE_1' \sE_2 \sE_2'$ registers are initialized in the state $\ket{\Phi}_{\sE_{1} \sE_{1}'} \otimes \ket{\Phi}_{\sE_{2} \sE_{2}'}$, where $\ket{\Phi}_{\sE_j \sE_j'}$ denotes the maximally entangled state between $\sE_j$ and $\sE_j'$. The $\sK$ register is initialized to all zeroes.
-
-%The maximally entangled state $\ket{\Phi}_{\sE_1 \sE_1'}$ is used to teleport the verifier's outgoing message to the provers; after the circuit $C_Q$, there is a teleportation circuit $TP$ acting on $\sV \sM \sE_1$, which performs a Bell measurement on $\sM \sE_1$ and stores the measurement outcome in $\sV$. The provers then act on $\sE_1' \sE_2' \sP \sK$, where the $i$-th prover acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_i$. 
-
-%Then, a SWAP gate is applied between $\sE_2$ and $\sM$. Finally, the circuit $C_A$ is applied to $\sC \sV \sM$. In addition to the output qubit $\sV_{out}$, we identify additional sub-registers of $\sV$, denoted by $\sV_{tp1},\sV_{tp2}$. These two registers are each isomorphic to two copies of $\sM$.
-
-%The first register $\sV_{tp1}$ is isomorphic to two copies of $\cM$. The second register $\sV_{tp2}$ is isomorphic to two copies of $\cA$. 
 
 \noindent See Figure \ref{fig:simcom} for the circuit representation of a simcom game.
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=4.5in]{graphics/simcom.pdf}
+\includegraphics[width=5in]{graphics/simcom.pdf}
 \end{center}
 \caption{Simulated communication game circuit.}
 \label{fig:simcom}
 \end{figure}
 
-Let $V = (C_Q,C_A)$ be a verifier and let $\mathscr{Z}_V$ denote the simcom game corresponding to $V$. We say that $V$ accepts in $\mathscr{Z}_V$ if measuring the $\sV_{out} \sK_1 \sK_2 \sK_2'$ registers yields outcome $(b,k_1,k_2,k_2')$ where $b = 1$, $k_1$ is all zero, and $k_2 = k_2'$. 
+Let $V = (C_Q,C_A)$ be a verifier and let $\mathscr{Z}_V$ denote the simcom game corresponding to $V$. We say that $V$ accepts in $\mathscr{Z}_V$ if measuring the $\sO \sK_2 \sK_2'$ registers yields outcome $(o,k_2,k_2')$ where $o = 1$ and $k_2 = k_2'$. 
 
-\paragraph{Strategies for simcom games} Strategies $\strat$ for simcom games are the similar to normal three-turn protocol strategies; they consist of a state $\rho$ and a collection of reflections $\{ P_i \}$. The shared state $\rho$ is on registers $\sC, \sP_1,\ldots,\sP_r$. The reflections $P_i$ act on registers $\sE_1' \sE_2' \sP_i \sK_{2,i}'$. Given a strategy $\strat = (\rho,\{P_i\})$, the \textbf{value of $\strat$ in $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ and is defined to be
+\paragraph{Strategies for simcom games} Strategies $\strat$ for simcom games are the similar to normal three-turn protocol strategies; they consist of a state $\rho$ and a collection of reflections $\{ P_i \}$. The shared state $\rho$ is on registers $\sC, \sP_1,\ldots,\sP_k$. The reflections $P_i$ act on registers $\sE_1' \sE_2' \sP_i \sK_{2,i}'$. Given a strategy $\strat = (\rho,\{P_i\})$, the \textbf{value of $\strat$ in $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ and is defined to be
 \[
 	\omega^{SC}_\strat(V) = \Tr \Paren{ \wt{\Pi}_{out} \, U \sigma U^\dagger}
 \]
 where
 \begin{enumerate}
-	\item $U =  (C_A) \,  (\text{C-Pauli}) \, (SWAP_{\sM \leftrightarrow \sE_2}) \, (H^{\otimes m}) \, (P)\, (\mathrm{Bell})\, (C_Q)$, where $\mathrm{Bell}$ is the Bell measurement circuit that saves the measurement outcome in register $\sK_1$ and $\text{C-Pauli}$ is the Pauli correction circuit that is controlled on $\sK_2$
+	\item $U =  (F) \, (C_A) \,  (\text{C-Pauli}) \, (SWAP_{\sM \leftrightarrow \sE_2}) \, (H^{\otimes m}) \, (P)\, (\mathrm{Bell})\, (C_Q)$, where $F$ is the gate that applies a CNOT to $\sO$ if $\sK_1$ is all zero, $\mathrm{Bell}$ is the Bell measurement circuit that saves the measurement outcome in register $\sK_1$ and $\text{C-Pauli}$ is the Pauli correction circuit that is controlled on $\sK_2$
 	\item $\sigma = \rho \otimes \ketbra{0}{0}_{\sV \sM \sK_1 \sK_2 \sK_2'} \otimes \ketbra{\Phi}{\Phi}_{\sE_1 \sE_1'} \otimes \ketbra{\Phi}{\Phi}_{\sE_2 \sE_2'}$
 	\item  $\wt{\Pi}_{out} = \ketbra{1}{1}_{\sV_{out}} \otimes \Pi_{tp} + (\Id - \Pi_{tp})$
-	\item $\Pi_{tp} = \ketbra{0}{0}_{\sK_1} \otimes \Paren{ \sum_{k} \ketbra{kk}{kk}_{\sK_2 \sK_2'}}$.
+	\item $\Pi_{tp} = \ketbra{1}{1}_{\sO} \otimes \Paren{ \sum_{k} \ketbra{kk}{kk}_{\sK_2 \sK_2'}}$.
 \end{enumerate}
-The unitary $U$ is the sequence of unitaries in the simcom game. The state $\sigma$ is simply $\rho$ along with the proper initialization for the protocol. The projector $\Pi_{tp}$ projects onto the state where $\sK_1$ is the zero state, and $\sK_2$ and $\sK_2'$ are equal when measured in the standard basis.
+The unitary $U$ is the sequence of unitaries in the simcom game. The state $\sigma$ is simply $\rho$ along with the proper initialization for the protocol. The projector $\Pi_{tp}$ projects onto the state where $\sO$ is in the state $\ket{1}$, and $\sK_2$ and $\sK_2'$ are equal when measured in the standard basis.
 
 Finally, the \textbf{value of $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ and is defined to be the supremum of $\omega^{SC}_\strat(V)$ over all strategies $\strat$.
 
@@ -314,24 +387,24 @@ Although simcom games appear to be much more complicated than normal three-turn 
 
 \begin{lemma}
 \label{lem:convert_to_simcom}
-	For all verifiers $V = (C_Q,C_A)$, $\omega^{SC}(V) = 1 - \frac{1 - \omega^*(V)}{\dim \sM^4}$. 
+	For all verifiers $V = (C_Q,C_A)$, $\omega^{SC}(V) = 1 - \frac{1 - \omega^*(V)}{|\cQ|^2 \cdot |\cA|^2}$. \hnote{What are $\cQ$ and $\cA$ here?}
 \end{lemma}
 \begin{proof}
 %	Let $V'$ behave as follows. The circuit $C_Q'$ is exactly the same as $C_Q$ (which we assume to act as the identity on the registers $\sV_{tp1} \sV_{tp2}$. The circuit $C_A'$ first initializes $\sV_{tp2}$ to be a uniformly random string, and then apply the Pauli correction operation on the $\sM$ register, assuming that the teleportation keys are given by $\sV_{tp2}$. Then it runs the circuit $C_A$. 
 	We now argue that for every strategy $\strat$ for $\Protocol_V$, there is a strategy $\strat'$ for $\mathscr{Z}_V$ such that
 	\begin{equation}
 	\label{eq:simcom1}
-		\omega^{SC}_{\strat'}(V) = 1 - \frac{1 - \omega^*_\strat(V)}{\dim \sM^4}.
+		\omega^{SC}_{\strat'}(V) = 1 - \frac{1 - \omega^*_\strat(V)}{|\cQ|^2 \cdot |\cA|^2}.
 	\end{equation}
-	The strategy $\strat' = (\rho',\{P_i'\})$ is essentially the same as $\strat$: the states $\rho,\rho'$ are equal. The $i$-th prover $P_i'$ applies $P_i$ on $\sE_{1,i}' \sP_i$ (treating $\sE_{1,i}'$ as $\sM_i$). Then, it performs a Bell measurement on $\sE_{1,i}'$ and $\sE_{2,i}'$, saving the result of the Bell measurement in $\sK_{2,i}'$. In other words, the $i$-th prover uses $\sE_{1,i}'$ as its incoming message; it does not apply any Pauli corrections. Its message back to the verifier is teleported into the register $\sE_{2,i}'$. The probability that the keys $\sK_1$ from the first teleportation is equal to all zeroes is $(\dim \sM)^{-2}$. The probability the keys $\sK_2'$ from the second teleportation is equal to the verifier's guess in $\sK_2$ is also $(\dim \sM)^{-2}$. This establishes~\eqref{eq:simcom1}.
+	The strategy $\strat' = (\rho',\{P_i'\})$ is essentially the same as $\strat$: the states $\rho,\rho'$ are equal. The $i$-th prover $P_i'$ applies $P_i$ on $\sE_{1,i}' \sP_i$ (treating $\sE_{1,i}'$ as $\sM_i$). Then, it performs a Bell measurement on $\sE_{1,i}'$ and $\sE_{2,i}'$, saving the result of the Bell measurement in $\sK_{2,i}'$. In other words, the $i$-th prover uses $\sE_{1,i}'$ as its incoming message; it does not apply any Pauli corrections. Its message back to the verifier is teleported into the register $\sE_{2,i}'$. The probability that the keys $\sK_1$ from the first teleportation is equal to all zeroes is $|\cQ|^{-2}$. The probability the keys $\sK_2'$ from the second teleportation is equal to the verifier's guess in $\sK_2$ is $|\cA|^{-2}$. This establishes~\eqref{eq:simcom1}.
 	
-	This implies that $\omega^{SC}(V) \geq 1 - \frac{1 - \omega^*(V)}{\dim \sM^4}$. Now we argue for all strategies $\strat'$ for $\mathscr{Z}_{V}$, there exists a strategy $\strat$ for $\Protocol_V$ such that Equation~\eqref{eq:simcom1} holds. Let $\strat' = (\rho',\{ P_i' \})$. Define $\strat = (\rho,\{P_i\})$ where
+	This implies that $\omega^{SC}(V) \geq 1 - \frac{1 - \omega^*(V)}{|\cQ|^2 \cdot |\cA|^2}$. Now we argue for all strategies $\strat'$ for $\mathscr{Z}_{V}$, there exists a strategy $\strat$ for $\Protocol_V$ such that Equation~\eqref{eq:simcom1} holds. Let $\strat' = (\rho',\{ P_i' \})$. Define $\strat = (\rho,\{P_i\})$ where
 	\begin{enumerate}
 		\item $\rho = \rho' \otimes \ketbra{\Phi}{\Phi}_{\sE_1 \sE_1'} \otimes \ketbra{\Phi}{\Phi}_{\sE_2 \sE_2'} \otimes \ketbra{0}{0}_{\sK_2'}$. 
 		
 		\item The $i$-th prover $P_i$ receives registers $\sM_i \sP_i \sE_{1,i}' \sE_{2,i}' \sK_{2,i}'$ in this strategy. It does the following: it teleports the register $\sM_i$ into $\sE_{1,i}'$, applying Pauli corrections as needed. Then, it applies $P_i'$ to registers $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. Then, it applies the Pauli correction operation on $\sE_{2,i}'$, using $\sK_{2,i}'$ as the correction keys. Then, it swaps the $\sE_{2,i}'$ register with the $\sM_i$ register. 
 	\end{enumerate}
-	It is straightforward to verify that~\eqref{eq:simcom1} holds. \hnote{Double check this.} This implies that $\omega^{SC}(V) \leq 1 - \frac{1 - \omega^*(V)}{\dim \sM^4}$, this proving the lemma.
+	It is straightforward to verify that~\eqref{eq:simcom1} holds. \hnote{Double check this.} This implies that $\omega^{SC}(V) \leq 1 - \frac{1 - \omega^*(V)}{|\cQ|^2 \cdot |\cA|^2}$, this proving the lemma.
 \end{proof}
 
 
@@ -344,7 +417,7 @@ Here we discuss three-turn protocols with classical messages. What we mean by th
 \[
 	C_Q = \sum_{a} \ketbra{a}{a} \otimes C_Q^a 
 \]
-where $a$ runs over the computational basis states of $\sM$ and $C_Q^a$ is a unitary on $\sC \sV$. Furthermore, we will assume such protocols are equipped with a question and answer alphabet $\cQ = \cQ_1 \times \cdots \times \cQ_r$ and $\cA = \cA_1 \times \cdots \times \cA_r$, where the $i$-th prover receives questions from $\cQ_i$ and answers from $\cA_i$. We call these protocols \textbf{classical message protocols}, and their associated verifiers \textbf{classical message verifiers}.
+where $a$ runs over the computational basis states of $\sM$ and $C_Q^a$ is a unitary on $\sC \sV$. Furthermore, we will assume such protocols are equipped with a question and answer alphabet $\cQ = \cQ_1 \times \cdots \times \cQ_k$ and $\cA = \cA_1 \times \cdots \times \cA_k$, where the $i$-th prover receives questions from $\cQ_i$ and answers from $\cA_i$. We call these protocols \textbf{classical message protocols}, and their associated verifiers \textbf{classical message verifiers}.
 
 Nonlocal games are an example of such protocols. We will also generally consider simcom games with classical communication. 
 
@@ -354,7 +427,7 @@ When the communication is classical, we can instead think of a \textbf{measureme
 %We call such a strategy a \textbf{measurement strategy}, to distinguish it from a unitary strategy. 
 
 A measurement strategy $\cM = (\rho,\{M_i\})$ has a canonical unitary strategy associated with it.
-Let $\rho$ be on registers $\sC \sP_1 \cdots \sP_r$. Define $\strat_\cM = (\rho_U,\{P_i\})$ where $\rho_U = \rho \otimes \Paren{ \bigotimes_i \ketbra{0}{0}_{\sM_i'}}$ where $\sM_i'$ is an ancilla register isomorphic to $\sM_i$ given to the $i$-th prover (in addition to register $\sP_i$), and $P_i$ is defined as follows:
+Let $\rho$ be on registers $\sC \sP_1 \cdots \sP_k$. Define $\strat_\cM = (\rho_U,\{P_i\})$ where $\rho_U = \rho \otimes \Paren{ \bigotimes_i \ketbra{0}{0}_{\sM_i'}}$ where $\sM_i'$ is an ancilla register isomorphic to $\sM_i$ given to the $i$-th prover (in addition to register $\sP_i$), and $P_i$ is defined as follows:
 \[
 	P_i = SWAP_{\sM_i \leftrightarrow \sM_i'} \cdot U_i
 \]
