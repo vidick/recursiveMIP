@@ -298,7 +298,7 @@ Simulate $\cV$ on input $(1^n,w,\lambda)$ for $p(n)$ steps using TMSIM, where $\
     \end{enumerate}
     
     \medskip
-	The circuit $C_A(n,V)$:
+	The circuit $C_A^{(n)}$:
 	  \begin{enumerate}    
         \item (\textbf{CheckAnswers phase}) Simulate $\cV$ for $p(n)$ additional steps, using the $\sV_{work} \, \sM$ registers to specify the state of the Turing machine $\cV$ as well as the contents of its tapes. Specifically, $\sM$ is used to specify the contents of the prover answer tape. Write the decision bit that is on the referee decision tape onto the first qubit of $\sV_{work}$.
         \end{enumerate}    
@@ -307,18 +307,18 @@ Simulate $\cV$ on input $(1^n,w,\lambda)$ for $p(n)$ steps using TMSIM, where $\
        	We will use $C_Q^{(n)}(\lambda)$ to denote the circuit $C_Q^{(n)}$ where $\lambda$ is initialized in the register $\sV_{in}$.
 \end{mdframed}
 \begin{figure}[H]
-\caption{The circuits $C_Q$ and $C_A$ specified by a VTM $V$.}
+\caption{The circuits $C_Q$ and $C_A$ specified by a VTM $\cV$.}
 \label{fig:vtm_circuits}
 \end{figure}
 \end{center}
 
-The circuits $C_Q(n,V)$ and $C_A(n,V)$ have size $\poly(n,|V|)$ where $|V|$ denotes the description length of $V$. We now argue that these circuits can be computed extremely efficiently. 
+The circuits $C_Q^{(n)}$ and $C_A^{(n)}$ have size $\poly(n,|\cV|)$ where $|\cV|$ denotes the description length of $\cV$. We now argue that these circuits can be computed extremely efficiently. 
 \begin{lemma}
 \label{lem:succinct_vtm_circuits}
-	There exists a GTM $G_{C_Q}$ (resp. $G_{C_A}$) such that on input $(n,t,V)$ where $n,t$ are integers written in binary such that $1 \leq t \leq |C_Q(n,V)|$ (resp. $1 \leq t \leq |C_A(n,V)|$), computes the $t$-th gate of $C_Q(n,V)$ (resp. $C_A(n,V)$) in time $\poly \log_{|V|} (n)$.
+	There exists a GTM $G_{C_Q}$ (resp. $G_{C_A}$) such that on input $(n,t,\cV)$ where $n,t$ are integers written in binary such that $1 \leq t \leq |C_Q^{(n)}|$ (resp. $1 \leq t \leq |C_A^{(n)}|$), computes the $t$-th gate of $C_Q^{(n)}$ (resp. $C_A^{(n)}$) that corresponds to $\cV$ in time $\poly \log_{|\cV|} (n)$.
 \end{lemma}
 \begin{proof}
-Here we use the fact that the phases of $V$ are run for exactly $p(n)$ steps.
+Here we use the fact that the phases of $\cV$ are run for exactly $p(n)$ steps.
 \hnote{Insert justification.}
 \end{proof}
 

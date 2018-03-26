@@ -270,7 +270,7 @@ The procedures  \textbf{Toffoli Check} and \textbf{Hadamard Check} are taken fro
 	\[
 		\frac{1}{4} \Tr_{\rho} \paren{ \Id - J_t \otimes U }
 	\]
-	where $J_t$ denotes the following unitary acting on $\sC_{mip}$:
+	where $J_t$ denotes the following unitary acting on $\sC$:
 	\[
 		J_t = \Id - 2\ketbra{-_t}{-_t}.
 	\]
@@ -336,7 +336,7 @@ where for all $t$, the state $\ket{\psi_t}_{\sP \sR}$ is defined to be $g_t \ket
 	\]
 	where we define
 	\[
-		\rho' = Q^\dagger \rho Q, \qquad Q = \sum_t \ketbra{t}{t}_{\sC_{mip}} \otimes g_t \cdots g_1.
+		\rho' = Q^\dagger \rho Q, \qquad Q = \sum_t \ketbra{t}{t}_{\sC} \otimes g_t \cdots g_1.
 	\]
 Thus we have
 	\[
@@ -348,7 +348,7 @@ Thus we have
 	
 	This concludes the proof.
 	
-%	We can thus construct a new honest Pauli strategy $\strat'$ where the prover operators are the same as in $\strat$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0}_{\sC_{mip}} \otimes \ket{\theta}$ (i.e. is a history state for the computation $g_1 g_2 \cdots g_{\tau(N)}$) and otherwise has the form~\eqref{eq:honest-psi}.We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so $\strat'$ is $\poly[N;\eps]$-close to $\strat$, and furthermore $\strat'$ is an honest Gate Check strategy. This concludes the proof. %\hnote{We will need to write what it means for two strategies to be close.}
+%	We can thus construct a new honest Pauli strategy $\strat'$ where the prover operators are the same as in $\strat$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0}_{\sC} \otimes \ket{\theta}$ (i.e. is a history state for the computation $g_1 g_2 \cdots g_{\tau(N)}$) and otherwise has the form~\eqref{eq:honest-psi}.We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so $\strat'$ is $\poly[N;\eps]$-close to $\strat$, and furthermore $\strat'$ is an honest Gate Check strategy. This concludes the proof. %\hnote{We will need to write what it means for two strategies to be close.}
 %	The propagation term has spectral gap $1/\poly(N)$ and its zero eigenspace is exactly the space of history states of the aforementioned computation.
 	
 	%This, combined with Lemma~\ref{lem:closeness_to_groundspace}, implies that $\rho_0$ is $\poly[N;\eps]$-close to a history state of the computation $g_1g_2\cdots g_{\tau(N)}$.%\tnote{should the last implication refer to a theorem?}
@@ -421,7 +421,7 @@ Recall that the registers $\what{\sO} \what{\sK}_1 \what{\sK}_2 \cdots$ are held
 \begin{proof}
 The completeness statement of the Theorem is straightforward. We now argue about the soundness statement.
 
-Let $\ket{\psi}_{\sC_p \sC_{mip} \sP \sR}$ denote the shared state. Let $\rho = \ketbra{\psi}{\psi}$. Since the strategy $\strat$ is an honest Gate Check strategy (and therefore an honest Pauli Check strategy), we have that
+Let $\ket{\psi}_{\sC \sP \sR}$ denote the shared state. Let $\rho = \ketbra{\psi}{\psi}$. Since the strategy $\strat$ is an honest Gate Check strategy (and therefore an honest Pauli Check strategy), we have that
 \[
 \ket{\psi}_{\sC\sP \sR} = \frac{1}{\sqrt{\tau(N)+1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC} \otimes \ket{\psi_t}_{\sP \sR}
 \]
@@ -519,7 +519,7 @@ We now argue the Soundness part of the Theorem statement. Let $\ket{\psi}_{\sC \
 
 %Since the strategy is an honest Input Check strategy, the shared state (when conditioned on $\sC_p$ register being zero) is a history state of the protocol executed by the verifier $UPC_{N,r-1}$ with a number of provers,
 %\[
-%\frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC_{mip}} \otimes \ket{\psi_t}_{\sP \sR}
+%\frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC} \otimes \ket{\psi_t}_{\sP \sR}
 %\]
 %with the initial snapshot state $\ket{\psi_0}$ being properly initialized to $\ket{G,V,M,0}$ in the $\sV_{r-1} \setminus \{ \sC_{r-1} \}$ registers. Note that the probability of rejection in the protocol described by the history state is 
 %\[
