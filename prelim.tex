@@ -77,7 +77,7 @@ Figure \ref{fig:qip} depicts this protocol as a circuit:
 \label{fig:qip}
 \end{figure}
 
-A verifier $V = (C_Q,C_A)$ will implicitly define $3$-turn quantum interactive protocol for some number of provers. We let $\Protocol_V$ denote this protocol.
+A verifier $V = (C_Q,C_A)$ will\tnote{will ---  when? There are 25 wills in this draft. Let's cut it to 1/10-th of this --- rounded down.} implicitly define $3$-turn quantum interactive protocol for some number of provers. We let $\Protocol_V$ denote this protocol.
 
 
 
@@ -283,7 +283,7 @@ Second, when executed on input $(1^n,w,V)$ the VTM $\cV$ runs in exactly $3p(n)$
 \item \textsc{CheckAnswers} phase (timesteps $2p(n) + 1$ through $3p(n)$). During this phase the VTM only accesses the input tape (read only), the work tape, the measurement outcome tape (read only), the prover answer tape (read only), and the referee decision tape (write only). Assuming that at the beginning of the phase the measurement outcome tape contains a valid measurement outcome, and the prover answer tape contains a valid $r_{\cV,n}$-tuple of answers, at the end of the phase the referee decision tape contains a single bit. 
 \end{enumerate}
 
-\paragraph{From VTMs to verifiers} We now specify how a VTM $\cV$ specifies verifier circuits $\{ (C_Q^{(n)},C_A^{(n)}) \}$. Fix the parameter $n$. The circuits will act on three registers $\sC, \sV, \sM$ that are each $3p(n)$ qubits wide. The $\sV$ register is divided into two subregisters $\sV_{in}$ and $\sV_{work}$ (each are $3p(n)/2$ qubits wide). 
+\paragraph{From VTMs to verifiers} We now specify how a VTM $\cV$ specifies a family of circuits $\{ (C_Q^{(n)},C_A^{(n)}) \}$ for the verifier. Fix the parameter $n$. The circuits will act on three registers $\sC, \sV, \sM$ of $3p(n)$ qubits each\tnote{let's not use the notion of a register being ``$3p(n)$ qubits wide''. It's ugly. And a register has no depth, so width is the only parameter, it doesn't need a name}. The $\sV$ register is divided into two subregisters $\sV_{in}$ and $\sV_{work}$ (each are $3p(n)/2$ qubits wide). 
 
 %Recall that a verifier in a three-turn quantum interactive protocol is specified by two circuits $C_Q$ and $C_A$, which act on registers $\sC \sV \sM$. A VTM $V$ can be used to specify circuits $C_Q$ and $C_A$ as described in Figure \ref{fig:vtm_circuits}. The $\sV$ register is divided into two subregisters $\sV_{in}$ and $\sV_{work}$.
 
@@ -292,7 +292,7 @@ Second, when executed on input $(1^n,w,V)$ the VTM $\cV$ runs in exactly $3p(n)$
 	The circuit $C_Q^{(n)}$:
 	  \begin{enumerate}
         \item (\textbf{ClockMeasurement phase}) Use a quantum circuit to compute a random string $w \in \{0,1\}^n$ in the work register $\sV_{work}$. 
-Simulate $\cV$ on input $(1^n,w,\lambda)$ for $p(n)$ steps using TMSIM, where $\lambda$ is the contents of $\sV_{in}$. Let $s$ denote the contents of the measurement specification tape of $V_R$.   Execute CKTSIM on input $s$ and the $\sV_{work}, \sC$ registers.%, writing the classical output $s$ into $\sV_{work}$.
+Simulate $\cV$ on input $(1^n,w,\lambda)$ for $p(n)$ steps using TMSIM, where $\lambda$ is the contents of $\sV_{in}$. Let $s$ denote the contents of the measurement specification tape of $V_R$\tnote{is this $\sV$?}.   Execute CKTSIM on input $s$ and the $\sV_{work}, \sC$ registers.\tnote{Refer to ``the register $\sV$'', not ``the $\sV$ register''. Same for ``the $V$ verifier'', should be ``the verifier $V$'', etc.}%, writing the classical output $s$ into $\sV_{work}$.
 %registers $\sV_{m}$ (circuit description) and $\sC$, writing the classical output in register $\sV_{mo}$.
         \item (\textbf{GenQuestions phase}) Simulate $\cV$ for $p(n)$ additional steps. Copy the contents of the prover question tape of $\cV$ into registers $\sM_{i}$, $i\in\{1,\ldots,r_{\cV,n}\}$.
     \end{enumerate}
@@ -304,7 +304,7 @@ Simulate $\cV$ on input $(1^n,w,\lambda)$ for $p(n)$ steps using TMSIM, where $\
         \end{enumerate}    
         
         \medskip
-       	We will use $C_Q^{(n)}(\lambda)$ to denote the circuit $C_Q^{(n)}$ where $\lambda$ is initialized in the register $\sV_{in}$.
+       	We will use $C_Q^{(n)}(\lambda)$ to denote the circuit $C_Q^{(n)}$ where $\lambda$ is initialized in the register $\sV_{in}$\tnote{above you write something very similar as ``$\lambda$ is the contents of'', instead of ``$\lambda$ is initialized in''. Are they the same? I prefer the former}.
 \end{mdframed}
 \begin{figure}[H]
 \caption{The circuits $C_Q$ and $C_A$ specified by a VTM $\cV$.}
@@ -315,7 +315,7 @@ Simulate $\cV$ on input $(1^n,w,\lambda)$ for $p(n)$ steps using TMSIM, where $\
 The circuits $C_Q^{(n)}$ and $C_A^{(n)}$ have size $\poly(n,|\cV|)$ where $|\cV|$ denotes the description length of $\cV$. We now argue that these circuits can be computed extremely efficiently. 
 \begin{lemma}
 \label{lem:succinct_vtm_circuits}
-	There exists a GTM $G_{C_Q}$ (resp. $G_{C_A}$) such that on input $(n,t,\cV)$ where $n,t$ are integers written in binary such that $1 \leq t \leq |C_Q^{(n)}|$ (resp. $1 \leq t \leq |C_A^{(n)}|$), computes the $t$-th gate of $C_Q^{(n)}$ (resp. $C_A^{(n)}$) that corresponds to $\cV$ in time $\poly \log_{|\cV|} (n)$.
+	There exists a GTM $G_{C_Q}$ (resp. $G_{C_A}$) such that on input $(n,t,\cV)$ where $n,t$ are integers written in binary such that $1 \leq t \leq |C_Q^{(n)}|$ (resp. $1 \leq t \leq |C_A^{(n)}|$), computes the $t$-th gate of $C_Q^{(n)}$ (resp. $C_A^{(n)}$) that corresponds to $\cV$ \tnote{``$C_Q$ that corresponds to $\cV$'' is confusing. How about we define this precisely and use notation such as $C_Q(1^n,\cV)$?} in time $\poly \log_{|\cV|} (n)$.
 \end{lemma}
 \begin{proof}
 Here we use the fact that the phases of $\cV$ are run for exactly $p(n)$ steps.
@@ -352,7 +352,7 @@ The allocation of registers is as follows: the verifier holds registers $\sO \sK
 	\item A SWAP gate is applied between $\sE_2$ and $\sM$.
 	\item Controlled on $\sK_2$, Pauli corrections (such as one would do in a teleportation protocol) is applied to the $\sM$ register.
 	\item The circuit $C_A$ is applied to $\sC \sV \sM$.
-	\item The $\sO$ register is set to $1$ if and only if the $\sK_1$ register is all zero. 
+	\item The $\sO$ register is set to $1$ if and only if the $\sK_1$ register is all zero. \tnote{is this the only reason for $\sO$? Given later you consider measuring complete registers, $\sK_2\sK_2'$, why not do the same for $\sK_1$, is $\sO$ used for another reason?}
 \end{enumerate}
 
 \noindent See Figure \ref{fig:simcom} for the circuit representation of a simcom game.
@@ -376,7 +376,7 @@ Let $V = (C_Q,C_A)$ be a verifier and let $\mathscr{Z}_V$ denote the simcom game
 \[
 	\omega^{SC}_\strat(V) = \Tr \Paren{ \wt{\Pi}_{out} \, U \sigma U^\dagger}
 \]
-where
+where \tnote{I think it'd be easier to say in words that this is the probability of obtaining a certain outcome, when making a certain measurement on certain registers of the circuit in the picture. You made a nice picture, much easier to parse than the below, which is not really needed}
 \begin{enumerate}
 	\item $U =  (F) \, (C_A) \,  (\text{C-Pauli}) \, (SWAP_{\sM \leftrightarrow \sE_2}) \, (H^{\otimes m}) \, (P)\, (\mathrm{Bell})\, (C_Q)$, where $F$ is the gate that applies a CNOT to $\sO$ if $\sK_1$ is all zero, $\mathrm{Bell}$ is the Bell measurement circuit that saves the measurement outcome in register $\sK_1$ and $\text{C-Pauli}$ is the Pauli correction circuit that is controlled on $\sK_2$
 	\item $\sigma = \rho \otimes \ketbra{0}{0}_{\sV \sM \sK_1 \sK_2 \sK_2'} \otimes \ketbra{\Phi}{\Phi}_{\sE_1 \sE_1'} \otimes \ketbra{\Phi}{\Phi}_{\sE_2 \sE_2'}$

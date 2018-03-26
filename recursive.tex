@@ -20,7 +20,7 @@ Here, $\kappa_r = 2R$. \hnote{Subject to change.} The main idea is to carefully 
 \label{sec:circuits}
 
 \paragraph{Universal Protocol Circuit, $UPC_{n,r}$} %This is a family of circuits for a $\kappa_r$-prover simcom game where the verifier has size $\poly(n)$. 
-This is a family of $\kappa_r$-prover protocol circuits of size $\poly(n)$. The $UPC_{n,r}$ circuit takes an input $(G,V_{final},M)$. It expects $G$ to be the description of a GTM for some circuit family, $V_{final}$ to be a VTM, and $M$ to be a non-deterministic Turing machine. At a high level, $UPC_{n,r}$ is the circuit of the $\kappa_r$-prover simcom game (see Figure \ref{fig:simcom}) where the verifier circuits $(C_Q,C_A)$ are specified by a VTM $V_{UPC}$ that we explain in detail in Section~\ref{sec:vtm_upc}. For a more detailed specification of $UPC_{n,r}$, see Section~\ref{sec:upc}.
+This is a family of $\kappa_r$-prover protocol circuits\tnote{do we say somewhere what is a ``family of $x$-prover protocol circuits''} of size $\poly(n)$. The $UPC_{n,r}$ circuit takes an input $(G,V_{final},M)$. It expects $G$ to be the description of a GTM for some circuit family, $V_{final}$ to be a VTM, and $M$ to be a non-deterministic Turing machine. At a high level, $UPC_{n,r}$ is the circuit of the $\kappa_r$-prover simcom game (see Figure \ref{fig:simcom}) where the verifier circuits $(C_Q,C_A)$ are specified by a VTM $V_{UPC}$ that we explain in detail in Section~\ref{sec:vtm_upc}. For a more detailed specification of $UPC_{n,r}$, see Section~\ref{sec:upc}.
 
 We use $\omega^{SC}(UPC_{n,r}(G,V_{final},M))$ to denote the the value of the simcom game that is specified by the circuit $UPC_{n,r}$ on input $(G,V_{final},M)$.
 
@@ -163,7 +163,7 @@ Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an inst
 \section{The circuit $UPC_{n,r}$ and its GTM $G_{UPC}$}
 \label{sec:upc}
 
-The circuit $UPC_{n,r}$ is meant to be interpreted as the circuit for a simcom game with $\kappa_r$ provers, as described in Section~\ref{sec:prelim_simcom} and depicted in Figure \ref{fig:simcom}. Part of a simcom game are subcircuits $C_Q$, $C_A$, and $P$. In $UPC_{n,r}$, the subcircuits $C_Q$ and $C_A$ are determined by the VTM $V_{UPC}$ that we will describe fully in Section~\ref{sec:vtm_upc}. The subcircuit $P$ is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa_r}$. %where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
+The circuit $UPC_{n,r}$ is meant to be interpreted as the circuit for a simcom game\tnote{this confused me. What is the circuit for a simcom game? Maybe this should be properly defined as the circuit in the figure? Isn't it a deterministic function of a specification of $C_Q$ and $C_A$, i.e. once these two are specified there are no more free parameters?} with $\kappa_r$ provers, as described in Section~\ref{sec:prelim_simcom} and depicted in Figure \ref{fig:simcom}. Part of a simcom game are subcircuits $C_Q$, $C_A$, and $P$. In $UPC_{n,r}$, the subcircuits $C_Q$ and $C_A$ are determined by the VTM $V_{UPC}$ that we will describe fully in Section~\ref{sec:vtm_upc}. The subcircuit $P$ \tnote{what is this? What is a subcircuit? I didn't find this in the simcom section}is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa_r}$. %where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
 
 The registers of the circuit $UPC_{n,r}$ have the following specification. The registers $\sK_1, \sK_2$ are $2m$ qubits wide each and $\sE_1,\sE_1',\sE_2,\sE_2'$ are $m$ qubits wide each, where $m = O(\kappa_r \poly(n))$. The register $\sV$ has two subregisters: $\sV_{in}$ and $\sV_{work}$. The circuit receives the input triple $\lambda = (G,V,M)$ in a register $\sV_{in}$. The registers $\sK_1 \sK_2 \sV_{work} \sM$ are initialized in the all zeroes state. The $\sE_1 \sE_1' \sE_2 \sE_2'$ registers are initialized with maximally entangled states as described in Section~\ref{sec:prelim_simcom}. The $\sC \sP \sK_2'$ registers are initialized with an arbitrary state.
 
@@ -173,6 +173,7 @@ The registers of the circuit $UPC_{n,r}$ have the following specification. The r
 %The circuit $UPC_{n,r}$ is specified by two subcircuits $C_Q$ and $C_A$, which have act on the $\sC \sV \sM$ registers. Since $UPC_{n,r}$ is a protocol circuit, the subcircuit $P$ that acts on registers $\sE_1' \sE_2' \sP \sK_2'$ is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa_r}$ where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
 
 The circuit $UPC_{n,r}$ is described in detailed pseudocode in Figure \ref{fig:upc} below.
+\tnote{I didn't get why the figure is needed. Isn't it just describing the earlier figure of a simcom game that you made? }
 
 \begin{center}
 \begin{mdframed}
