@@ -4,7 +4,7 @@
 We present our recursive $\MIPstar$ compression scheme in this section. The main result we prove is the following:
 
 \begin{theorem}
-	There exists a deterministic algorithm $A$ that on input $\langle M, 1^n, R \rangle$ outputs a $(\kappa(R) + 8)$-prover one-round game $G_{M,n,R}$ such that 
+	There exists a deterministic algorithm $A$ that on input $\langle M, 1^n, R \rangle$ outputs a $(\kappa_r + 8)$-prover one-round game $G_{M,n,R}$ such that 
 \begin{align*}
 		\omega^*(G_{M,n,R}) &= 1  \quad & \text{if } \langle M,1^n \rangle\in \mathcal{L}_R \\
 		\omega^*(G_{Mn,r,}) &\leq 1 - \exp^{R-1}_2(-cn) \quad &\text{if } \langle M,1^n \rangle\notin \mathcal{L}_R.
@@ -12,15 +12,15 @@ We present our recursive $\MIPstar$ compression scheme in this section. The main
 Furthermore, $A$ runs in time $\poly(n) + \poly\log(R)$.	
 \end{theorem}
 
-Here, $\kappa(R) = 2R$. \hnote{Subject to change.} The main idea is to carefully compose the $\MIPstar$ compression scheme of~\cite{ji2016compression} $R$ times, each time shrinking the completeness-soundness gap by an exponential. 
+Here, $\kappa_r = 2R$. \hnote{Subject to change.} The main idea is to carefully compose the $\MIPstar$ compression scheme of~\cite{ji2016compression} $R$ times, each time shrinking the completeness-soundness gap by an exponential. 
 
 
 
 \subsection{Circuits}
 \label{sec:circuits}
 
-\paragraph{Universal Protocol Circuit, $UPC_{n,r}$} %This is a family of circuits for a $\kappa(r)$-prover simcom game where the verifier has size $\poly(n)$. 
-This is a family of $\kappa(r)$-prover protocol circuits of size $\poly(n)$. The $UPC_{n,r}$ circuit takes an input $(G,V_{final},M)$. It expects $G$ to be the description of a GTM for some circuit family, $V_{final}$ to be a VTM, and $M$ to be a non-deterministic Turing machine. At a high level, $UPC_{n,r}$ is the circuit of the $\kappa(r)$-prover simcom game (see Figure \ref{fig:simcom}) where the verifier circuits $(C_Q,C_A)$ are specified by a VTM $V_R$ that we explain in detail in Section~\ref{sec:vtm_r}. For a more detailed specification of $UPC_{n,r}$, see Section~\ref{sec:upc}.
+\paragraph{Universal Protocol Circuit, $UPC_{n,r}$} %This is a family of circuits for a $\kappa_r$-prover simcom game where the verifier has size $\poly(n)$. 
+This is a family of $\kappa_r$-prover protocol circuits of size $\poly(n)$. The $UPC_{n,r}$ circuit takes an input $(G,V_{final},M)$. It expects $G$ to be the description of a GTM for some circuit family, $V_{final}$ to be a VTM, and $M$ to be a non-deterministic Turing machine. At a high level, $UPC_{n,r}$ is the circuit of the $\kappa_r$-prover simcom game (see Figure \ref{fig:simcom}) where the verifier circuits $(C_Q,C_A)$ are specified by a VTM $V_R$ that we explain in detail in Section~\ref{sec:vtm_r}. For a more detailed specification of $UPC_{n,r}$, see Section~\ref{sec:upc}.
 
 We use $\omega^{SC}(UPC_{n,r}(G,V_{final},M))$ to denote the the value of the simcom game that is specified by the circuit $UPC_{n,r}$ on input $(G,V_{final},M)$.
 
@@ -43,7 +43,7 @@ There exists an $\delta > 0$ such that the following holds. Let $M$ be a nondete
 %\item Generate a uniformly random string $w \in \{0,1\}^n$. 
 %\item If $r=1$, execute the $k$-prover simcom game where the verifier is specified by the VTM $V_{final}$ on input $(1^n,w,M)$.
 %
-%\item If $r>0$, execute the $\kappa(r)$-prover simcom game where the verifier is specified by the VTM $V_R$ on input $(1^n,w,r,G,V_{final},M)$. 
+%\item If $r>0$, execute the $\kappa_r$-prover simcom game where the verifier is specified by the VTM $V_R$ on input $(1^n,w,r,G,V_{final},M)$. 
 
 %Note that $UPC_{n,r}$ cannot compute the entire
 
@@ -103,12 +103,12 @@ Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an inst
 \begin{theorem}[Main]
 	For all integer $R > 0$, 
 	\[
-		\NEXP^{(R)} \subseteq \MIPstar(\kappa(R)+8,1)_{f_R(n)}
+		\NEXP^{(R)} \subseteq \MIPstar(\kappa_r+8,1)_{f_R(n)}
 	\]
 	 where $f_n(R) = \exp^{R-1}_2(-cn)$ for some $c > 1$.
 \end{theorem}
 \begin{proof}
-	Fix an instance of $\langle M,1^n \rangle$ of $\mathcal{L}_R$. By Corollary~\ref{cor:recursive_enl} we have a simcom game $\mathscr{Z}_M$  of size $\poly(n,|M|)$ and involving $\kappa(R)$ provers such that $\omega^{SC}(\mathscr{Z}_M) = 1$ if $\langle M,1^n \rangle \in \mathcal{L}_R$, and otherwise $\omega^{SC}(\mathscr{Z}_M) \leq 1 - f_R(n)$. 
+	Fix an instance of $\langle M,1^n \rangle$ of $\mathcal{L}_R$. By Corollary~\ref{cor:recursive_enl} we have a simcom game $\mathscr{Z}_M$  of size $\poly(n,|M|)$ and involving $\kappa_r$ provers such that $\omega^{SC}(\mathscr{Z}_M) = 1$ if $\langle M,1^n \rangle \in \mathcal{L}_R$, and otherwise $\omega^{SC}(\mathscr{Z}_M) \leq 1 - f_R(n)$. 
 	
 	By Lemma~\ref{lem:convert_to_simcom} there exists a three-turn protocol $\Protocol_M$ such that $\omega^*(\Protocol_M) = 1$ if $\langle M,1^n \rangle \in \mathcal{L}_R$, and $\omega^*(\Protocol_M) \leq 1 - f_R(n)$ otherwise.
 	
@@ -130,7 +130,7 @@ Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an inst
 %    \begin{tabular}{ | l | p{10cm} |}
 %    \hline
 %    \textbf{Notation} & \textbf{Explanation} \\ \hline
-%    $\kappa(r)$ 		& Upper bound on the number of provers that the verifier $UPC_{n,r}$, on input $(G_{UPC},V_{NV},M)$, will interact with.  \\ \hline
+%    $\kappa_r$ 		& Upper bound on the number of provers that the verifier $UPC_{n,r}$, on input $(G_{UPC},V_{NV},M)$, will interact with.  \\ \hline
 %    
 %    $G_{UPC}(n,r,t)$ 			& The Gate Turing Machine (GTM) for the circuit family $\{ UPC_{n,r} \}$ \\ \hline
 %    
@@ -157,7 +157,7 @@ Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an inst
 %
 
 
-%The circuit $C_Q$ computes a $\kappa(r)$-tuple of queries $(q_1,\ldots,q_{\kappa(r)})$, where query $q_i$ is written on register $\sM_i$. The circuit $C_A$ acts on $\sV \sM$ and writes a single bit of output in the first qubit of register $\sV_{work}$. 
+%The circuit $C_Q$ computes a $\kappa_r$-tuple of queries $(q_1,\ldots,q_{\kappa_r})$, where query $q_i$ is written on register $\sM_i$. The circuit $C_A$ acts on $\sV \sM$ and writes a single bit of output in the first qubit of register $\sV_{work}$. 
 
 %\subsection{The VTM $V_R$}
 %\label{sec:vtm}
@@ -165,14 +165,14 @@ Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an inst
 \section{The circuit $UPC_{n,r}$ and its GTM $G_{UPC}$}
 \label{sec:upc}
 
-The circuit $UPC_{n,r}$ is meant to be interpreted as the circuit for a simcom game with $\kappa(r)$ provers, as described in Section~\ref{sec:prelim_simcom} and depicted in Figure \ref{fig:simcom}. Part of a simcom game are subcircuits $C_Q$, $C_A$, and $P$. In $UPC_{n,r}$, the subcircuits $C_Q$ and $C_A$ are determined by the VTM $V_R$ that we will describe fully in Section~\ref{sec:vtm_r}. The subcircuit $P$ is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa(r)}$. %where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
+The circuit $UPC_{n,r}$ is meant to be interpreted as the circuit for a simcom game with $\kappa_r$ provers, as described in Section~\ref{sec:prelim_simcom} and depicted in Figure \ref{fig:simcom}. Part of a simcom game are subcircuits $C_Q$, $C_A$, and $P$. In $UPC_{n,r}$, the subcircuits $C_Q$ and $C_A$ are determined by the VTM $V_R$ that we will describe fully in Section~\ref{sec:vtm_r}. The subcircuit $P$ is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa_r}$. %where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
 
-The registers of the circuit $UPC_{n,r}$ have the following specification. The registers $\sK_1, \sK_2$ are $2m$ qubits wide each and $\sE_1,\sE_1',\sE_2,\sE_2'$ are $m$ qubits wide each, where $m = O(\kappa(r) \log n)$. The register $\sV$ has two subregisters: $\sV_{in}$ and $\sV_{work}$. The circuit receives the input triple $\lambda = (G,V,M)$ in a register $\sV_{in}$. The registers $\sK_1 \sK_2 \sV_{work} \sM$ are initialized in the all zeroes state. The $\sE_1 \sE_1' \sE_2 \sE_2'$ registers are initialized with maximally entangled states as described in Section~\ref{sec:prelim_simcom}. The $\sC \sP \sK_2'$ registers are initialized with an arbitrary state.
+The registers of the circuit $UPC_{n,r}$ have the following specification. The registers $\sK_1, \sK_2$ are $2m$ qubits wide each and $\sE_1,\sE_1',\sE_2,\sE_2'$ are $m$ qubits wide each, where $m = O(\kappa_r \poly(n))$. The register $\sV$ has two subregisters: $\sV_{in}$ and $\sV_{work}$. The circuit receives the input triple $\lambda = (G,V,M)$ in a register $\sV_{in}$. The registers $\sK_1 \sK_2 \sV_{work} \sM$ are initialized in the all zeroes state. The $\sE_1 \sE_1' \sE_2 \sE_2'$ registers are initialized with maximally entangled states as described in Section~\ref{sec:prelim_simcom}. The $\sC \sP \sK_2'$ registers are initialized with an arbitrary state.
 
-%That is, in addition to registers $\sC \sV \sM \sP$, the circuit acts on registers $\sK_1 \sK_2 \sK_2'$ and $\sE_1 \sE_2 \sE_1' \sE_2'$ as described in Section~\ref{sec:prelim_simcom}, and depicted in Figure \ref{fig:simcom}. The registers $\sK_1, \sK_2$ are $2m$ qubits wide each and $\sE_1,\sE_1',\sE_2,\sE_2'$ are $m$ qubits wide each, where $m = O(\kappa(r) \log n)$.
+%That is, in addition to registers $\sC \sV \sM \sP$, the circuit acts on registers $\sK_1 \sK_2 \sK_2'$ and $\sE_1 \sE_2 \sE_1' \sE_2'$ as described in Section~\ref{sec:prelim_simcom}, and depicted in Figure \ref{fig:simcom}. The registers $\sK_1, \sK_2$ are $2m$ qubits wide each and $\sE_1,\sE_1',\sE_2,\sE_2'$ are $m$ qubits wide each, where $m = O(\kappa_r \log n)$.
 
 
-%The circuit $UPC_{n,r}$ is specified by two subcircuits $C_Q$ and $C_A$, which have act on the $\sC \sV \sM$ registers. Since $UPC_{n,r}$ is a protocol circuit, the subcircuit $P$ that acts on registers $\sE_1' \sE_2' \sP \sK_2'$ is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa(r)}$ where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
+%The circuit $UPC_{n,r}$ is specified by two subcircuits $C_Q$ and $C_A$, which have act on the $\sC \sV \sM$ registers. Since $UPC_{n,r}$ is a protocol circuit, the subcircuit $P$ that acts on registers $\sE_1' \sE_2' \sP \sK_2'$ is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa_r}$ where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
 
 The circuit $UPC_{n,r}$ is described in detailed pseudocode in Figure \ref{fig:upc} below.
 
@@ -183,7 +183,7 @@ The circuit $UPC_{n,r}$ is described in detailed pseudocode in Figure \ref{fig:u
 		\item Write the integer $r$ in binary after the input triple $\lambda = (G,V,M)$ in the register $\sV_{in}$.
 		\item Apply the $C_Q(n,V_R)$ circuit on the $\sC \sV \sM$ registers.
     \item Apply a Bell measurement on the $\sM$ and $\sE_1$ registers, and save the measurement outcome in register $\sK_1$.
-    \item For $i \in \{1,\ldots,\kappa(r)\}$, apply the prover reflection $P_i$ on the $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$ registers.
+    \item For $i \in \{1,\ldots,\kappa_r\}$, apply the prover reflection $P_i$ on the $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$ registers.
     \item Apply $H^{\otimes 2m}$ (the $2m$-fold tensor product of the Hadamard gate) on $\sK_2$. 
     \item Swap the $\sM$ and $\sE_2$ registers.
     \item Controlled on $\sK_2$, apply the Pauli correction operation on $\sM$.
@@ -199,7 +199,7 @@ The circuit $UPC_{n,r}$ is described in detailed pseudocode in Figure \ref{fig:u
 
 
 
-%verifier in an ENL game with $\kappa(r)$ provers, where $\kappa(r)$ is a function to be determined later (but this function will be $O(r)$). 
+%verifier in an ENL game with $\kappa_r$ provers, where $\kappa_r$ is a function to be determined later (but this function will be $O(r)$). 
 
 
 %The three circuits that constitute $UPC_{n,r}$ are described in Figure~\ref{fig:UPC}. Each of them is essentially an elaborate Turing machine simulator that emulates a phase of $V$. Recall the specification of the registers on which the circuits $UPC_{n,r}$ operate given at the start of Section~\ref{sec:upc}. 
