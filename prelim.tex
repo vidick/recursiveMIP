@@ -367,7 +367,8 @@ The allocation of registers is as follows: the verifier holds registers $\sO \sK
 
 Let $V = (C_Q,C_A)$ be a verifier and let $\mathscr{Z}_V$ denote the simcom game corresponding to $V$. We say that $V$ accepts in $\mathscr{Z}_V$ if measuring the $\sO \sV_{out} \sK_2 \sK_2'$ registers yields outcome $(o,b,k_2,k_2')$ where either:
 \begin{enumerate}
-	\item $o = 0$ or $k_2 \neq k_2'$, or
+	\item $o = 0$, or
+	\item $k_2 \neq k_2'$, or
 	\item $o = 1$, $k_2 = k_2'$, and $b = 1$.
 \end{enumerate}
 

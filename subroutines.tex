@@ -53,7 +53,7 @@ The second stage of the argument will then show that the \textbf{Stabilizer chec
 
 \paragraph{Description of the subroutines}
 
-Each of the subroutines of $V_{UPC}$ and $V_H$ follows a similar structure, summarized in Figure~\ref{fig:check_structure}. For simplicity, we give an ``operational'' description of the subroutines in the sections below, with the understanding that each should be broken down into three phases, as described in the figure.
+Each of the subroutines of $V_{UPC}$ and $V_H$ follows a similar structure, summarized in Figure~\ref{fig:check_structure}. For simplicity, we give an ``operational'' description of the subroutines in $V_H$ and $V_R$, with the understanding that each should be broken down into three phases, as described in the figure below.
 
 \vspace{10pt}
 \begin{center}
@@ -89,8 +89,8 @@ The number of provers that $V_H$ interacts with depends on its input in the foll
 
 Suppose that $UPC_{N,r-1}$ involves a set $\cP_{r-1}$ of $\kappa_{r-1}$ provers. The $r$-th level verifier then interacts with a set $\cH_r$ of $\alpha_r = \kappa_{r-1} + 1$ provers. These provers are labeled
 \begin{itemize}
-	\item $PV$: This prover plays the role of the verifier in the protocol described by $C_{N,r-1}$. 
-	\item $PP_1,\ldots,PP_{\kappa_{r-1}}$: These provers play the role of the $\kappa_{r-1}$ provers in $C_{N,r-1}$.
+	\item $PV$: This prover plays the role of the verifier in the protocol described by $UPC_{N,r-1}$. 
+	\item $PP_1,\ldots,PP_{\kappa_{r-1}}$: These provers play the role of the $\kappa_{r-1}$ provers in $UPC_{N,r-1}$.
 \end{itemize}
 We use the label $P$ to refer to an arbitrary prover $P\in\cH_r$. Questions to and answers from the provers are denoted  by $q_V$, $q_{P,1},\ldots,q_{P,\kappa_{r-1}}$, and $a_V$, $a_{P,1},\ldots,a_{P,\kappa_{r-1}}$, respectively, where the subscript indicates the label of the prover. Furthermore, the provers' private registers are labeled $\sP_V, \sP_{P,1},\ldots,\sP_{P,\kappa_{r-1}}$ where the subscripts have the same meaning.
 
@@ -130,6 +130,8 @@ Recall that the state $\rho$ is on $\alpha_r + 1$ registers: the $r$-th level ve
 %that are like those in $UPC_{N,r-1}$, and furthermore its measurement operators correspond to honest Pauli measurements on these registers. 
 
 
+\medskip
+Next, we present the three subroutines of the VTM $V_H$, and prove rigidity results for each of the subroutines. Each subroutine is presented as a standalone protocol, where we implicitly understand the subroutine as a VTM (with fixed parameters $(n,r,G,V,M)$) that specifies a verifier. 
 %
 %\subsection{Propagation Check}
 %
@@ -282,7 +284,7 @@ Any prover who was not explicitly sent a question is sent a null question, denot
 \paragraph{Question types} There are two types of questions in this test: Pauli operations and a prover reflection question $\star$.
 
 \paragraph{Honest Gate Check strategy} 
-\hnote{An honest gate check strategy is to actually leave the luggage on the jetway when they ask you to, instead of sneakily taking it on the plane with you... ahem....}
+%\hnote{An honest gate check strategy is to actually leave the luggage on the jetway when they ask you to, instead of sneakily taking it on the plane with you... ahem....}
 
 For all $0 \leq t \leq \tau(N)$, let $g_t = G(N,r-1,t)$. An honest Pauli strategy $\strat$ is an honest Gate Check strategy if the shared state $\ket{\psi}_{\sC \sP \sR}$ is a history state of the computation $g_1g_2\cdots g_{\tau(N)}$. In other words, it has the following form:
 \[
