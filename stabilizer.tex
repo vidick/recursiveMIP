@@ -52,3 +52,105 @@ A strategy $\strat = (\rho,\{M_i\})$ with shared state $\ket{\psi}_{\sC \sP \sR}
 The \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check} subroutines are exactly the same as \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check} except whatever question was supposed to be sent to $PV$ is now sent simultaneously to $PV_1,\ldots,PV_r$. Answers that were meant to be from $PV$ are now computed by taking the XOR of all the answers from $PV_1,\ldots,PV_7$. 
 
 
+\subsection{Prover simulation}
+
+\begin{definition}
+Call an extended nonlocal game a \emph{Single Pauli Prover game} if the following holds. The game has $(r+1)$ provers. The first prover is called the ``Pauli prover''. In the game, queries take the form $(q_P,q_1,\ldots,q_r)$, where $q_P$ is always of the form $(W_1,W_2,W_3)$ where $W_1,W_2,W_3$ are labels for commuting Pauli operators acting on $S$ qubits. Moreover, in the honest strategy for the game the Pauli prover has an $S$-qubit register, and it determines its $3$-bit answer to question $q_P$ by measuring the indicated Pauli observables. 
+\end{definition}
+
+Let $G$ be an $(r+1)$-prover Single Pauli Prover game such that $r\geq 7$. We define an $r$-prover \emph{Simulated Pauli Prover game} $G'$ by using $7$ out of the $r$ provers to simulate the Pauli prover in $G$ using a technique similar to the ``code-check'' test in~\cite{NV17} (see also~\cite{Ji}). For this we first define the kind of codes we need, and then introduce a multi-qubit test for Pauli observables from~\cite{}. 
+
+
+\subsubsection{Background material}
+\label{sec:codes}
+
+\paragraph{Stabilizer codes.}
+We consider weakly self-dual  \emph{Calderbank-Shor-Steane (CSS)
+  codes}~\cite{CalderbankShor96,Steane96}. Let $C$ be a classical $[k,k']$ linear error-correcting code over $\Fp_2$: $C$ is specified by a generator matrix $G \in \Fp_2^{k\times k'}$ and a parity check matrix $K\in \Fp_2^{(k-k')\times k}$ such that $C = \text{Im}(G)=\ker(K)$. We say that $C$ is weakly self-dual if the dual code $C^\perp$, with generator matrix $K^T$, is such that $C\subseteq C^\perp$; equivalently, $G^T G=0$. To any such  code $C$ we associate a subspace $\mathcal{C}$ of 
+$(\C^2)^{\otimes k}$ that is the simultaneous $+1$ eigenspace of a set of stabilizers 
+$\{S_{W,j}\}_{W\in\{X,Z\},j\in\{1,\ldots,k'\}}$ such that $S_{W,j}$ is
+a tensor product of Pauli $W$ observables over $\Fp_2$ in the locations indicated by the
+$j$-th column of the generator matrix $G$, i.e.
+\[ S_{W,j} = \sigma_W(G_{1j}) \otimes \sigma_W(G_{2j}) \otimes \cdots
+  \otimes  \sigma_W(G_{kj}), \]
+where $G_{ij}$ is the $(i,j)$-th entry of $G$.
+The condition that $G^TG=0$ implies that all the $S_{W,j}$ commute, so that $\mathcal{C}$ is well-defined. 
+
+\begin{example}[Quadratic residue code]
+\label{ex:quad_res_code}
+The $7$-qudit code is a weakly self-dual CSS code that has $k=7$, $k'=3$, and encodes one qudit over $\Fp_2$.
+\end{example}
+
+\paragraph{Pauli braiding test.}
+
+\tnote{sketchy; notation should be adapted}
+\begin{theorem}[Pauli braiding test]\label{thm:pbt}
+  For any integer $S\geq 2$ there exists a two-player nonlocal game with $O(S)$-bit questions and $O(1)$-bit answers such
+  that any strategy
+  that has success probability at least $1-\eps$ for some
+  $\eps\geq 0$ must be based on observables $A(x),A(z),A(x,z)$ and an
+  entangled state $\ket{\psi}_{AB}$ such that up to local isometries
+  $$A(x) \approx_{\delta} \otimes_i \sigma_X^{x_i}, \qquad A(z) \approx_{\delta} \otimes_i \sigma_Z^{z_i},\qquad\text{and}
+\qquad \ket{\psi}_{AB} \approx_{\delta} \ket{\Phi}_{AB}^{\otimes n},$$
+where $\delta=\poly(\eps)$. 
+\end{theorem}
+
+\subsubsection{Simulated Pauli Prover game}
+
+For convenience, fix a self-dual CSS code with $k=7$, such as the code from Example~\ref{ex:quad_res_code}. Let $C$ be the generator matrix of the code. Let $G$ be an $(r+1)$ Single Pauli Prover game, such that $r\geq 7$ and such that questions to the Pauli prover consist of $S$-qubit Pauli observables. The associated Simulated Pauli prover game is described in Figure~\ref{fig:simpauli_check}. Before the game starts, $7$ out of the $r$ provers are designated to be the ``simulated Pauli prover''. Once the game has started, the verifier splits the provers that constitute the simulated Pauli prover into two groups. One prover, indexed by $t\in\{1,\ldots, r\}$, is chosen
+at random and called the ``special prover''. The remaining $6$ provers, indexed by $i_1,\ldots,i_6 \in \{1,\ldots,r\}\backslash\{t\}$, are
+jointly called the ``composite prover''. In general a
+prover is not told whether it is the special prover, or a composite prover. The description of the game involves notions of ``composite query'' and ``composite answer'' that are defined as follows.  
+
+\begin{definition}[Composite queries and answers]\label{def:queries}
+Let $W$ be an $S$-qubit Pauli observable.
+\begin{enumerate}
+\item The composite query associated with $Q$, denoted $\comp{Q}$, is
+  obtained by sending each prover forming the composite prover the query $Q$.
+\item 
+Given answers $(A_j)_{j \neq t}$ from the $(k-1)$ provers
+  forming the composite prover, the composite answer $\comp{A}$ is
+  obtained by selecting a uniformly random vector $v$ in the column
+  span of $C$ such that $v_t=1$, and computing the sum $\comp{A} =
+  \sum_{j \neq t} v_j A_j$.
+\end{enumerate}
+\end{definition} 
+
+
+\begin{center}
+\begin{mdframed}
+    Input: Single Pauli Prover game $G$ \\
+		There are $r$ provers, $7$ of which have been designated as the ``simulated Pauli prover''. Among those $7$ provers, the verifier chooses one at random to be the ``special prover'' $P_t$, for $t\in\{1,\ldots,r\}$. The remaining $6$ provers, $P_{i_1},\ldots,P_{i_6}$, are jointly referred to as the ``composite prover''. The verifier performs either of the following with equal probability: 
+	\begin{enumerate}
+		\item (Stabilizer test) The verifier generates a query $(W,W')$ in the $S$-qubit Pauli braiding test (PBT). In addition, the verifier samples uniformly random $S$-qubit Pauli questions $W_2,W_3$ and $W'_2,W'_3$, under the constraint that $\{W,W_2,W_3\}$ and $\{W',W'_2,W'_3\}$ commute. The verifier sends $(W,W_2,W_3)$ to the special prover, and distributes $(\comp{W'},\comp{W'_2},\comp{W'_3})$ to the composite prover (each triple is sent in lexigraphic order). In addition, the verifier generates a query $(q_P,q_1,\ldots,q_r)$ as in $G$ and sends $q_i$ to the $i$-th prover (the question $q_P$ is ignored). \\
+		If $(A_1,A_2,A_3)$ and $(\comp{A'_1},\comp{A'_2},\comp{A'_3})$ are the answers to the Pauli questions, the verifier accepts if and only if $(A_1,A'_1)$ would have been accepted in the PBT. Answers to the questions from $G$ are ignored.  
+		\item (Simulate $G$) The verifier generates a query $(q_P,q_1,\ldots,q_r)$ as in $G$. He sends $q_P$ to the special prover and distributes $\comp{q_P}$ to the composite prover. In addition, he sends question $q_i$ to prover $i$, for $i\in\{1,\ldots,r\}$.\\
+		Let $(A,\comp{A})$ be the answer from the simulated Pauli prover, and $(a_1,\ldots,a_r)$ the remaining answers. The verifier accepts if and only if $(A+\comp{A},a_1,\ldots,a_r)$ is a valid answer to $(q_P,q_1,\ldots,q_r)$ in $G$.
+	\end{enumerate}    
+\end{mdframed}
+\end{center}
+\begin{figure}[H]
+\caption{Simulated Pauli Prover game}
+\label{fig:simpauli_check}
+\end{figure}
+
+\begin{theorem}
+Let $G$ be an $(r+1)$-prover Single Pauli Prover game, such that $r\geq 7$ and such that the honest Pauli prover uses an $S$ qubit register. Let $G'$ be the associated Simulated Pauli Prover game, as described in Figure~\ref{fig:simpauli_check}. Then the following hold:
+\begin{itemize}
+\item (Completeness) If there is a perfect strategy for the $(r+1)$ provers in $G$, then there is a perfect strategy for the $r$ provers in $G'$. Moreover, \tnote{maybe need to describe how the verifier is split}
+\item (Soundness) For any $r$-prover strategy in $G'$ that is accepted with probability at least $1-\eps$, there is an $(r+1)$-prover strategy in $G$ that is accepted with probability at least $1-\poly[S;\eps]$.
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+\tnote{very sketchy}
+First we note that for any fixing of $(q_1,\ldots,q_r)$ the questions to the simulated Pauli prover in parts 1. and 2. of the test are indistinguishable. Using the analysis of part 1. that follows from Theorem~\ref{thm:pbt} as in~\cite{}, we deduce that, for any fixed $(q_1,\ldots,q_r)$ the simulated Pauli prover implements a honest $S$-qubit Pauli strategy. 
+
+Next we observe that only the question $q_t$ to the special prover is changed, it must apply the same Pauli observable, as it should remain consistent with the composite prover. Therefore, the isometry and the Pauli observables do not depend on $q$. 
+
+We define a strategy for $G$ as follows. The Pauli prover is given each of the $S$-qubit registers held by the simulated Pauli prover in $G'$. On reception a Pauli query, it simulates the actions of these provers. 
+
+The remaining $r$ provers are given the remaining qubits of the $r$ other provers in $G'$. On reception a question in $G$, a prover samples a uniformly random (fake) Pauly query, and applies the associated observable. In general this observable may require $S$ extra qubits, so the prover uses $S$ qubits in the $\ket{0}$ state as a proxy. 
+
+To complete the analysis it suffices to argue that the observables associated to $q_i$ act nearly as identity on the $S$-qubit Pauli registers. Informally, this follows because the $7$-qubit code corrects at least one error.
+\end{proof}
