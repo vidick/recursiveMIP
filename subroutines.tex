@@ -3,7 +3,7 @@
 \section{The VTM $V_{UPC}$}
 \label{sec:vtm_upc}
 
-We now specify the VTM $V_{UPC}$, which interacts with $\kappa_R$ provers. The VTM is specified in high level pseudocode in Figure~\ref{fig:vtm}. It receives input $(1^n,w,\lambda)$, where $\lambda$ is interpreted as a tuple $(G,V_{final},M,r)$ where $G$ is a Gate Turing Machine, $V_{final}$ is another VTM, $M$ is a nondeterministic Turing machine, and $r$ is an integer written in binary. The input string $w$ is used to determine all random choices made by $V_{UPC}$.
+We now specify the VTM $V_{UPC}$, which interacts with $\kappa_R$ provers. The VTM is specified in high level pseudocode in Figure~\ref{fig:vtm}. It receives input $(1^n,w,\lambda)$, where $\lambda$ is interpreted as a tuple $(G,V_{final},M,r)$ where $G$ is a Gate Turing Machine, $V_{final}$ is another VTM, $M$ is a nondeterministic Turing machine \tnote{Couldn't we fold $M$ into $V_{final}$? Maybe one dedicated final object is enough? It'd make the presentation a little lighter}, and $r$ is an integer written in binary. The input string $w$ is used to determine all random choices made by $V_{UPC}$.
 
 \begin{center}
 \begin{mdframed}
@@ -44,11 +44,11 @@ The argument proceeds in two stages. In the first stage, we analyze a VTM $V_H$ 
 \end{figure}
 \end{center}
 
-Observe that $V_H$ is the same as $V_{UPC}$ except it does not run the VTM $V_{final}$ when $r = 1$, and furthermore it runs a different set of subroutines: \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check}. We present and analyze these subroutines first; we will restrict ourselves to \textbf{honest Pauli strategies}, in which there is a specific prover (called the \textbf{honest Pauli prover}) that is only asked to perform Pauli measurements, and its measurement operators are indeed the honest ones.
+Observe that $V_H$ is the same as $V_{UPC}$ except it does not run the VTM $V_{final}$ when $r = 1$, and furthermore it runs a different set of subroutines: \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check}. We present and analyze these subroutines first; we will restrict ourselves to \textbf{honest Pauli strategies}, in which there is a specific prover\tnote{explain this is an extra prover?} (called the \textbf{honest Pauli prover}) that is only asked to perform Pauli measurements, and its measurement operators are indeed the honest ones.
 
-We will show that honest Pauli strategies passing the protocol $\Protocol^H_{n,r}$ corresponding to $V_H$ with high enough probability must involve a history state for $\mathscr{Z}_{N,r-1}$.
+We will show that honest Pauli strategies passing the protocol $\Protocol^H_{n,r}$ corresponding to $V_H$ with high enough probability must involve\tnote{what does it mean, ``involve''} a history state for $\mathscr{Z}_{N,r-1}$.
 
-The second stage of the argument will then show that the \textbf{Stabilizer check} subroutine of $V_{UPC}$ will essentially force a set of $7$ provers to encode an honest Pauli prover using an error correcting code. The subroutines \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check} will be the same as those in $V_H$ except that the messages sent to the honest Pauli prover will now be distributed to these $7$ provers. The value of a strategy in $\Protocol_{n,r}$ will then be related to the value of the corresponding honest Pauli strategy in $\Protocol^H_{n,r}$.
+The second stage of the argument will then show that the \textbf{Stabilizer check} subroutine of $V_{UPC}$ will essentially force a set of $7$ provers\tnote{Here, are these re-used provers or $7$ extra provers?} to encode an honest Pauli prover using an error correcting code. The subroutines \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check} will be the same as those in $V_H$ except that the messages sent to the honest Pauli prover will now be distributed to these $7$ provers. The value of a strategy in $\Protocol_{n,r}$ will then be related to the value of the corresponding honest Pauli strategy in $\Protocol^H_{n,r}$.
 
 
 \paragraph{Description of the subroutines}
