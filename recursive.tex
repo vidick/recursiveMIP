@@ -20,7 +20,7 @@ Here, $\kappa_r = 2R$. \hnote{Subject to change.} The main idea is to carefully 
 \label{sec:circuits}
 
 \paragraph{Universal Protocol Circuit, $UPC_{n,r}$} %This is a family of circuits for a $\kappa_r$-prover simcom game where the verifier has size $\poly(n)$. 
-This is a family of $\kappa_r$-prover protocol circuits of size $\poly(n)$. The $UPC_{n,r}$ circuit takes an input $(G,V_{final},M)$. It expects $G$ to be the description of a GTM for some circuit family, $V_{final}$ to be a VTM, and $M$ to be a non-deterministic Turing machine. At a high level, $UPC_{n,r}$ is the circuit of the $\kappa_r$-prover simcom game (see Figure \ref{fig:simcom}) where the verifier circuits $(C_Q,C_A)$ are specified by a VTM $V_R$ that we explain in detail in Section~\ref{sec:vtm_r}. For a more detailed specification of $UPC_{n,r}$, see Section~\ref{sec:upc}.
+This is a family of $\kappa_r$-prover protocol circuits of size $\poly(n)$. The $UPC_{n,r}$ circuit takes an input $(G,V_{final},M)$. It expects $G$ to be the description of a GTM for some circuit family, $V_{final}$ to be a VTM, and $M$ to be a non-deterministic Turing machine. At a high level, $UPC_{n,r}$ is the circuit of the $\kappa_r$-prover simcom game (see Figure \ref{fig:simcom}) where the verifier circuits $(C_Q,C_A)$ are specified by a VTM $V_{UPC}$ that we explain in detail in Section~\ref{sec:vtm_upc}. For a more detailed specification of $UPC_{n,r}$, see Section~\ref{sec:upc}.
 
 We use $\omega^{SC}(UPC_{n,r}(G,V_{final},M))$ to denote the the value of the simcom game that is specified by the circuit $UPC_{n,r}$ on input $(G,V_{final},M)$.
 
@@ -28,7 +28,7 @@ We use $\omega^{SC}(UPC_{n,r}(G,V_{final},M))$ to denote the the value of the si
 
 \paragraph{Universal Extended Verifier GTM, $G_{UPC}$} This is a GTM for $\{UPC_{n,r}\}$. On input $n$, $r$ and $t$ it computes the $t$-th gate of $UPC_{n,r}$. 
 
-\paragraph{Recursive Compression VTM, $V_R$} This is the VTM that specifies the verifier used in our recursive compression scheme. The auxiliary input $\lambda$ is interpreted as $(G,V_{final},M,r)$ where $G$ is a GTM, $V_{final}$ is a VTM, and $M$ is a nondeterministic Turing machine, and $r$ is an integer in binary. It is described in Section~\ref{sec:vtm_r}. 
+\paragraph{Recursive Compression VTM, $V_{UPC}$} This is the VTM that specifies the verifier used in our recursive compression scheme. The auxiliary input $\lambda$ is interpreted as $(G,V_{final},M,r)$ where $G$ is a GTM, $V_{final}$ is a VTM, and $M$ is a nondeterministic Turing machine, and $r$ is an integer in binary. It is described in Section~\ref{sec:vtm_upc}. 
 
 \paragraph{Natarajan-Vidick VTM, $V_{NV}$} This is a VTM that is called in the final stage of the recursive composition. The auxiliary input $\lambda$ is interpeted as a non-deterministic Turing machine $M$. The VTM $V_{NV}$ computes the questions and checks the answers as required in the Natarajan-Vidick protocol (see the following Theorem) with $2$ provers to decide whether $\langle M, 1^n \rangle \in \mathcal{L}_1$.
 
@@ -43,7 +43,7 @@ There exists an $\delta > 0$ such that the following holds. Let $M$ be a nondete
 %\item Generate a uniformly random string $w \in \{0,1\}^n$. 
 %\item If $r=1$, execute the $k$-prover simcom game where the verifier is specified by the VTM $V_{final}$ on input $(1^n,w,M)$.
 %
-%\item If $r>0$, execute the $\kappa_r$-prover simcom game where the verifier is specified by the VTM $V_R$ on input $(1^n,w,r,G,V_{final},M)$. 
+%\item If $r>0$, execute the $\kappa_r$-prover simcom game where the verifier is specified by the VTM $V_{UPC}$ on input $(1^n,w,r,G,V_{final},M)$. 
 
 %Note that $UPC_{n,r}$ cannot compute the entire
 
@@ -134,7 +134,7 @@ Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an inst
 %    
 %    $G_{UPC}(n,r,t)$ 			& The Gate Turing Machine (GTM) for the circuit family $\{ UPC_{n,r} \}$ \\ \hline
 %    
-%    $V_R(r,G,M)$			& The Verifier Turing Machine (VTM) that is used in $UPC$ \\ \hline
+%    $V_{UPC}(r,G,M)$			& The Verifier Turing Machine (VTM) that is used in $UPC$ \\ \hline
 %    \end{tabular}
 %\end{center}
 %\caption{Table of notation}
@@ -159,13 +159,11 @@ Let $V_{NV}$ be the Natarajan-Vidick VTM. Let $\langle M,1^n \rangle$ be an inst
 
 %The circuit $C_Q$ computes a $\kappa_r$-tuple of queries $(q_1,\ldots,q_{\kappa_r})$, where query $q_i$ is written on register $\sM_i$. The circuit $C_A$ acts on $\sV \sM$ and writes a single bit of output in the first qubit of register $\sV_{work}$. 
 
-%\subsection{The VTM $V_R$}
-%\label{sec:vtm}
 
 \section{The circuit $UPC_{n,r}$ and its GTM $G_{UPC}$}
 \label{sec:upc}
 
-The circuit $UPC_{n,r}$ is meant to be interpreted as the circuit for a simcom game with $\kappa_r$ provers, as described in Section~\ref{sec:prelim_simcom} and depicted in Figure \ref{fig:simcom}. Part of a simcom game are subcircuits $C_Q$, $C_A$, and $P$. In $UPC_{n,r}$, the subcircuits $C_Q$ and $C_A$ are determined by the VTM $V_R$ that we will describe fully in Section~\ref{sec:vtm_r}. The subcircuit $P$ is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa_r}$. %where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
+The circuit $UPC_{n,r}$ is meant to be interpreted as the circuit for a simcom game with $\kappa_r$ provers, as described in Section~\ref{sec:prelim_simcom} and depicted in Figure \ref{fig:simcom}. Part of a simcom game are subcircuits $C_Q$, $C_A$, and $P$. In $UPC_{n,r}$, the subcircuits $C_Q$ and $C_A$ are determined by the VTM $V_{UPC}$ that we will describe fully in Section~\ref{sec:vtm_upc}. The subcircuit $P$ is simply a sequence of prover reflection gates $P_1,\ldots,P_{\kappa_r}$. %where $P_i$ acts on $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$. 
 
 The registers of the circuit $UPC_{n,r}$ have the following specification. The registers $\sK_1, \sK_2$ are $2m$ qubits wide each and $\sE_1,\sE_1',\sE_2,\sE_2'$ are $m$ qubits wide each, where $m = O(\kappa_r \poly(n))$. The register $\sV$ has two subregisters: $\sV_{in}$ and $\sV_{work}$. The circuit receives the input triple $\lambda = (G,V,M)$ in a register $\sV_{in}$. The registers $\sK_1 \sK_2 \sV_{work} \sM$ are initialized in the all zeroes state. The $\sE_1 \sE_1' \sE_2 \sE_2'$ registers are initialized with maximally entangled states as described in Section~\ref{sec:prelim_simcom}. The $\sC \sP \sK_2'$ registers are initialized with an arbitrary state.
 
@@ -181,13 +179,13 @@ The circuit $UPC_{n,r}$ is described in detailed pseudocode in Figure \ref{fig:u
 %    Input: The description of a GTM $G$, a VTM $V_{final}$, and a nondeterministic Turing machine $M$.
 	\begin{enumerate}
 		\item Write the integer $r$ in binary after the input triple $\lambda = (G,V,M)$ in the register $\sV_{in}$.
-		\item Apply the $C_Q(n,V_R)$ circuit on the $\sC \sV \sM$ registers.
+		\item Apply the $C_Q(n,V_{UPC})$ circuit on the $\sC \sV \sM$ registers.
     \item Apply a Bell measurement on the $\sM$ and $\sE_1$ registers, and save the measurement outcome in register $\sK_1$.
     \item For $i \in \{1,\ldots,\kappa_r\}$, apply the prover reflection $P_i$ on the $\sE_{1,i}' \sE_{2,i}' \sP_i \sK_{2,i}'$ registers.
     \item Apply $H^{\otimes 2m}$ (the $2m$-fold tensor product of the Hadamard gate) on $\sK_2$. 
     \item Swap the $\sM$ and $\sE_2$ registers.
     \item Controlled on $\sK_2$, apply the Pauli correction operation on $\sM$.
-    \item Apply the $C_A(n,V_R)$ circuit on the $\sC \sV \sM$ registers.
+    \item Apply the $C_A(n,V_{UPC})$ circuit on the $\sC \sV \sM$ registers.
     \item Apply a CNOT gate to $\sO$ if $\sK_1$ is all zeroes.
     \end{enumerate}
 \end{mdframed}
@@ -214,7 +212,7 @@ Let $\tau(n,r)$ denote the circuit size of $UPC_{n,r}$. It remains to describe t
 \begin{proof}
 	Given $(n,r,t)$, it is straightforward to compute which of the eight steps of $UPC_{n,r}$ described above the time $t$ corresponds to. If the time $t$ corresponds to a time in the $C_Q$ or $C_A$ circuits, we invoke the GTMs from Lemma~\ref{lem:succinct_vtm_circuits}. Otherwise, all the other gates are easily seen to be efficiently computable. \hnote{Write more here...}
 	
-%	 Furthermore, the description of $V_R$ is hardwired into $G_{UPC}$.
+%	 Furthermore, the description of $V_{UPC}$ is hardwired into $G_{UPC}$.
 %	
 %	If $t$ is a gate in the measurement circuit, it is either a gate used to generate the random string $w$, or a gate used to copy inputs between different registers, or a gate of TMSIM, or a gate of CKTSIM. Which case holds can be determined easily.
 %	

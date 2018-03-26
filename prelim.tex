@@ -365,7 +365,11 @@ The allocation of registers is as follows: the verifier holds registers $\sO \sK
 \label{fig:simcom}
 \end{figure}
 
-Let $V = (C_Q,C_A)$ be a verifier and let $\mathscr{Z}_V$ denote the simcom game corresponding to $V$. We say that $V$ accepts in $\mathscr{Z}_V$ if measuring the $\sO \sK_2 \sK_2'$ registers yields outcome $(o,k_2,k_2')$ where $o = 1$ and $k_2 = k_2'$. 
+Let $V = (C_Q,C_A)$ be a verifier and let $\mathscr{Z}_V$ denote the simcom game corresponding to $V$. We say that $V$ accepts in $\mathscr{Z}_V$ if measuring the $\sO \sV_{out} \sK_2 \sK_2'$ registers yields outcome $(o,b,k_2,k_2')$ where either:
+\begin{enumerate}
+	\item $o = 0$ or $k_2 \neq k_2'$, or
+	\item $o = 1$, $k_2 = k_2'$, and $b = 1$.
+\end{enumerate}
 
 \paragraph{Strategies for simcom games} Strategies $\strat$ for simcom games are the similar to normal three-turn protocol strategies; they consist of a state $\rho$ and a collection of reflections $\{ P_i \}$. The shared state $\rho$ is on registers $\sC, \sP_1,\ldots,\sP_k$. The reflections $P_i$ act on registers $\sE_1' \sE_2' \sP_i \sK_{2,i}'$. Given a strategy $\strat = (\rho,\{P_i\})$, the \textbf{value of $\strat$ in $\mathscr{Z}_V$} is denoted by $\omega^{SC}(V)$ and is defined to be
 \[

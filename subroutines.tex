@@ -1,9 +1,9 @@
 %!TEX root = main.tex
 
-\section{The VTM $V_R$}
-\label{sec:vtm_r}
+\section{The VTM $V_{UPC}$}
+\label{sec:vtm_upc}
 
-We now specify the VTM $V_R$, which interacts with $\kappa_R$ provers. The VTM is specified in high level pseudocode in Figure~\ref{fig:vtm}. It receives input $(1^n,w,\lambda)$, where $\lambda$ is interpreted as a tuple $(G,V_{final},M,r)$ where $G$ is a Gate Turing Machine, $V_{final}$ is another VTM, $M$ is a nondeterministic Turing machine, and $r$ is an integer written in binary. The input string $w$ is used to determine all random choices made by $V_R$.
+We now specify the VTM $V_{UPC}$, which interacts with $\kappa_R$ provers. The VTM is specified in high level pseudocode in Figure~\ref{fig:vtm}. It receives input $(1^n,w,\lambda)$, where $\lambda$ is interpreted as a tuple $(G,V_{final},M,r)$ where $G$ is a Gate Turing Machine, $V_{final}$ is another VTM, $M$ is a nondeterministic Turing machine, and $r$ is an integer written in binary. The input string $w$ is used to determine all random choices made by $V_{UPC}$.
 
 \begin{center}
 \begin{mdframed}
@@ -17,17 +17,17 @@ We now specify the VTM $V_R$, which interacts with $\kappa_R$ provers. The VTM i
 \end{mdframed}
 
 \begin{figure}[H]
-\caption{The VTM $V_R$}
+\caption{The VTM $V_{UPC}$}
 \label{fig:vtm}
 \end{figure}
 \end{center}
 
-Fix integers $n, r$, and fix $\lambda = (G_{UPC},V_{NV},M,r)$. Recall from Section~\ref{sec:vtm} that a VTM $V_R$ specifies verifier circuits $C_Q^{(n)}(\lambda)$ and $C_A^{(n)}$. In a slight abuse of notation, we use $V_R^{(n,r)}$ to denote $(C_Q^{(n)}(\lambda),C_A^{(n)})$. Let $\Protocol_{n,r}$ denote the protocol that is executed by this verifier. 
+Fix integers $n, r$, and fix $\lambda = (G_{UPC},V_{NV},M,r)$. Recall from Section~\ref{sec:vtm} that a VTM $V_{UPC}$ specifies verifier circuits $C_Q^{(n)}(\lambda)$ and $C_A^{(n)}$. In a slight abuse of notation, we use $V_{UPC}^{(n,r)}$ to denote $(C_Q^{(n)}(\lambda),C_A^{(n)})$. Let $\Protocol_{n,r}$ denote the protocol that is executed by this verifier. 
 
-We will show that provers succeeding in the protocol $\Protocol_{n,r}$ with high enough probability must, up to local isometries, share a history state of the simcom game $\mathscr{Z}_{N,r-1}$ whose verifier is $V_R^{(N,r-1)}$ where $N = 2^n$. This in turn allows us to relate the value of $\Protocol_{n,r}$ to the simcom value of $\mathscr{Z}_{N,r-1}$. This is the main idea behind the proof of Proposition~\ref{prop:UPC_soundness}.
+We will show that provers succeeding in the protocol $\Protocol_{n,r}$ with high enough probability must, up to local isometries, share a history state of the simcom game $\mathscr{Z}_{N,r-1}$ whose verifier is $V_{UPC}^{(N,r-1)}$ where $N = 2^n$. This in turn allows us to relate the value of $\Protocol_{n,r}$ to the simcom value of $\mathscr{Z}_{N,r-1}$. This is the main idea behind the proof of Proposition~\ref{prop:UPC_soundness}.
 
 
-The argument proceeds in two stages. In the first stage, we analyze a VTM $V_H$ that is a modification of $V_R$: 
+The argument proceeds in two stages. In the first stage, we analyze a VTM $V_H$ that is a modification of $V_{UPC}$: 
 
 \begin{center}
 \begin{mdframed}
@@ -44,16 +44,16 @@ The argument proceeds in two stages. In the first stage, we analyze a VTM $V_H$ 
 \end{figure}
 \end{center}
 
-Observe that $V_H$ is the same as $V_R$ except it does not run the VTM $V_{final}$ when $r = 1$, and furthermore it runs a different set of subroutines: \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check}. We present and analyze these subroutines first; we will restrict ourselves to \textbf{honest Pauli strategies}, in which there is a specific prover (called the \textbf{honest Pauli prover}) that is only asked to perform Pauli measurements, and its measurement operators are indeed the honest ones.
+Observe that $V_H$ is the same as $V_{UPC}$ except it does not run the VTM $V_{final}$ when $r = 1$, and furthermore it runs a different set of subroutines: \textbf{Gate2 check}, \textbf{Input2 check}, and \textbf{Output2 check}. We present and analyze these subroutines first; we will restrict ourselves to \textbf{honest Pauli strategies}, in which there is a specific prover (called the \textbf{honest Pauli prover}) that is only asked to perform Pauli measurements, and its measurement operators are indeed the honest ones.
 
 We will show that honest Pauli strategies passing the protocol $\Protocol^H_{n,r}$ corresponding to $V_H$ with high enough probability must involve a history state for $\mathscr{Z}_{N,r-1}$.
 
-The second stage of the argument will then show that the \textbf{Stabilizer check} subroutine of $V_R$ will essentially force a set of $7$ provers to encode an honest Pauli prover using an error correcting code. The subroutines \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check} will be the same as those in $V_H$ except that the messages sent to the honest Pauli prover will now be distributed to these $7$ provers. The value of a strategy in $\Protocol_{n,r}$ will then be related to the value of the corresponding honest Pauli strategy in $\Protocol^H_{n,r}$.
+The second stage of the argument will then show that the \textbf{Stabilizer check} subroutine of $V_{UPC}$ will essentially force a set of $7$ provers to encode an honest Pauli prover using an error correcting code. The subroutines \textbf{Gate check}, \textbf{Input check}, and \textbf{Output check} will be the same as those in $V_H$ except that the messages sent to the honest Pauli prover will now be distributed to these $7$ provers. The value of a strategy in $\Protocol_{n,r}$ will then be related to the value of the corresponding honest Pauli strategy in $\Protocol^H_{n,r}$.
 
 
 \paragraph{Description of the subroutines}
 
-Each of the subroutines of $V_R$ and $V_H$ follows a similar structure, summarized in Figure~\ref{fig:check_structure}. For simplicity, we give an ``operational'' description of the subroutines in the sections below, with the understanding that each should be broken down into three phases, as described in the figure.
+Each of the subroutines of $V_{UPC}$ and $V_H$ follows a similar structure, summarized in Figure~\ref{fig:check_structure}. For simplicity, we give an ``operational'' description of the subroutines in the sections below, with the understanding that each should be broken down into three phases, as described in the figure.
 
 \vspace{10pt}
 \begin{center}
@@ -72,12 +72,12 @@ If $t'$ is not specified it is understood that $t'=t+1$.
 
 \end{center}
 \begin{figure}[H]
-\caption{Template for each of the subroutines of $V_R$ and $V_H$}
+\caption{Template for each of the subroutines of $V_{UPC}$ and $V_H$}
 \label{fig:check_structure}
 \end{figure}
 
 \paragraph{Notation} 
-Fix integers $n, r > 1$. In what follows, we let $G = G_{UPC}$, $V = V_{NV}$, and $M$ be some fixed nondeterministic Turing machine. For notational clarity we will sometimes omit mention of the input parameters $(G,V,M)$ and treat them as fixed. The VTMs $V_H$ and $V_R$ take input $(1^n,w,r)$, where $w$ is a string that is used to make all random choices of the VTMs. $r$ is an integer to indicate the ``level'' for the verifier. 
+Fix integers $n, r > 1$. In what follows, we let $G = G_{UPC}$, $V = V_{NV}$, and $M$ be some fixed nondeterministic Turing machine. For notational clarity we will sometimes omit mention of the input parameters $(G,V,M)$ and treat them as fixed. The VTMs $V_H$ and $V_{UPC}$ take input $(1^n,w,r)$, where $w$ is a string that is used to make all random choices of the VTMs. $r$ is an integer to indicate the ``level'' for the verifier. 
 
 
 \subsection{Analyzing $V_H$ with honest Pauli strategies}
@@ -491,7 +491,7 @@ Suppose now that the shared state in \textbf{Input Check} is $\rho_{0}$. \hnote{
 % post-selects on the clock register $\sR$ in reading the last time $\tau(N)$ of the circuit, and the verifier will ask prover $1$ to measure its first qubit in the computational basis, which should correspond to the output bit of the history state. 
 
 \paragraph{Question types} 
-The honest Pauli prover $PV$ is sent multi-qubit Pauli questions. The provers $PP_i$ are all sent the question $\Diamondblack$, wherein they are supposed to produce teleportation keys.
+The honest Pauli prover $PV$ is sent multi-qubit Pauli questions. The provers $PP_i$ are all sent the question $\Diamondblack$, where they are supposed to produce teleportation keys.
 
 \begin{lemma}	
 \label{lem:output_check}
