@@ -171,22 +171,25 @@ Given answers $(A_{i_j})_{i\in\{1,\ldots,6\}}$ from the $6$ provers
 \end{figure}
 
 \begin{theorem}
-Let $G$ be an $S$-qubuit $(r+1)$-prover Single Pauli Prover game such that $r\geq 7$. Let $G'$ be the associated Simulated Pauli Prover game, as described in Figure~\ref{fig:simpauli_check}. Then the following hold:
+Let $G$ be an $S$-qubuit $(r+1)$-prover Single Pauli Prover game such that $r\geq 7$, such that the distribution of questions in $G$ is a product distribution\tnote{I had to add this for consistency reasons. It's not strictly needed, but easier this way. Can we make it to hold, by just tweaking the actual distribution and using e.g. ``rejection sampling'' (i.e. dummy accepts for the verifier)?} Let $G'$ be the associated Simulated Pauli Prover game, as described in Figure~\ref{fig:simpauli_check}. Then the following hold:
 \begin{itemize}
 \item (Completeness) If there is a perfect strategy for the $(r+1)$ provers in $G$ such that the Pauli prover employs an honest Single-Prover Pauli strategy, then there is a perfect strategy for the $r$ provers in $G'$. 
 \item (Soundness) For any $\eps\geq 0$ and any $r$-prover strategy that is accepted with probability at least $1-\eps$ in $G'$, there is an $(r+1)$-prover strategy in $G$ such that the Pauli prover employs an honest Single-Prover Pauli strategy, and that is accepted with probability at least $1-\poly[S;\eps]$ in $G$.
 \end{itemize}
 \end{theorem}
 
-\begin{proof}
-\tnote{very sketchy}
-First we note that for any fixing of $(q_1,\ldots,q_r)$ the questions to the simulated Pauli prover in parts 1. and 2. of the test are indistinguishable. Using the analysis of part 1. that follows from Theorem~\ref{thm:pbt} as in~\cite{}, we deduce that, for any fixed $(q_1,\ldots,q_r)$ the simulated Pauli prover implements a honest $S$-qubit Pauli strategy. 
+\begin{proof}\tnote{still sketchy, but maybe detailed enough for a first pass}
+Completeness of the test is clear. We show soundness. 
+Fix a strategy $(\ket{\psi},\{M_i\})$ for the $r$ provers in $G'$ that has success probability at least $1-\eps$, for some $\eps\geq 0$. 
 
-Next we observe that only the question $q_t$ to the special prover is changed, it must apply the same Pauli observable, as it should remain consistent with the composite prover. Therefore, the isometry and the Pauli observables do not depend on $q$. 
+On average over the choice of the $G$ questions $Q=(q_1,\ldots,q_r)$ in part 1. of the test, the players' strategy (depending on $Q$) to determine their answers to the EPR questions has success probability $1-O(\eps)$ in the ``stabilizer-encoded'' variant of the EPR test. In particular, the strategy that is derived, on the one hand from the special prover, and on the other hand by combining the strategies of the six provers that make the composite prover (including the post-processing involved in computing the composite answer $\comp{A'}$) defines a successful strategy in the EPR test. Applying the soundness analysis of the EPR test given in Theorem~\ref{thm:epr-test} it follows that there is an isometry local to the special prover under which its observables are $\delta$-close to tensor products of Pauli observables, for some $\delta = \poly[S;\eps]$. Since the composite prover is chosen at random, the same analysis applies to all provers that constitute the simulated Pauli prover. 
 
-We define a strategy for $G$ as follows. The Pauli prover is given each of the $S$-qubit registers held by the simulated Pauli prover in $G'$. On reception a Pauli query, it simulates the actions of these provers. 
+We can further argue that the observable applied by the composite prover to determine its answer to an EPR question of the form $q=(W^{(1)},W^{(2)},W^{(3)})$ does not depend on the accompanying $G$ question $q_t$. By the consistency test that is part of item 1. of the EPR test, on average over the choice of a question tuple $(q_1,\ldots,q_r)$, and on average over $j\in\{1,2,3\}$, the observable $W^{(j)}$ (depending on $q_t$) that determines the special prover's answer to the question with that label must be consistent with the associated observable for the composite prover (depending on $(q_1,\ldots,q_{t-1},q_{t+1},\ldots,q_r)$). Using the assumption that the tuple $(q_1,\ldots,q_r)$ is sampled according to a product distribution, it follows that $W^{(j)}$ can only depend on $q_t$ up to small error $\poly[S;\eps]$. We may thus without loss of generality consider that it is strictly independent of $q_t$ (e.g. by making an ``average'' choice of a fixed $q_t$ to define the observable). 
 
-The remaining $r$ provers are given the remaining qubits of the $r$ other provers in $G'$. On reception a question in $G$, a prover samples a uniformly random (fake) Pauly query, and applies the associated observable. In general this observable may require $S$ extra qubits, so the prover uses $S$ qubits in the $\ket{0}$ state as a proxy. 
-
-To complete the analysis it suffices to argue that the observables associated to $q_i$ act nearly as identity on the $S$-qubit Pauli registers. Informally, this follows because the $7$-qubit code corrects at least one error.
+With a well-defined isometry local to each prover, independent of the prover's $G$ question $q_i$, and an associated set of Pauli observables, we define a strategy for $G$ as follows:
+\begin{itemize}
+\item The Pauli prover is given each of the $S$-qubit registers held by the $7$ provers that constitute the simulated Pauli prover in $G'$. On reception of an EPR question in $G$ (recall that by assumptions all questions to the Pauli prover in $G$ are EPR questions), the prover reproduces the actions of the simulated Pauli prover in $G$. It returns the sum of the simulated Pauli prover's answers as its three-bit answer. 
+\item Each of the remaining $r$ provers in $G$ is given the remaining qubits of the corresponding prover in $G'$, i.e. the qubits that are not part of the $S$ qubits singled out by the isometry. These qubits are replaced by a maximally entangled state (for each prover, uncorrelated with the others), so that the prover's observables from $G'$ have a well-defined action on the prover's register in $G$. On reception of a question in $G$, the prover samples a uniformly random EPR question, and performs the same measurement as the prover would in the game $G'$. It ignores the answer to the EPR question, and returns the answer to the $G$ question. 
+\end{itemize} 
+We argue that the success probability of this strategy in $G$ is polynomially related to the success probability of the strategy in $G'$, and more specifically to the success probability in part 2. of $G'$. \tnote{this is missing}
 \end{proof}
