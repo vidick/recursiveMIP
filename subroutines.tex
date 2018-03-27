@@ -278,6 +278,7 @@ Thus we have
 \subsection{Input2 check}
 \label{sec:input_check}
 
+\hnote{Need to put in a small discussion about how we index qubits in registers.}
 
 \vspace{10pt}
 \begin{center}
@@ -358,12 +359,64 @@ Suppose now that the shared state in \textbf{Input Check} is $\rho_{0}$. Let $\w
 	\begin{itemize}
 		\item $H_{in} = \frac{1}{|\what{\sV}_{in}|} \sum_{i \in \what{\sV}_{in}} \ketbra{\overline{x}_i}{\overline{x}_i}_i$.
 		\item $H_{work} = \frac{1}{|\what{\sX}|} \sum_{i \in \what{\sX}} \ketbra{1}{1}_i$
-		\item $H_{epr1} = \frac{1}{2|\what{\sE}_1|} \sum_{(i,j) \in \what{\sE}_1} \frac{1}{2} \Paren{ \Id - X_{1ij} \otimes X^{(i)}_{1j}} + \frac{1}{2} \Paren{ \Id - Z_{1ij} \otimes Z^{(i)}_{1j}}$
-		\item $H_{epr2} = \frac{1}{2|\what{\sE}_2|} \sum_{(i,j) \in \what{\sE}_2} \frac{1}{2} \Paren{ \Id - X_{2ij} \otimes X^{(i)}_{2j}} + \frac{1}{2} \Paren{ \Id - Z_{1ij} \otimes Z^{(i)}_{2j}}$
+		\item $H_{epr1} = \frac{1}{2|\what{\sE}_1|} \sum_{(i,j) \in \what{\sE}_1} \frac{1}{2} \Paren{ \Id - X_{1ij} \otimes \wt{X}^{(i)}_{1j}} + \frac{1}{2} \Paren{ \Id - Z_{1ij} \otimes \wt{Z}^{(i)}_{1j}}$
+		\item $H_{epr2} = \frac{1}{2|\what{\sE}_2|} \sum_{(i,j) \in \what{\sE}_2} \frac{1}{2} \Paren{ \Id - X_{2ij} \otimes \wt{X}^{(i)}_{2j}} + \frac{1}{2} \Paren{ \Id - Z_{1ij} \otimes \wt{Z}^{(i)}_{2j}}$
 	\end{itemize}
-	We use $\overline{x}_i$ to denote the complement of the bit $x_i$. The subscripts on a projector (such as $\ketbra{1}{1}_i$) indicates which qubit it acts on. We use $|\sX|$ to denote the number of qubits in $\sX$. The operators $X_{kij},Z_{kij}$ for denote the (honest) single qubit Pauli observables that $PV$ uses to measure the $j$'th qubit of the register $\what{\sE}_{k,i}$. The operators $X^{(i)}_{kj}$ (resp. $Z^{(i)}_{kj}$) denotes the observables (which are not necessarily the honest Pauli observables) used by prover $PP_i$ when given question $X_{kj}$ (resp. $Z_{kj}$). These observables act on the prover space $\sP_i$, respectively.
+	We use $\overline{x}_i$ to denote the complement of the bit $x_i$. The subscripts on a projector (such as $\ketbra{1}{1}_i$) indicates which qubit it acts on. We use $|\sR|$ to denote the number of qubits in a register $\sR$. The operators $X_{kij},Z_{kij}$ for denote the (honest) single qubit Pauli observables that $PV$ uses to measure the $j$'th qubit of the register $\what{\sE}_{k,i}$. The operators $\wt{X}^{(i)}_{kj}$ (resp. $\wt{Z}^{(i)}_{kj}$) denotes the observables (which are not necessarily the honest Pauli observables) used by prover $PP_i$ when given question $X_{kj}$ (resp. $Z_{kj}$). These observables act on the prover space $\sP_i$, respectively.
 
-\hnote{Continue...}
+The fact that $\Tr_{\rho_0} ( H_{in} + H_{work}) \leq 4 \eps'$, combined with 
+Observe that the operator $H_{in} + H_{work}$ is positive semidefinite and has eigenvalue $0$, and has spectral gap $\Delta = 1/\poly(N)$. Furthermore, the eigenvectors of $H_{in} + H_{work}$ with eigenvalue $0$ are all states $\ket{\theta}_{\sP \sR}$ where the $\ket{\sV}_{in}$ register is in the state $\ket{G,r,0}$ and the $\ket{\sX}$ register is in the all zeroes state. Using Lemma~\ref{lem:closeness_to_groundspace}, we conclude that $\ket{\psi_0}$ is $\poly[N;\eps]$-close to a state $\ket{\psi'_0}$ that is a ground state of $H_{in} + H_{work}$. Let $\rho_0' = \ketbra{\psi_0'}{\psi_0'}$. We have that 
+\begin{equation}
+\label{eq:input_check_epr_hamiltonian}
+	\Tr_{\rho_0'} (H_{epr1} + H_{epr2}) \leq \poly[N;\eps].
+\end{equation}
+We appeal to the next Lemma to show that the $\what{\sE}_j \what{\sE}_j'$ registers of $\rho_0'$ must be, up to local isometries, close to a maximally entangled state.
+
+\begin{lemma}
+\label{lem:partial_epr_rigidity}
+	Let $X_1,\ldots,X_n$ and $Z_1,\ldots,Z_n$ be single-qubit Pauli observables acting on $(\C^2)^{\otimes n})$ where $X_i,Z_i$ act on the $i$-th qubit. Let $\wt{X}_1,\ldots,\wt{X}_n$ and $\wt{Z}_1,\ldots,\wt{Z}_n$ be arbitrary observables acting on a Hilbert space $\Hilb$. Let $\ket{\psi}$ be a state on $(\C^2)^{\otimes n}) \otimes \Hilb$ satisfying
+	\begin{equation}
+	\label{eq:approx_cons}
+		\bra{\psi} \Paren{ X_i \otimes \wt{X}_i  + Z_i \otimes \wt{Z}_i} \ket{\psi} \geq 1 - \delta
+	\end{equation}
+	for all $i = 1,\ldots,n$. Then there exists an isometry $V: \Hilb \to (\C^2)^{\otimes n} \otimes \cA$ such that for all $i$
+	\[
+		\Norm{ V \wt{X}_i \ket{\psi} - X_i' V \ket{\psi} }_2^2 \leq \poly[n; \delta] 	\qquad  	\Norm{ V \wt{Z}_i \ket{\psi} - Z_i' V \ket{\psi} }_2^2 \leq \poly[n; \delta]
+	\]
+	where $X_i'$ and $Z_i'$ are single-qubit Pauli observables acting on the $i$'th qubit of the space in the range of the isometry $V$. Furthermore, 
+	\[
+		\Norm{ V \ket{\psi} - \ket{\Phi_n} \otimes \ket{\theta}_{\cA} }_2^2 \leq \poly[n;\delta]
+	\]
+	where $\ket{\Phi_n}$ is the maximally entangled state on $n$ qubits and $\ket{\theta}_{\cA}$ is some state.
+\end{lemma}
+\begin{proof}
+For every $a,b\in\{0,1\}^n$, define $\wt{X}(a) = \prod_{i} \wt{X}_i^{a_i}$ and $\wt{Z}(b) = \prod_i \wt{Z}_i^{b_i}$. We argue that there exists a $\delta' = \poly[n;\delta]$ such that
+\begin{equation}
+\label{eq:pauli_braiding}
+	\wt{X}(a) \wt{Z}(b) \ket{\psi} \approx_{\delta'} (-1)^{a \cdot b} \wt{Z}(b) \wt{X}(a) \ket{\psi}.
+\end{equation}
+Let $X(a), Z(b)$ be the analogous operators. From~\eqref{eq:approx_cons}, we have that for all $a,b$
+\[
+	X(a) \otimes \wt{X}(a) \ket{\psi} \approx_{n \delta} \ket{\psi} \qquad Z(b) \otimes \wt{Z}(b) \ket{\psi} \approx_{n \delta} \ket{\psi}.
+\]
+Thus 
+\[
+	-Z(b)X(a) \otimes \wt{X}(a) \wt{Z}(b) \ket{\psi} = X(a) Z(b) \otimes \wt{X}(a) \wt{Z}(b) \ket{\psi} \approx_{2n \delta} \ket{\psi}.
+\]
+In other words, $-Z(b) X(a) \ket{\psi} \approx_{2n \delta} \wt{X}(a) \wt{Z}(b) \ket{\psi}$. On the other hand, $-Z(b) X(a) \ket{\psi} \approx_{2n \delta} -\wt{Z}(b) \wt{X}(a) \ket{\psi}$. This establishes~\eqref{eq:pauli_braiding} for $\delta' = 4n\delta$. 
+
+Similar arguments establish that for all $a,a',b,b' \in \{0,1\}^n$, we have the linearity relations 
+\[
+	\wt{X}(a) \wt{X}(a') \ket{\psi} \approx_{\delta'} \wt{X}(a \oplus a') \ket{\psi} \qquad \wt{Z}(b) \wt{Z}(b') \ket{\psi} \approx_{\delta'} \wt{Z}(b \oplus b')\ket{\psi}.
+\]
+By the Gowers-Hatami theorem~\cite{}, this implies the conclusions of the Claim.
+\end{proof}
+
+The inequality~\eqref{eq:input_check_epr_hamiltonian} along with Lemma~\ref{lem:partial_epr_rigidity} implies that for all $i \in \{1,\ldots,\kappa_{r-1}\}$, there exist isometries $V_i$ acting on $PP_i$'s private space $\sP_{PP_i}$ such that 
+\[
+	\Norm{ V_1 \otimes \cdots \otimes V_{\kappa{r-1}} \ket{\psi_0}_{\sP \sR} - \ket{\Phi}_{\what{\sE}_1 \what{\sE}_1'} \otimes \ket{\Phi}_{\what{\sE}_2 \what{\sE}_2'} \otimes \ket{\theta}_{\sY \sR}} \leq \poly[N;\eps]
+\]
+where $\sY$ is the set of qubits in $\sP$ outside of $\what{\sE}_1 \what{\sE}_1' \what{\sE}_2 \what{\sE}_2'$. Furthermore, the $\what{\sV}_{in} \what{\sX}$ registers of $\ket{\theta}$ are in the state $\ket{G,r,0}_{\what{\sV}_{in}} \otimes \ket{0}_{\what{\sX}}$. This concludes the proof.
 	
 %	Let $H_{init} = H_{in} + H_{work} + H_{epr1} + H_{epr2}$. Furthermore, each of the terms of $H_{init}$ act on different qubits 
 %	
