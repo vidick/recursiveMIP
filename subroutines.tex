@@ -95,27 +95,6 @@ Suppose that the protocol of $UPC_{N,r-1}$ involves a set $\cP_{r-1}$ of $\kappa
 \end{itemize}
 We use the label $P$ to refer to an arbitrary prover $P\in\cH_r$. Questions to and answers from the provers are denoted  by $q_V$, $q_{P,1},\ldots,q_{P,\kappa_{r-1}}$, and $a_V$, $a_{P,1},\ldots,a_{P,\kappa_{r-1}}$, respectively, where the subscript indicates the label of the prover. Furthermore, the provers' private registers are labeled $\sP_V, \sP_{P,1},\ldots,\sP_{P,\kappa_{r-1}}$ where the subscripts have the same meaning.
 
-%The subroutines all take the same input $(1^n,w,G,V,M,r)$. $w$ is a string that is used to make all random choices. $r$ is an integer that indicates a ``level'' for the verifier. It is used to parametrize a set $\mathcal{P}_r$ of $\kappa_R$ provers, each playing different roles. 
-
-%The subroutines describe tests that are to be performed by the verifier in the protocol $UPC_{n,r}$. We call this the $r$-th level verifier. The tests are meant to enforce that the provers hold a history state for the simcom protocol described by $UPC_{N,r-1}$ where $N = 2^n$. 
-%that would be carried out by the $(r-1)$-th level verifier and the set of provers $\mathcal{P}_{r-1} \subseteq \mathcal{P}_r$. 
-
-%The provers in the set $\mathcal{P}_r$ have the following labels and associated roles:
-%\begin{itemize}
-%	\item $PV$: This prover plays the role of the verifier in the simcom game described by $UPC_{N,r-1}$. In this first stage of the analysis, we assume $PV$ is an honest Pauli prover.
-%	\item $PP_1,\ldots,PP_{\kappa_{r-1}}$: These provers play the role of the $\kappa_{r-1}$ provers $\mathcal{P}_{r-1}$ that the $(r-1)$-th level verifier interacts with.
-%%	\item $PA$: This is an ancilla prover
-%%	\item $PA_1,\ldots,PA_{\kappa_{r-1}}$: These are ancilla provers.
-%\end{itemize}
-%We match the ancilla provers with the other provers in $\mathcal{P}_r$ in the following way: the ancilla prover corresponding to $PV$ is $PA_V$, and the ancilla prover corresponding to $PP_i$ is $PA_i$ for all $i$. 
-%We let $\mathcal{R}_r$ denote the set $\{PV,PP_1,\ldots,PP_{\kappa_{r-1}} \} \subset \mathcal{P}_r$ to denote the set of non-ancilla provers. 
-%We order the provers in $\mathcal{P}_r$ for notational convenience: $PV < PP_1 < \cdots < PP_{\kappa_{r-1}}$. 
-
-
-%In what follows, we use the standard notation $\sC,\sV_{in},\sV_{work}, \sK_1, \sE_j$, etc., to refer to registers that $UPC_{n,r}$ acts on. To refer to registers that are involved in the $(r-1)$-th level interaction as described by $UPC_{N,r-1}$, we use the hat symbol, such as $\what{\sC}$, $\what{\sV}_{in},\what{\sV}_{work}$, and $\{ \what{\sM}_i \}_i$.
-
-% we use the notation $\sC,\sV_{in},\sV_{work}$, and $\sM_i$ introduced in Section~\ref{sec:specs} to refer to registers on which the verifier in $UPC_{n,r}$ acts on. In addition, we write $\what{\sC}$, $\what{\sV}_{in},\what{\sV}_{work}$, and $\{ \what{\sM}_i \}_i$ to denote the registers that $UPC_{N,r-1}$ acts on. We let $\what{\sM}$ denote the union of $\{ \what{\sM}_i \}_i$. 
-
 
 
 \paragraph{Honest Pauli strategy} 
@@ -133,50 +112,6 @@ Recall that the state $\rho$ is on $\alpha_r + 1$ registers: the $r$-th level ve
 
 \medskip
 Next, we present the three subroutines of the VTM $\cV_H$, and prove rigidity results for each of the subroutines. Each subroutine is presented as a standalone protocol, where we implicitly understand the subroutine as a VTM (with fixed parameters $(n,r,G)$) that specifies a verifier. 
-%
-%\subsection{Propagation Check}
-%
-%\begin{center}
-%\begin{mdframed}
-%    Input: $(T,P,\reg{C},\{g_1,\ldots,g_T\})$, where $T$ is an integer, $P$ is the label for a prover, $\reg{C}$ the label for a clock register,  $g_1,\ldots,g_T$ question symbols. 
-%	\begin{enumerate}
-%		\item (\textbf{ClockMeasurement}) Select a uniformly random integer $t\in\{1,\ldots,T\}$. Write on the measurement specification tape a description for the circuit $C_M$ that implements the following measurement on clock register $\reg{C}$: 
-%\[
-%	\{ 	\Pi^0 = \ketbra{+_t}{+_t}, 
-%	\Pi^1 = \ketbra{-_t}{-_t}, 
-%	\Pi^2 = \Id - \Pi^0 - \Pi^1 \}\;.
-%\]	
-%Let $s\in \{0,1,2\}$ denote the result of the measurement.
-%	\item (\textbf{GenQuestions}) Set $q_P = g_t$.
-%		\item (\textbf{CheckAnswers}) If $s = 2$, then accept. Otherwise, accept if and only if $a_P = s$. 
-%	\end{enumerate}    
-%\end{mdframed}
-%
-%\end{center}
-%\begin{figure}[H]
-%\caption{Propagation Check}
-%\label{fig:prop_check_0}
-%\end{figure}
-%
-%
-%
-%
-%\paragraph{Honest Propagation Check strategy} An honest Propagation Check strategy is one in which the shared state is a history state of the computation $G_T\cdots G_1$, where $G_i$ is the binary observable measured by the prover on question $g_i$. In other words, it has the following form:
-%\[
-%	\frac{1}{\sqrt{T}} \sum_{t = 0}^{T} \ket{t}_{\reg{C}} \otimes G_t\cdots G_1 \ket{\psi_0}_{\sP}\;,
-%\]
-%for some state $\ket{\psi_0}_{\sP}$.
-%
-%\begin{lemma}	
-%\label{lem:prop_check_0}
-%\leavevmode
-%\begin{enumerate}
-%\item (\textbf{Completeness}) An honest Propagation strategy passes the $\textbf{Propagation Check}$ subprotocol with probability $1$. 
-%\item (\textbf{Soundness}) Any strategy that passes the $\textbf{Propagation Check}$ subprotocol with probability at least $1 - \eps$ is $\delta$-close to an honest Propagation Check strategy, for some $\delta = \poly[N;\eps]$.
-%\end{enumerate}
-%\end{lemma}
-%
-
 
 
 
@@ -184,7 +119,6 @@ Next, we present the three subroutines of the VTM $\cV_H$, and prove rigidity re
 \subsection{Gate2 check}
 \label{sec:prop_check}
 
-%\tnote{I renamed this gate check because I wanted a more general ``propagation check''. But I did not edit the section}
 
 \vspace{10pt}
 \begin{center}
@@ -198,27 +132,10 @@ Next, we present the three subroutines of the VTM $\cV_H$, and prove rigidity re
 	\Pi^2 = \Id - \Pi^0 - \Pi^1 \}\;.
 \]	
 Let $s \in \{0,1,2\}$ denote the result of the measurement. If $s = 2$, accept.
-%		\item (\textbf{ClockMeasurement}) Select a uniformly random integer $t\in\{1,\ldots, \tau(N)\}$, where $N = 2^n$. Write on the measurement specification tape a description for the circuit $C_M$ that implements the following measurement, which is a tensor product of a two-outcome POVM $F$ acting on clock register $\reg{C}_p$ and a three outcome POVM $\Pi_t$ acting on clock register $\reg{C}_{mip}$: 
-%\[
-%	\{F^0 = \ketbra{0}{0}, F^1 = \Id - F^0 \}\;,
-%\]
-%\[
-%	\{ 	\Pi^0 = \ketbra{+_t}{+_t}, 
-%	\Pi^1 = \ketbra{-_t}{-_t}, 
-%	\Pi^2 = \Id - \Pi^0 - \Pi^1 \}\;.
-%\]	
-%Let $(p,s) \in \{0,1\} \times \{0,1,2\}$ denote the result of the six-outcome measurement $F \otimes \Pi_t$.
-
 	\item Execute the GTM $G$ to compute $g = G(N,r-1,t)$. 
 	\item If $g$ is a Toffoli gate or doubled Hadamard gate, then run the \textbf{Toffoli Check} or \textbf{Hadamard Check} with $PV$, respectively. 
 	\item If $g$ is a prover question to prover $P$, then set $q_P = \star$. Accept only if the answer $a_P = s$.
-%	
-%	
-%	\item (\textbf{CheckAnswers}) If $s = 2$, then accept. Otherwise:
-%		\begin{itemize}
-%			\item If $g$ is a Toffoli gate or doubled Hadamard gate, check the answers according to \textbf{Toffoli Check} or \textbf{Hamadard Check}, respectively. 
-%			\item If $g$ is a prover question to prover $P$, then accept only if $a_P = s$. 
-%		\end{itemize}
+
 	\end{enumerate}    
 \end{mdframed}
 
@@ -432,38 +349,40 @@ Let $\Pi = \ketbra{0}{0}_{\sC}$. These two items imply that $\Tr_\rho (\Pi) \geq
 \]
 The probability that \textbf{Input Check} rejects when the shared state is $\rho_{0}$ instead of $\rho$ is at most $\eps' = \poly(N) \eps$. 
 
-Suppose now that the shared state in \textbf{Input Check} is $\rho_{0}$. \hnote{Need to update this proof...}
+Suppose now that the shared state in \textbf{Input Check} is $\rho_{0}$. Let $\what{\sX} = \what{\sO} \what{\sV}_{work} \what{\sM} \what{\sK}_1 \what{\sK}_2$. The probability of rejection is then
+	\begin{equation}
+		\Tr_{\rho_{0}} \Paren{ \frac{1}{4}H_{in} + \frac{1}{4}H_{work} + \frac{1}{4} H_{epr1} + \frac{1}{4} H_{epr2} } \leq \eps'
+		\label{eq:init}
+	\end{equation}
+	where we define 
+	\begin{itemize}
+		\item $H_{in} = \frac{1}{|\what{\sV}_{in}|} \sum_{i \in \what{\sV}_{in}} \ketbra{\overline{x}_i}{\overline{x}_i}_i$.
+		\item $H_{work} = \frac{1}{|\what{\sX}|} \sum_{i \in \what{\sX}} \ketbra{1}{1}_i$
+		\item $H_{epr1} = \frac{1}{2|\what{\sE}_1|} \sum_{(i,j) \in \what{\sE}_1} \frac{1}{2} \Paren{ \Id - X_{1ij} \otimes X^{(i)}_{1j}} + \frac{1}{2} \Paren{ \Id - Z_{1ij} \otimes Z^{(i)}_{1j}}$
+		\item $H_{epr2} = \frac{1}{2|\what{\sE}_2|} \sum_{(i,j) \in \what{\sE}_2} \frac{1}{2} \Paren{ \Id - X_{2ij} \otimes X^{(i)}_{2j}} + \frac{1}{2} \Paren{ \Id - Z_{1ij} \otimes Z^{(i)}_{2j}}$
+	\end{itemize}
+	We use $\overline{x}_i$ to denote the complement of the bit $x_i$. The subscripts on a projector (such as $\ketbra{1}{1}_i$) indicates which qubit it acts on. We use $|\sX|$ to denote the number of qubits in $\sX$. The operators $X_{kij},Z_{kij}$ for denote the (honest) single qubit Pauli observables that $PV$ uses to measure the $j$'th qubit of the register $\what{\sE}_{k,i}$. The operators $X^{(i)}_{kj}$ (resp. $Z^{(i)}_{kj}$) denotes the observables (which are not necessarily the honest Pauli observables) used by prover $PP_i$ when given question $X_{kj}$ (resp. $Z_{kj}$). These observables act on the prover space $\sP_i$, respectively.
 
-%Let $\sX = \sV_{r-1} \setminus \sC_{r-1}$ (i.e. all the qubits of $\sV_{r-1}$ except those in $\sC_{r-1}$) and $\sY = \sP \sR \setminus \sX$ (i.e. all the qubits of $\sP \sR$ except those in $\sX$). Consider an ordering of the qubits in the registers $\sX$  so that $\sV_{r-1,in}$ goes first, followed by the rest of the registers. Let $x$ denote the string of length $|\sV_{r-1,in}|$ that is $(G,V,M)$ padded with zeroes. The probability of rejection is then
-%	\begin{equation}
-%		\Tr_{\rho_{00}} ( H_{init} ) \leq \eps'
-%		\label{eq:init}
-%	\end{equation}
-%	where we define 
-%	\[
-%		H_{init} = \frac{1}{\left | \sX \right|} \left ( \sum_{i \in \sV_{r-1,in}} \ketbra{\overline{x}_i}{\overline{x}_i}_i +  \sum_{i \notin \sV_{r-1,in}} \ketbra{1}{1}_i \right)
-%	\] 
-%	where the first sum is over all the qubits in $\sV_{r-1,in}$ and the second sum is over all qubits in $\sX \setminus \sV_{r-1,in}$. We use $\overline{x}_i$ to denote the complement of the bit $x_i$. The subscripts on a projector (such as $\ketbra{1}{1}_i$) indicates which qubit it acts on. We use $|\sX|$ to denote the number of qubits in $\sX$. 
+\hnote{Continue...}
+	
+%	Let $H_{init} = H_{in} + H_{work} + H_{epr1} + H_{epr2}$. Furthermore, each of the terms of $H_{init}$ act on different qubits 
 %	
-%	Notice that $H_{init}$ resembles the term of the Feynman-Kitaev Hamiltonian that checks if the history state is initialized correctly. The unique eigenvector of eigenvalue $0$ of $H_{init}$ (on the register $\sA$) is the state $\ket{G,V,M,0}$. The inequality in~\eqref{eq:init} and Lemma~\ref{lem:closeness_to_groundspace} implies that
+%	The spectral gap $\Delta$ of $H_{init}$ is $1/\poly(N)$; therefore there exist
+%	
+%	The unique eigenvector of eigenvalue $0$ of $H_{init}$ (on the register $\sA$) is the state $\ket{G,V,M,0}$. The inequality in~\eqref{eq:init} and Lemma~\ref{lem:closeness_to_groundspace} implies that
 %	\[
 %		\Norm{ \ket{\psi_0}_{\sP \sR} - \ket{G,V,M,0}_{\sX} \otimes \ket{\theta}_{\sY} }^2 \leq \poly[N;\eps]
 %	\]
 %	for some state $\ket{\theta}_{\sY}$.
-%	
-%	Thus we can construct a new honest Gate strategy $\strat'$ where the prover operators are the same as in $\strat$, and the shared state $\ket{\psi'}_{\sC \sP \sR}$ is such that $\Pi \ket{\psi'} = \ket{0,0}_{\sC} \otimes \ket{G,V,M,0}_{\sX} \otimes \ket{\theta}_{\sY}$, and otherwise has the form of an honest Gate strategy. We have that $\| \ket{\psi} - \ket{\psi'} \|^2 \leq \poly[N;\eps]$, so therefore $\strat'$ is $\poly[N;\eps]$-close to $\strat$, and furthermore $\strat'$ is an honest Input Check strategy. This concludes the proof.
 	
-%	$\Big( \rho_{00} \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ is $\poly(N) \eps'$-close to $\ketbra{G,V,M,0}{G,V,M,0}$. This finishes the proof.
-
-	
-%Let $\Big( \rho_0 \Big)_{\sV_{r-1} \setminus \{ \sC_{r-1} \}}$ denote the reduced density matrix of $\rho_{00}$ on the registers $\sV_{r-1} \setminus \{ \sC_{r-1} \}$. 
-
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%		OUTPUT CHECK		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Output2 check}
 \label{sec:output_check}
 
+
+Assume without loss of generality that $\cA_1 = \cA_2 = \cdots = \cA_{\kappa_{r-1}}$. Let $\ell = 2 \log |\cA_1|$.  Note that $\ell$ is twice the answer length.
 
 \vspace{10pt}
 \begin{center}
@@ -475,10 +394,8 @@ Suppose now that the shared state in \textbf{Input Check} is $\rho_{0}$. \hnote{
 		\item Let $j_O$ and $j_{out}$ be the indices of the qubits of the $\what{\sO}$ and $\what{\sV}_{out}$ registers, respectively. For $i \in \{1,\ldots,\kappa_{r-1}\}$, let $j_{i,1},\ldots,j_{i,h}$ denote the indices of the qubits in the $\what{\sK}_{2,i}$ register. 
 		\item Set $q_V = (Z_{j_O},Z_{j_{out}},Z_{j_{1,1}},\ldots,Z_{j_{\kappa_{r-1},h}})$. In other words, ask $PV$ to measure its registers $\what{\sO} \what{\sV}_{out} \what{\sK}_2$ in the computational basis. 
 		\item For $i \in \{1,\ldots,\kappa_{r-1}\}$, set $q_{PP_i} = \Diamondblack$. 
-		\item Let $a_V = (o,b,k_1,\ldots,k_{\kappa_{r-1}})$ where $k_i \in \{0,1\}^{2\log |\cA_i|}$. Let $a_{PP_i} = k_i'$. 
-		\item If $o = 0$, then accept.
-		\item If there exists an $i$ such that $k_i \neq k_i'$, then accept.
-		\item If $b = 1$, then accept. Otherwise, reject. 
+		\item Let $a_V = (o,b,k_1,\ldots,k_{\kappa_{r-1}})$ where $k_i \in \{0,1\}^{\ell}$. Let $a_{PP_i} = k_i'$. 
+		\item If $o = 1$ and $k_i = k_i'$ for all $i$ and $b = 0$, then reject. Otherwise, accept.
 	\end{enumerate}    
 \end{mdframed}
 \end{center}
@@ -512,8 +429,38 @@ Let $\omega_{N,r-1}^{SC}$ denote the maximum acceptance probability of the simco
 The Completeness part of the Theorem statement follows from the fact that one can construct an honest Input Check strategy that corresponds to provers using the perfect strategy that achieves $\omega_{N,r-1} = 1$.
 
 We now argue the Soundness part of the Theorem statement. Let $\ket{\psi}_{\sC \sP \sR}$ denote the shared state. Let the rejection probability with this shared state be $\eps$. 
-\hnote{Update...}
 
+Since the strategy is an honest Input Check strategy, the shared state is a history state of the protocol circuit $UPC_{N,r-1}$
+\[
+\frac{1}{\sqrt{\tau(N) + 1}} \sum_{t = 0}^{\tau(N)} \ket{t}_{\sC} \otimes \ket{\psi_t}_{\sP \sR}
+\]
+with the initial snapshot state $\ket{\psi_0}$ representing a valid initial state of the simcom game represented by $UPC_{N,r-1}$, which we denote by $\mathscr{Z}(UPC_{N,r-1})$. Furthermore, the history state will implicitly define a strategy $\strat = (\rho,\{P_i\})$ for $\mathscr{Z}(UPC_{N,r-1})$: the initial snapshot $\ket{\psi_0}$ will specify what $\rho$ is, and $i$-th prover's reflections $P_i$ can be extracted from the snapshot corresponding to the query to prover $i$.
+
+Let $\sigma = \ketbra{\psi}{\psi}$. Let $\Pi = \ketbra{\tau(N)}{\tau(N)}_{\sC}$. We have that $\Tr_\sigma (\Pi) \geq 1/\poly(N)$. Let
+\[
+\sigma_{f} = \frac{\Pi \sigma \Pi}{\Tr_\sigma (\Pi)}.
+\]
+The probability that \textbf{Output Check} rejects when the shared state $\sigma_f$ is at most $\eps' = \poly(N) \eps$. 
+
+For each $i \in \{1,\ldots,\kappa_{r-1} \}$, let $\{ K_i^{k_i} \}$ denote the projective measurement that $PP_i$ uses on question $\Diamondblack$ to produce an outcome $k_i \in \{0,1\}^\ell$. For each $i$, let $U_i$ be a unitary acting on $\sP_i$ such that $K_i^{k_i} = U_i (\ketbra{k_i}{k_i} \otimes \Id)U_i^\dagger$ for all $k_i \in \{0,1\}^\ell$. Let $U = U_1 \otimes \cdots \otimes U_{\kappa_{r-1}}$.
+
+The rejection probability when the shared state is $\sigma_f$ can also be written as $\Tr_{\sigma_f} \left ( U\Pi_{rej}U^\dagger \right)$ where
+\begin{align*}
+	\Pi_{rej} &= \ketbra{1}{1}_{\what{\sO}} \otimes \ketbra{0}{0}_{\what{\sV}_{out}} \otimes \sum_k \ketbra{kk}{kk}_{\what{\sK}_2 \what{\sK}_2'}
+\end{align*}
+where the summation of $k$ runs over $(\{0,1\}^\ell)^{\kappa_{r-1}}$.
+
+Notice that the quantity $\Tr_{\sigma_f}(U \Pi_{rej} U^\dagger) = \Tr_{U^\dagger \sigma_f U} (\Pi_{rej})$ is the rejection probability of the simcom game $\mathscr{Z}(UPC_{N,r-1})$ with a modified strategy $\strat' = (\rho',\{P_i'\})$, where $\rho' = \rho$ but $P_i' = U_i P_i$. 
+
+Thus 
+\[
+	\eps' \geq \Tr_{U^\dagger \sigma_f U} (\Pi_{rej}) \geq 1 - \omega^{SC}_{N,r-1}.
+\]
+or equivalently
+\[
+	1 - \eps \leq 1 - \frac{1 - \omega^{SC}_{N,r-1}}{\poly(N)}
+\]
+which concludes the proof.
 \end{proof}
 
 
